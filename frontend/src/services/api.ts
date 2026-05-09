@@ -1,0 +1,148 @@
+/**
+ * ============================================================
+ * FILE: src/services/api.ts
+ * PURPOSE: Configures the Axios HTTP client for all API calls.
+ *          - Sets base URL from environment variable
+ *          - Attaches access token from Redux store to every request
+ *          - Handles 401 errors by attempting token refresh
+ *          - Applies consistent error handling and response format
+ *
+ * WHY A SHARED AXIOS INSTANCE?
+ * - Avoids repeating base URL and headers in every service file
+ * - Single place to modify auth headers, timeouts, and interceptors
+ * - Centralized token refresh logic (no duplication)
+ *
+ * INTERCEPTOR FLOW:
+ *  Request  → Attach Authorization: Bearer <accessToken> header
+ *  Response → On 401: try refreshing token → retry original request
+ *             On other errors: pass to caller
+ *
+ * USAGE:
+ *   import api from '@/services/api';
+ *   const products = await api.get('/products');
+ * ============================================================
+ */
+
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+
+/**
+ * Base Axios instance with SG Fire backend URL.
+ * NEXT_PUBLIC_ prefix makes this accessible in browser (Next.js convention).
+ */
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+
+  // Include cookies (HTTP-only JWT cookies) in cross-origin requests
+  withCredentials: true,
+
+  // Request timeout: fail if server doesn't respond within 15 seconds
+  timeout: 15000,
+
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// ─────────────────────────────────────────────
+// REQUEST INTERCEPTOR
+// Runs BEFORE every outgoing request.
+// ─────────────────────────────────────────────
+
+/**
+ * Attaches the access token to the Authorization header if available.
+ * The access token is stored in Redux state (not localStorage — more secure).
+ * HTTP-only cookies handle the actual auth — this header is for API clients.
+ */
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Get access token from Redux store via a module-level reference
+    // (This works because Redux store is a singleton)
+    const token =
+      typeof window !== 'undefined'
+        ? (window as any).__REDUX_STORE__?.getState()?.auth?.accessToken
+        : null;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ─────────────────────────────────────────────
+// RESPONSE INTERCEPTOR
+// Runs AFTER every incoming response.
+// ─────────────────────────────────────────────
+
+/** Track if a token refresh is currently in progress to prevent multiple concurrent refreshes */
+let isRefreshing = false;
+
+/** Queue of failed requests waiting for the token to refresh */
+let failedQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
+
+/** Process all queued requests after token refresh completes or fails */
+const processQueue = (error: AxiosError | null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(undefined);
+    }
+  });
+  failedQueue = [];
+};
+
+api.interceptors.response.use(
+  // Success: pass the response straight through
+  (response) => response,
+
+  // Error handler
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
+    // ── Handle 401 Unauthorized ──────────────────────────
+    // This means the access token has expired.
+    // Attempt to refresh it silently using the refresh token cookie.
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Another refresh is already in progress — queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(() => api(originalRequest));
+      }
+
+      originalRequest._retry = true; // Mark request to prevent infinite retry loop
+      isRefreshing = true;
+
+      try {
+        // Call refresh endpoint — sends the HTTP-only refresh token cookie automatically
+        await api.post('/auth/refresh-token');
+
+        processQueue(null); // Resume all queued requests
+        return api(originalRequest); // Retry the original failed request
+      } catch (refreshError) {
+        processQueue(refreshError as AxiosError);
+
+        // Refresh also failed — user needs to log in again
+        // Redirect to login page if in browser
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth/login';
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;

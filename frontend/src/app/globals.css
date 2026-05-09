@@ -1,0 +1,362 @@
+/**
+ * ============================================================
+ * FILE: src/app/globals.css
+ * PURPOSE: Global CSS styles for the SG Fire application.
+ *          Defines:
+ *          - Tailwind CSS directives
+ *          - CSS custom properties (design tokens)
+ *          - Dark mode color overrides
+ *          - Custom scrollbar styling
+ *          - Utility classes for reuse
+ *          - Animation keyframes
+ *          - Typography defaults
+ * ============================================================
+ */
+
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   CSS CUSTOM PROPERTIES (Design Tokens)
+   Define all brand colors, gradients, shadows here.
+   Using CSS variables allows runtime dark/light switching.
+───────────────────────────────────────────── */
+:root {
+  /* Primary brand colors — SG Fire red */
+  --color-primary: #dc2626;        /* Primary red */
+  --color-primary-dark: #b91c1c;   /* Darker red for hover states */
+  --color-primary-light: #ef4444;  /* Lighter red for accents */
+
+  /* Accent colors */
+  --color-accent: #ea580c;         /* Fire orange */
+  --color-accent-light: #fb923c;   /* Light orange for gradients */
+
+  /* Background colors */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+
+  /* Text colors */
+  --color-text: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #9ca3af;
+
+  /* Border colors */
+  --color-border: #e5e7eb;
+
+  /* Premium gradient — used on hero section, buttons */
+  --gradient-fire: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #f97316 100%);
+  --gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+  --shadow-fire: 0 4px 30px rgba(220, 38, 38, 0.3);  /* Glowing red shadow */
+
+  /* Font families (from Google Fonts via Next.js) */
+  --font-inter: 'Inter', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+
+  /* Transitions */
+  --transition-base: all 0.2s ease;
+  --transition-slow: all 0.4s ease;
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --color-bg: #0a0a0a;
+  --color-bg-secondary: #111111;
+  --color-bg-tertiary: #1a1a1a;
+  --color-text: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #6b7280;
+  --color-border: #2d2d2d;
+}
+
+/* ─────────────────────────────────────────────
+   BASE ELEMENT STYLES
+───────────────────────────────────────────── */
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default margin/padding */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-inter);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Headings use Outfit font for premium feel */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Images: prevent layout shift */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ─────────────────────────────────────────────
+   CUSTOM SCROLLBAR
+   Styled to match the SG Fire brand colors.
+───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATION KEYFRAMES
+───────────────────────────────────────────── */
+
+/* Fade in from below — used for page section entrance animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation for fire/emergency indicators */
+@keyframes firePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0);
+  }
+}
+
+/* Shimmer animation for skeleton loaders */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─────────────────────────────────────────────
+   UTILITY CLASSES
+───────────────────────────────────────────── */
+
+/* Section container — consistent max-width and padding */
+.container-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Section spacing */
+.section-padding {
+  padding: 5rem 0;
+}
+
+/* Premium gradient text — used for headings */
+.gradient-text {
+  background: var(--gradient-fire);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Fire gradient background */
+.bg-fire-gradient {
+  background: var(--gradient-fire);
+}
+
+/* Skeleton loader base style */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary) 25%,
+    var(--color-bg-tertiary) 50%,
+    var(--color-bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Focus ring — used for accessibility */
+.focus-ring {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Animate on scroll — add class via Framer Motion or Intersection Observer */
+.animate-fade-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Fire pulse indicator (for emergency/urgent items) */
+.fire-pulse {
+  animation: firePulse 2s infinite;
+}
+
+/* ─────────────────────────────────────────────
+   PRODUCT CARD STYLES
+───────────────────────────────────────────── */
+
+/* Badge styles for product cards */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-red { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
+.badge-green { background: rgba(22, 163, 74, 0.1); color: #16a34a; }
+.badge-orange { background: rgba(234, 88, 12, 0.1); color: #ea580c; }
+.badge-blue { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+
+/* ─────────────────────────────────────────────
+   FORM STYLES
+───────────────────────────────────────────── */
+
+/* Input field base style */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Form label */
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Form error message */
+.form-error {
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+/* ─────────────────────────────────────────────
+   BUTTON STYLES
+───────────────────────────────────────────── */
+
+/* Primary CTA button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--gradient-fire);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-fire);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary (outlined) button */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 2px solid var(--color-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* ─────────────────────────────────────────────
+   STAR RATING
+───────────────────────────────────────────── */
+.star-filled { color: #f59e0b; }
+.star-empty { color: #d1d5db; }
