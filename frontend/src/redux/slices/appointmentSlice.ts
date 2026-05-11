@@ -53,6 +53,23 @@ export const getMyAppointments = createAsyncThunk(
   }
 );
 
+// Book new appointment
+export const bookAppointment = createAsyncThunk(
+  'appointments/book',
+  async (formData: FormData, thunkAPI) => {
+    try {
+      // Use FormData for multipart/form-data (site images)
+      const response = await api.post('/appointments', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Admin: Approve
 export const approveAppointment = createAsyncThunk(
   'appointments/approve',

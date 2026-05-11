@@ -74,14 +74,20 @@ const appointmentSchema = new mongoose.Schema(
     serviceType: {
       type: String,
       required: [true, 'Service type is required'],
+      // Support both short codes and full display names
       enum: [
-        'installation',    // Install new fire safety equipment
-        'inspection',      // Annual fire safety inspection
-        'maintenance',     // Regular maintenance and refilling
-        'amc',             // Annual Maintenance Contract service
-        'emergency',       // Emergency fire safety service (priority)
-        'consultation',    // Professional fire safety assessment
-        'repair',          // Repair damaged fire safety equipment
+        'Fire Safety Audit',
+        'System Installation',
+        'AMC & Maintenance',
+        'Corporate Training',
+        'Emergency Consultation',
+        'installation',
+        'inspection',
+        'maintenance',
+        'amc',
+        'emergency',
+        'consultation',
+        'repair',
       ],
     },
 
@@ -103,17 +109,11 @@ const appointmentSchema = new mongoose.Schema(
     preferredTime: {
       type: String,
       required: [true, 'Preferred appointment time is required'],
-      enum: [
-        '09:00 AM - 11:00 AM',
-        '11:00 AM - 01:00 PM',
-        '01:00 PM - 03:00 PM',
-        '03:00 PM - 05:00 PM',
-        '05:00 PM - 07:00 PM',
-      ],
+      // Flexible time string (frontend provides free-text or range)
     },
 
     // ── Service Location ───────────────────────────────────
-    serviceAddress: { type: serviceAddressSchema, required: true },
+    serviceAddress: { type: String, required: true },
 
     // ── Additional Information ─────────────────────────────
     notes: {

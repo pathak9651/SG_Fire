@@ -23,7 +23,7 @@ import Appointment from '../models/Appointment.js';
 import User from '../models/User.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import sendEmail from '../utils/sendEmail.js';
-import { uploadToCloudinary } from '../middleware/upload.js';
+import { bufferToBase64 } from '../middleware/upload.js';
 
 // Helper: Generate appointment number (e.g., APT-20240115-K8P3)
 const generateAppointmentNumber = () => {
@@ -44,14 +44,12 @@ export const bookAppointment = asyncHandler(async (req, res) => {
     notes, relatedProducts, isEmergency,
   } = req.body;
 
-  // Upload any site images provided by the customer
-  let siteImages = [];
-  if (req.files && req.files.length > 0) {
-    const uploads = await Promise.all(
-      req.files.map((file) => uploadToCloudinary(file.buffer, 'sgfire/appointments'))
-    );
-    siteImages = uploads.map((u) => ({ url: u.url, public_id: u.public_id }));
-  }
+  // Convert site images to Base64 for MongoDB storage
+  const siteImages = req.files && req.files.length > 0
+    ? req.files.map((file) => ({
+        url: bufferToBase64(file),
+      }))
+    : [];
 
   const appointment = await Appointment.create({
     appointmentNumber: generateAppointmentNumber(),

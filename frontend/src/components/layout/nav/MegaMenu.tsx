@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Shield, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Flame, Shield, AlertTriangle, ArrowRight, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const CATEGORIES = [
@@ -96,6 +96,13 @@ export default function MegaMenu({ isOpen }: MegaMenuProps) {
                   <div className="flex items-center gap-3">
                     <AlertTriangle size={16} className="text-red-500" />
                     <span className="text-sm font-medium dark:text-gray-300 group-hover:text-red-600 transition-colors">Emergency Support</span>
+                  </div>
+                  <ArrowRight size={14} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link href="/appointments" className="flex items-center justify-between group">
+                  <div className="flex items-center gap-3">
+                    <Calendar size={16} className="text-red-500" />
+                    <span className="text-sm font-medium dark:text-gray-300 group-hover:text-red-600 transition-colors">Schedule Site Visit</span>
                   </div>
                   <ArrowRight size={14} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </Link>
