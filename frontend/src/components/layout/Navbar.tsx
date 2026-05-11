@@ -251,8 +251,13 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link href="/auth/login" className="btn-primary py-2 px-6 text-sm hidden sm:flex shadow-red-500/20">
-                Sign In
+              <Link href="/auth/login" className="flex items-center gap-2 group">
+                <div className="p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90 sm:hidden">
+                  <User size={20} />
+                </div>
+                <div className="btn-primary py-2 px-6 text-sm hidden sm:flex shadow-red-500/20">
+                  Sign In
+                </div>
               </Link>
             )}
 

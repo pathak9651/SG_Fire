@@ -67,6 +67,22 @@ const nextConfig: NextConfig = {
   // Highlights potential problems in development (runs effects twice)
   reactStrictMode: true,
 
+  // ── Redirects ──────────────────────────────────────────
+  async redirects() {
+    return [
+      {
+        source: '/login',
+        destination: '/auth/login',
+        permanent: true,
+      },
+      {
+        source: '/signup',
+        destination: '/auth/signup',
+        permanent: true,
+      },
+    ];
+  },
+
   // ── Compiler Options ──────────────────────────────────
   // Removes console.log in production builds (smaller bundle)
   compiler: {

@@ -209,15 +209,17 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     throw new ErrorResponse('Invalid session. Please login again.', 401);
   }
 
-  // Issue a new access token
-  const newAccessToken = generateAccessToken(user._id);
+  // Issue a new access token with role-based expiry
+  const isAdmin = user.role === 'admin';
+  const expiresIn = isAdmin ? 30 * 60 * 1000 : 5 * 60 * 1000; // 30m for admin, 5m for user
+  const newAccessToken = generateAccessToken(user._id, isAdmin ? '30m' : '5m');
 
   // Set new access token in cookie
   res.cookie('accessToken', newAccessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    sameSite: 'lax',
+    maxAge: expiresIn,
   });
 
   res.json({ success: true, accessToken: newAccessToken });

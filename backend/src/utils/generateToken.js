@@ -26,13 +26,14 @@ import jwt from 'jsonwebtoken';
  * Creates a short-lived JWT access token containing the user's ID.
  *
  * @param {string} userId - MongoDB ObjectId of the user
+ * @param {string} expiresIn - Expiry duration (e.g., '5m', '30m')
  * @returns {string} Signed JWT access token
  */
-export const generateAccessToken = (userId) => {
+export const generateAccessToken = (userId, expiresIn = '15m') => {
   return jwt.sign(
-    { id: userId },              // Payload: only store minimal data (user ID)
-    process.env.JWT_SECRET,       // Secret key from environment variables
-    { expiresIn: process.env.JWT_EXPIRE || '15m' } // Short expiry for security
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn }
   );
 };
 
@@ -40,62 +41,54 @@ export const generateAccessToken = (userId) => {
  * generateRefreshToken()
  * ----------------------
  * Creates a long-lived JWT refresh token.
- * Stored in HTTP-only cookie and used to issue new access tokens.
- *
- * @param {string} userId - MongoDB ObjectId of the user
- * @returns {string} Signed JWT refresh token
  */
 export const generateRefreshToken = (userId) => {
   return jwt.sign(
     { id: userId },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRE || '7d' }
+    { expiresIn: '7d' }
   );
 };
 
 /**
  * sendTokenResponse()
  * -------------------
- * Helper that creates tokens, sets HTTP-only cookies, and sends
- * a structured JSON response. Called at the end of login/register.
+ * Helper that creates tokens, sets HTTP-only cookies, and sends response.
  *
- * WHY HTTP-ONLY COOKIES?
- * - JavaScript cannot access HTTP-only cookies, preventing XSS attacks
- * - Automatically sent with every request to the same domain
- *
- * @param {Object} user      - Mongoose User document (password already excluded)
- * @param {number} statusCode - HTTP status code (200, 201, etc.)
+ * @param {Object} user      - User document
+ * @param {number} statusCode - HTTP status code
  * @param {Object} res       - Express response object
  */
 export const sendTokenResponse = (user, statusCode, res) => {
-  // Generate both tokens
-  const accessToken = generateAccessToken(user._id);
+  // Determine session duration based on role
+  // User: 5 min, Admin: 30 min
+  const isAdmin = user.role === 'admin';
+  const accessExpireStr = isAdmin ? '30m' : '5m';
+  const accessMaxAge = isAdmin ? 30 * 60 * 1000 : 5 * 60 * 1000;
+
+  const accessToken = generateAccessToken(user._id, accessExpireStr);
   const refreshToken = generateRefreshToken(user._id);
 
-  // Cookie options — shared base settings
   const cookieOptions = {
-    httpOnly: true,    // Cookie cannot be accessed by client-side JavaScript
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    sameSite: 'strict', // Prevents CSRF attacks by blocking cross-site requests
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax', // Use 'lax' for better cross-port support in development
   };
 
-  // Set refresh token as HTTP-only cookie (expires in 7 days)
+  // Refresh token always 7 days
   res.cookie('refreshToken', refreshToken, {
     ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  // Set access token as HTTP-only cookie (expires in 15 minutes)
+  // Access token based on role
   res.cookie('accessToken', accessToken, {
     ...cookieOptions,
-    maxAge: 15 * 60 * 1000, // 15 minutes in milliseconds
+    maxAge: accessMaxAge,
   });
 
-  // Remove password from user object before sending response
   user.password = undefined;
 
-  // Send JSON response with user data and access token
-  // (Access token is also sent in body for non-cookie clients like mobile)
   res.status(statusCode).json({
     success: true,
     accessToken,

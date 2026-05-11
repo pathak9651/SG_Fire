@@ -109,8 +109,13 @@ api.interceptors.response.use(
 
     // ── Handle 401 Unauthorized ──────────────────────────
     // This means the access token has expired.
-    // Attempt to refresh it silently using the refresh token cookie.
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // We attempt to refresh it silently.
+    // IMPORTANT: Do NOT attempt refresh for auth routes themselves (login, refresh, etc.)
+    const isAuthRoute = originalRequest.url?.includes('/auth/login') || 
+                        originalRequest.url?.includes('/auth/refresh-token') ||
+                        originalRequest.url?.includes('/auth/register');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {
         // Another refresh is already in progress — queue this request
         return new Promise((resolve, reject) => {

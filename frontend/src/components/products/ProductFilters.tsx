@@ -6,7 +6,7 @@ import Button from '../ui/Button';
 interface ProductFiltersProps {
   filters: any;
   setFilters: (filters: any) => void;
-  categories: string[];
+  categories: any[];
   brands: string[];
   isOpen: boolean;
   onClose: () => void;
@@ -82,14 +82,14 @@ export default function ProductFilters({
           
           {expandedSection === 'categories' && (
             <div className="space-y-3">
-              {categories.map((category) => (
-                <label key={category} className="flex items-center gap-3 cursor-pointer group">
+              {categories.map((cat) => (
+                <label key={cat._id} className="flex items-center gap-3 cursor-pointer group">
                   <div className="relative flex items-center">
                     <input
                       type="checkbox"
                       className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 bg-white checked:border-red-600 checked:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all"
-                      checked={filters.category === category}
-                      onChange={() => handleCategoryChange(category)}
+                      checked={filters.category === cat._id}
+                      onChange={() => handleCategoryChange(cat._id)}
                     />
                     <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
@@ -97,7 +97,7 @@ export default function ProductFilters({
                       </svg>
                     </div>
                   </div>
-                  <span className="text-gray-600 group-hover:text-red-600 transition-colors">{category}</span>
+                  <span className="text-gray-600 group-hover:text-red-600 transition-colors font-medium text-sm">{cat.name}</span>
                 </label>
               ))}
             </div>

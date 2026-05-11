@@ -11,31 +11,32 @@ export const dynamic = 'force-dynamic';
 
 async function getProducts(searchParams: { [key: string]: string | string[] | undefined }) {
   try {
-    // Construct the query string from Next.js searchParams
     const query = new URLSearchParams();
-    
+    query.append('isActive', 'true'); // Only show active products to public users
     Object.entries(searchParams).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        query.append(key, value);
-      } else if (Array.isArray(value)) {
-        value.forEach(v => query.append(key, v));
-      }
+      if (typeof value === 'string') query.append(key, value);
     });
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     const res = await fetch(`${apiUrl}/products?${query.toString()}`, {
-      // Revalidate occasionally, but since it's force-dynamic it runs on request
-      next: { revalidate: 60 } 
+      cache: 'no-store' // Disable caching to show new products immediately
     });
 
-    if (!res.ok) {
-      throw new Error('Failed to fetch products');
-    }
-
+    if (!res.ok) throw new Error('Failed to fetch products');
     return await res.json();
   } catch (error) {
-    console.error('Error fetching products:', error);
     return { data: [], totalProducts: 0, totalPages: 1, currentPage: 1 };
+  }
+}
+
+async function getCategories() {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const res = await fetch(`${apiUrl}/categories`, { cache: 'no-store' });
+    const data = await res.json();
+    return data.data || [];
+  } catch (error) {
+    return [];
   }
 }
 
@@ -44,14 +45,18 @@ export default async function ProductsPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const data = await getProducts(searchParams);
+  const [productsData, categories] = await Promise.all([
+    getProducts(searchParams),
+    getCategories()
+  ]);
 
   return (
     <ProductsClient 
-      initialProducts={data.data || []}
-      totalProducts={data.totalProducts || 0}
-      totalPages={data.totalPages || 1}
-      currentPage={data.currentPage || 1}
+      initialProducts={productsData.data || []}
+      totalProducts={productsData.totalProducts || 0}
+      totalPages={productsData.totalPages || 1}
+      currentPage={productsData.currentPage || 1}
+      categories={categories}
     />
   );
 }

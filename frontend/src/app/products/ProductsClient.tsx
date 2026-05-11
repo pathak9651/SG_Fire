@@ -13,6 +13,7 @@ interface ProductsClientProps {
   totalProducts: number;
   totalPages: number;
   currentPage: number;
+  categories: any[];
 }
 
 export default function ProductsClient({
@@ -20,6 +21,7 @@ export default function ProductsClient({
   totalProducts,
   totalPages,
   currentPage,
+  categories,
 }: ProductsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -115,13 +117,17 @@ export default function ProductsClient({
           {/* Filters Sidebar */}
           <div className="w-full md:w-64 flex-shrink-0">
             <ProductFilters 
-              initialFilters={{
-                category: searchParams.get('category') || '',
-                minPrice: searchParams.get('price[gte]') || '',
-                maxPrice: searchParams.get('price[lte]') || '',
+              filters={{
+                category: searchParams.get('category') || undefined,
+                minPrice: searchParams.get('price[gte]') || undefined,
+                maxPrice: searchParams.get('price[lte]') || undefined,
                 sort: searchParams.get('sort') || '-createdAt'
               }}
-              onFilterChange={handleFilterChange} 
+              setFilters={handleFilterChange}
+              categories={categories}
+              brands={[]} // Brands could be fetched too, but leaving empty for now
+              isOpen={isMobileFiltersOpen}
+              onClose={() => setIsMobileFiltersOpen(false)}
             />
           </div>
 

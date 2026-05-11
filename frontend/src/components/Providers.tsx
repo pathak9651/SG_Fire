@@ -26,6 +26,7 @@ import { store } from '@/redux/store';
 import { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import AuthInitializer from '@/components/auth/AuthInitializer';
 
 /**
  * Create a stable QueryClient instance.
@@ -52,16 +53,18 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       {/* React Query provider for data fetching and caching */}
       <QueryClientProvider client={queryClient}>
-        {/* Global navigation bar */}
-        <Navbar />
+        <AuthInitializer>
+          {/* Global navigation bar */}
+          <Navbar />
 
-        {/* Main page content */}
-        <main className="min-h-screen">
-          {children}
-        </main>
+          {/* Main page content */}
+          <main className="min-h-screen">
+            {children}
+          </main>
 
-        {/* Global footer */}
-        <Footer />
+          {/* Global footer */}
+          <Footer />
+        </AuthInitializer>
 
         {/* 
           Toast notification container.

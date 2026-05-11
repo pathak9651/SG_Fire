@@ -32,7 +32,7 @@ import { bufferToBase64, deleteFromCloudinary } from '../middleware/upload.js';
 // ─────────────────────────────────────────────
 export const getProducts = asyncHandler(async (req, res) => {
   // Count total matching documents (for pagination metadata)
-  const totalQuery = new ApiFeatures(Product.find({ isActive: true }), req.query)
+  const totalQuery = new ApiFeatures(Product.find(), req.query)
     .search()
     .filter();
 
@@ -40,7 +40,7 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   // Fetch the paginated/sorted/filtered results
   const features = new ApiFeatures(
-    Product.find({ isActive: true }).populate('category', 'name slug'),
+    Product.find().populate('category', 'name slug'),
     req.query
   )
     .search()

@@ -43,7 +43,8 @@ export default function LoginPage() {
     try {
       const resultAction = await dispatch(loginUser(data));
       if (loginUser.fulfilled.match(resultAction)) {
-        router.push(returnUrl);
+        // Always redirect to home page after login as per user request
+        router.push('/');
       } else {
         if (resultAction.payload) {
           setServerError(resultAction.payload as string);
