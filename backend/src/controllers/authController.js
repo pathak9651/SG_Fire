@@ -186,7 +186,7 @@ export const logout = asyncHandler(async (req, res, next) => {
 // ─────────────────────────────────────────────
 export const getMe = asyncHandler(async (req, res, next) => {
   // req.user is set by the protect middleware after JWT verification
-  const user = await User.findById(req.user.id).populate('wishlist', 'title images price');
+  const user = await User.findById(req.user.id);
 
   res.json({ success: true, data: user });
 });

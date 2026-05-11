@@ -2,20 +2,12 @@
  * ============================================================
  * FILE: src/redux/slices/wishlistSlice.ts
  * PURPOSE: Manages the wishlist state in Redux.
- *          Stores the list of product IDs the user has wishlisted.
- *          Persisted to the backend (User.wishlist[]) and also
- *          cached locally for instant UI updates.
- *
- * OPTIMISTIC UI PATTERN:
- *  - When user clicks the wishlist heart, update Redux state IMMEDIATELY
- *  - Then sync to server in the background
- *  - If server call fails, rollback the Redux state change
- *  - This gives instant feedback without waiting for server response
  * ============================================================
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '@/services/api';
+import { fetchMe, loginUser } from './authSlice';
 
 interface WishlistState {
   items: string[];  // Array of product IDs
@@ -50,26 +42,18 @@ const wishlistSlice = createSlice({
   initialState,
 
   reducers: {
-    /**
-     * optimisticToggle: Instantly toggle wishlist in UI without waiting for server.
-     * Used in conjunction with toggleWishlist thunk for best UX.
-     */
     optimisticToggle: (state, action: PayloadAction<string>) => {
       const productId = action.payload;
       const index = state.items.indexOf(productId);
       if (index >= 0) {
-        state.items.splice(index, 1); // Remove (already wishlisted)
+        state.items.splice(index, 1);
       } else {
-        state.items.push(productId); // Add to wishlist
+        state.items.push(productId);
       }
     },
-
-    /** Set wishlist from external source (e.g., user profile fetch) */
     setWishlist: (state, action: PayloadAction<string[]>) => {
       state.items = action.payload;
     },
-
-    /** Clear wishlist on logout */
     clearWishlist: (state) => {
       state.items = [];
     },
@@ -81,9 +65,14 @@ const wishlistSlice = createSlice({
         state.items = action.payload;
       })
       .addCase(toggleWishlist.fulfilled, (state, action) => {
-        // Sync with server-confirmed state (overrides optimistic update)
         state.items = action.payload.wishlist;
-      });
+      })
+      .addMatcher(
+        (action) => [loginUser.fulfilled.type, fetchMe.fulfilled.type].includes(action.type),
+        (state, action: any) => {
+          state.items = action.payload.user.wishlist || [];
+        }
+      );
   },
 });
 

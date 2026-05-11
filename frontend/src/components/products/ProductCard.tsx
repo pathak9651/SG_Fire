@@ -8,12 +8,48 @@ import StarRating from '../ui/StarRating';
 import Badge from '../ui/Badge';
 import { cn } from '@/lib/utils';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '@/redux/store';
+import { optimisticToggle, toggleWishlist } from '@/redux/slices/wishlistSlice';
+import toast from 'react-hot-toast';
+
 interface ProductCardProps {
   product: Product;
   className?: string;
 }
 
 export default function ProductCard({ product, className }: ProductCardProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: wishlistItems } = useSelector((state: RootState) => state.wishlist);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  const isWishlisted = wishlistItems.includes(product._id);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error('Please login to use wishlist');
+      return;
+    }
+
+    // Optimistic update
+    dispatch(optimisticToggle(product._id));
+    
+    // Server sync
+    dispatch(toggleWishlist(product._id))
+      .unwrap()
+      .then((res) => {
+        toast.success(res.message);
+      })
+      .catch((err) => {
+        // Rollback on error (optimisticToggle again)
+        dispatch(optimisticToggle(product._id));
+        toast.error(err || 'Failed to update wishlist');
+      });
+  };
+
   const discountPercentage = product.discountPrice
     ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
     : 0;
@@ -42,11 +78,17 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
       {/* Wishlist Button */}
       <button
+        onClick={handleWishlistClick}
         type="button"
-        className="absolute top-3 right-3 z-10 rounded-full bg-white/80 p-2 text-gray-400 hover:text-red-500 hover:bg-white shadow-sm transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-        aria-label="Add to wishlist"
+        className={cn(
+          "absolute top-3 right-3 z-10 rounded-full p-2 shadow-sm transition-all active:scale-90",
+          isWishlisted 
+            ? "bg-red-50 text-red-500 opacity-100" 
+            : "bg-white/80 text-gray-400 hover:text-red-500 hover:bg-white opacity-0 group-hover:opacity-100 focus:opacity-100"
+        )}
+        aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
       >
-        <Heart className="h-5 w-5" />
+        <Heart className={cn("h-5 w-5", isWishlisted && "fill-current")} />
       </button>
 
       {/* Image */}
