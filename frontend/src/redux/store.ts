@@ -23,6 +23,8 @@ import authReducer from './slices/authSlice';
 import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import uiReducer from './slices/uiSlice';
+import productReducer from './slices/productSlice';
+import categoryReducer from './slices/categorySlice';
 
 export const store = configureStore({
   reducer: {
@@ -30,6 +32,8 @@ export const store = configureStore({
     cart: cartReducer,       // Shopping cart state
     wishlist: wishlistReducer, // Wishlist product IDs
     ui: uiReducer,           // UI state (modals, sidebar, theme)
+    product: productReducer, // Product catalog and admin state
+    category: categoryReducer, // Category state
   },
 
   // Middleware configuration

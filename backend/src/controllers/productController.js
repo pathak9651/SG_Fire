@@ -21,7 +21,7 @@ import Category from '../models/Category.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import ApiFeatures from '../utils/apiFeatures.js';
 import { createSlug, ensureUniqueSlug } from '../utils/slugify.js';
-import { uploadToCloudinary, deleteFromCloudinary } from '../middleware/upload.js';
+import { bufferToBase64, deleteFromCloudinary } from '../middleware/upload.js';
 
 // ─────────────────────────────────────────────
 // @desc    Get all products with search, filter, sort, pagination
@@ -145,21 +145,13 @@ export const createProduct = asyncHandler(async (req, res) => {
   const baseSlug = createSlug(title);
   const slug = await ensureUniqueSlug(baseSlug, Product);
 
-  // Upload all product images to Cloudinary
-  // req.files is set by the uploadMultiple middleware
-  const imageUploads = req.files
-    ? await Promise.all(
-        req.files.map((file) =>
-          uploadToCloudinary(file.buffer, 'sgfire/products')
-        )
-      )
+  // Convert all product images to Base64 for MongoDB storage
+  const images = req.files
+    ? req.files.map((file) => ({
+        url: bufferToBase64(file),
+        alt: title,
+      }))
     : [];
-
-  const images = imageUploads.map((result) => ({
-    url: result.url,
-    public_id: result.public_id,
-    alt: title, // Use product title as alt text for SEO
-  }));
 
   // Parse specifications if sent as JSON string
   const parsedSpecs =
@@ -184,20 +176,18 @@ export const updateProduct = asyncHandler(async (req, res) => {
   let product = await Product.findById(req.params.id);
   if (!product) throw new ErrorResponse('Product not found.', 404);
 
-  // If new images are uploaded, upload to Cloudinary
+  // If new images are uploaded, convert to Base64
   if (req.files && req.files.length > 0) {
-    // Delete old images from Cloudinary (prevent storage bloat)
+    // If there were Cloudinary images before, try to delete them
     await Promise.all(
-      product.images.map((img) => deleteFromCloudinary(img.public_id))
+      product.images
+        .filter((img) => img.public_id)
+        .map((img) => deleteFromCloudinary(img.public_id))
     );
 
-    // Upload new images
-    const imageUploads = await Promise.all(
-      req.files.map((file) => uploadToCloudinary(file.buffer, 'sgfire/products'))
-    );
-    req.body.images = imageUploads.map((r) => ({
-      url: r.url,
-      public_id: r.public_id,
+    // Convert new images to Base64
+    req.body.images = req.files.map((file) => ({
+      url: bufferToBase64(file),
       alt: req.body.title || product.title,
     }));
   }
@@ -225,12 +215,11 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (!product) throw new ErrorResponse('Product not found.', 404);
 
-  // Soft delete: mark as inactive instead of removing from DB
-  // This preserves order history references to this product
-  product.isActive = false;
-  await product.save();
+  // Hard delete: remove the product from the database as requested
+  // Note: For production, ensure no order references exist before hard deleting
+  await product.deleteOne();
 
-  res.json({ success: true, message: 'Product removed successfully.' });
+  res.json({ success: true, message: 'Product deleted successfully from database.' });
 });
 
 // ─────────────────────────────────────────────
@@ -250,4 +239,10 @@ export const updateStock = asyncHandler(async (req, res) => {
   if (!product) throw new ErrorResponse('Product not found.', 404);
 
   res.json({ success: true, data: { stock: product.stock } });
+});
+
+export const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).populate('category', 'name slug');
+  if (!product) throw new ErrorResponse('Product not found.', 404);
+  res.json({ success: true, data: product });
 });

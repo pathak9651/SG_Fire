@@ -18,6 +18,7 @@ import {
   updateProduct,
   deleteProduct,
   updateStock,
+  getProductById,
 } from '../controllers/productController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { uploadMultiple, uploadSingle } from '../middleware/upload.js';
@@ -38,6 +39,7 @@ router.get('/related/:id', getRelatedProducts);           // Related products si
 router.post('/', protect, adminOnly, uploadMultiple('images', 5), createProduct);
 router.put('/:id', protect, adminOnly, uploadMultiple('images', 5), updateProduct);
 router.delete('/:id', protect, adminOnly, deleteProduct);
+router.get('/:id', protect, adminOnly, getProductById);
 router.patch('/:id/stock', protect, adminOnly, updateStock);   // Quick stock update
 
 export default router;

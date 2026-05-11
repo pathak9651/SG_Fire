@@ -168,8 +168,8 @@ const productSchema = new mongoose.Schema(
     // Array of image objects from Cloudinary
     images: [
       {
-        url: { type: String, required: true },         // Cloudinary HTTPS URL
-        public_id: { type: String, required: true },   // For future deletion
+        url: { type: String, required: true },         // Image URL or Base64 data
+        public_id: { type: String },                   // For future deletion (optional if stored in DB)
         alt: { type: String, default: '' },            // Alt text for accessibility/SEO
       },
     ],

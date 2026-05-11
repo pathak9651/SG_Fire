@@ -135,8 +135,19 @@ export const uploadToCloudinary = (fileBuffer, folder = 'sgfire', options = {}) 
  * @returns {Promise<Object>} Cloudinary deletion result
  */
 export const deleteFromCloudinary = async (publicId) => {
+  if (!publicId) return; // Skip if no public_id (DB stored)
   const result = await cloudinary.uploader.destroy(publicId);
   return result;
+};
+
+/**
+ * bufferToBase64()
+ * ----------------
+ * Converts a file buffer to a Data URL (Base64).
+ * Used for storing images directly in MongoDB when cloud storage is disabled.
+ */
+export const bufferToBase64 = (file) => {
+  return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
 };
 
 // ─────────────────────────────────────────────
