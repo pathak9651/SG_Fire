@@ -327,3 +327,22 @@ export const completeAppointment = asyncHandler(async (req, res) => {
 
   res.json({ success: true, data: appointment });
 });
+
+export const rescheduleAppointment = asyncHandler(async (req, res) => {
+  const { preferredDate, preferredTime, message } = req.body;
+  const appointment = await Appointment.findById(req.params.id);
+  if (!appointment) throw new ErrorResponse('Appointment not found.', 404);
+
+  appointment.preferredDate = new Date(preferredDate);
+  appointment.preferredTime = preferredTime;
+  appointment.status = 'pending'; // Reset status to pending after reschedule
+  appointment.statusHistory.push({
+    status: 'pending',
+    message: message || 'Appointment rescheduled by admin',
+    timestamp: new Date(),
+    updatedBy: req.user.id,
+  });
+  await appointment.save();
+
+  res.json({ success: true, data: appointment });
+});

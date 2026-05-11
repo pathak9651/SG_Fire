@@ -26,6 +26,7 @@ import uiReducer from './slices/uiSlice';
 import productReducer from './slices/productSlice';
 import categoryReducer from './slices/categorySlice';
 import orderReducer from './slices/orderSlice';
+import appointmentReducer from './slices/appointmentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ export const store = configureStore({
     product: productReducer, // Product catalog and admin state
     category: categoryReducer, // Category state
     order: orderReducer,     // Order state
+    appointment: appointmentReducer, // Appointment state
   },
 
   // Middleware configuration

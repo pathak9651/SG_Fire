@@ -17,6 +17,7 @@ import {
   rejectAppointment,
   assignTechnician,
   completeAppointment,
+  rescheduleAppointment,
 } from '../controllers/appointmentController.js';
 import { protect, adminOnly, authorize } from '../middleware/auth.js';
 import { uploadMultiple } from '../middleware/upload.js';
@@ -35,6 +36,7 @@ router.post('/:id/cancel', cancelAppointment);                      // Cancel bo
 router.get('/', adminOnly, getAllAppointments);                      // All appointments
 router.patch('/:id/approve', adminOnly, approveAppointment);        // Approve
 router.patch('/:id/reject', adminOnly, rejectAppointment);          // Reject with reason
+router.patch('/:id/reschedule', adminOnly, rescheduleAppointment);      // Reschedule
 router.patch('/:id/assign', adminOnly, assignTechnician);           // Assign technician
 // Both admin and technician can mark as complete
 router.patch('/:id/complete', authorize('admin', 'technician'), completeAppointment);
