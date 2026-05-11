@@ -60,6 +60,20 @@ export const getSingleProduct = createAsyncThunk(
   }
 );
 
+// Update product stock only
+export const updateProductStock = createAsyncThunk(
+  'products/updateStock',
+  async ({ id, stock }: { id: string, stock: number }, thunkAPI) => {
+    try {
+      const response = await api.patch(`/products/${id}/stock`, { stock });
+      return { id, stock: response.data.data.stock };
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Create product
 export const createAdminProduct = createAsyncThunk(
   'products/create',
@@ -119,6 +133,12 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.products = state.products.filter(p => p._id !== action.payload.id);
         state.message = action.payload.message;
+      })
+      .addCase(updateProductStock.fulfilled, (state, action) => {
+        const index = state.products.findIndex(p => p._id === action.payload.id);
+        if (index !== -1) {
+          state.products[index].stock = action.payload.stock;
+        }
       })
       .addCase(deleteAdminProduct.rejected, (state, action) => {
         state.isLoading = false;
