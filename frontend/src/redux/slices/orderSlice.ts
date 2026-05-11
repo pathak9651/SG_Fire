@@ -67,6 +67,34 @@ export const getOrderDetails = createAsyncThunk(
   }
 );
 
+// Create Razorpay Order
+export const createRazorpayOrder = createAsyncThunk(
+  'orders/createRazorpay',
+  async (amount: number, thunkAPI) => {
+    try {
+      const response = await api.post('/orders/razorpay-order', { amount });
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// Place Order
+export const placeOrder = createAsyncThunk(
+  'orders/place',
+  async (orderData: any, thunkAPI) => {
+    try {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // Admin: Update order status
 export const updateOrderStatus = createAsyncThunk(
   'orders/updateStatus',

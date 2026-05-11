@@ -12,22 +12,25 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
 import { logoutUser } from '@/redux/slices/authSlice';
 import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
   { label: 'My Profile', icon: User, href: '/dashboard' },
-  { label: 'Order History', icon: ShoppingBag, href: '/dashboard/orders' },
-  { label: 'My Wishlist', icon: Heart, href: '/dashboard/wishlist' },
-  { label: 'Appointments', icon: Calendar, href: '/dashboard/appointments' },
+  { label: 'Order History', icon: ShoppingBag, href: '/dashboard/orders', userOnly: true },
+  { label: 'My Wishlist', icon: Heart, href: '/dashboard/wishlist', userOnly: true },
+  { label: 'Appointments', icon: Calendar, href: '/dashboard/appointments', userOnly: true },
   { label: 'Account Settings', icon: Settings, href: '/dashboard/settings' },
 ];
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const filteredItems = NAV_ITEMS.filter(item => !item.userOnly || user?.role !== 'admin');
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -43,7 +46,7 @@ export default function DashboardSidebar() {
         </div>
         
         <nav className="p-3 space-y-1">
-          {NAV_ITEMS.map((item) => {
+          {filteredItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link

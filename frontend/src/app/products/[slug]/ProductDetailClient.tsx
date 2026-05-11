@@ -6,10 +6,13 @@ import ProductImageGallery from '@/components/products/ProductImageGallery';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import StarRating from '@/components/ui/StarRating';
+import { cn } from '@/lib/utils';
 import { ShoppingCart, Heart, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/redux/store';
-import { addToCart } from '@/redux/slices/cartSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { optimisticToggle, toggleWishlist } from '@/redux/slices/wishlistSlice';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -19,12 +22,58 @@ interface ProductDetailClientProps {
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { items: wishlistItems } = useSelector((state: RootState) => state.wishlist);
 
-  const handleAddToCart = async () => {
+  const isWishlisted = wishlistItems.includes(product._id);
+
+  const handleAddToCart = async (redirect = false) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to continue');
+      router.push(`/auth/login?returnUrl=/products/${product.slug}`);
+      return;
+    }
+
     try {
       await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
+      toast.success('Added to cart!');
+      if (redirect) {
+        router.push('/cart');
+      }
     } catch (error) {
-      console.error('Failed to add to cart:', error);
+      toast.error(error as string || 'Failed to add to cart');
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to continue');
+      router.push(`/auth/login?returnUrl=/products/${product.slug}`);
+      return;
+    }
+    
+    try {
+      await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
+      router.push('/checkout');
+    } catch (error) {
+      toast.error(error as string || 'Failed to initiate purchase');
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to use wishlist');
+      return;
+    }
+
+    dispatch(optimisticToggle(product._id));
+    try {
+      const res = await dispatch(toggleWishlist(product._id)).unwrap();
+      toast.success(res.message);
+    } catch (error) {
+      dispatch(optimisticToggle(product._id));
+      toast.error('Failed to update wishlist');
     }
   };
 
@@ -143,19 +192,37 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                 </button>
               </div>
 
-              <div className="flex-1 flex gap-4">
+              <div className="flex-1 flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={handleAddToCart}
+                  onClick={() => handleAddToCart(false)}
                   disabled={product.stock === 0}
                   size="lg"
-                  className="flex-1 text-base shadow-lg shadow-red-500/30"
+                  variant="outline"
+                  className="flex-1 text-base border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white"
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                  Add to Cart
+                </Button>
+
+                <Button 
+                  onClick={handleBuyNow}
+                  disabled={product.stock === 0}
+                  size="lg"
+                  className="flex-[1.5] text-base shadow-lg shadow-red-500/30 bg-red-600 hover:bg-red-700"
+                >
+                  Buy Now
                 </Button>
                 
-                <Button variant="outline" size="lg" className="px-4 border-gray-300 text-gray-600 hover:text-red-600 hover:border-red-600">
-                  <Heart className="w-6 h-6" />
+                <Button 
+                  onClick={handleWishlistToggle}
+                  variant="outline" 
+                  size="lg" 
+                  className={cn(
+                    "px-4 border-gray-300 transition-all",
+                    isWishlisted ? "text-red-600 border-red-600 bg-red-50" : "text-gray-600 hover:text-red-600 hover:border-red-600"
+                  )}
+                >
+                  <Heart className={cn("w-6 h-6", isWishlisted && "fill-current")} />
                 </Button>
               </div>
             </div>

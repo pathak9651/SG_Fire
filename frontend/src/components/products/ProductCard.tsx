@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '@/redux/store';
 import { optimisticToggle, toggleWishlist } from '@/redux/slices/wishlistSlice';
+import { addToCart } from '@/redux/slices/cartSlice';
 import toast from 'react-hot-toast';
 
 interface ProductCardProps {
@@ -34,19 +35,40 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       return;
     }
 
-    // Optimistic update
     dispatch(optimisticToggle(product._id));
     
-    // Server sync
     dispatch(toggleWishlist(product._id))
       .unwrap()
       .then((res) => {
         toast.success(res.message);
       })
       .catch((err) => {
-        // Rollback on error (optimisticToggle again)
         dispatch(optimisticToggle(product._id));
         toast.error(err || 'Failed to update wishlist');
+      });
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to cart');
+      return;
+    }
+
+    if (product.stock <= 0) {
+      toast.error('Product is out of stock');
+      return;
+    }
+
+    dispatch(addToCart({ productId: product._id, quantity: 1 }))
+      .unwrap()
+      .then(() => {
+        toast.success('Added to cart!');
+      })
+      .catch((err) => {
+        toast.error(err || 'Failed to add to cart');
       });
   };
 
@@ -100,7 +122,6 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           className="object-cover transition-transform duration-500 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
 
@@ -132,6 +153,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           </div>
           
           <button
+            onClick={handleAddToCart}
             type="button"
             disabled={product.stock <= 0}
             className="flex items-center justify-center rounded-full bg-gray-900 p-3 text-white transition-all hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-gray-900 disabled:cursor-not-allowed group-hover:shadow-md"

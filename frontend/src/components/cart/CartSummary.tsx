@@ -71,7 +71,7 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
             <dt className="flex items-center">
               Discount ({cart.appliedCoupon.code})
             </dt>
-            <dd className="font-medium">-₹{cart.appliedCoupon.discount.toLocaleString('en-IN')}</dd>
+            <dd className="font-medium">-₹{(cart.appliedCoupon.discount || 0).toLocaleString('en-IN')}</dd>
           </div>
         )}
 

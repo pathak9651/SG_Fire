@@ -164,6 +164,8 @@ export const placeOrder = asyncHandler(async (req, res) => {
   const totalAmount = itemsTotal + shippingCharge + taxAmount - discountAmount;
 
   // ── Step 5: Create the Order document ──
+  const isCOD = paymentMethod === 'cod';
+  
   const order = await Order.create({
     orderNumber: generateOrderNumber(),
     user: req.user.id,
@@ -177,16 +179,16 @@ export const placeOrder = asyncHandler(async (req, res) => {
     shippingAddress,
     paymentInfo: {
       method: paymentMethod,
-      status: 'paid',
-      paidAt: new Date(),
+      status: isCOD ? 'pending' : 'paid',
+      paidAt: isCOD ? undefined : new Date(),
       amount: totalAmount,
       currency: 'INR',
-      ...paymentDetails,
+      ...(paymentDetails || {}),
     },
-    orderStatus: 'processing', // Auto-advance since payment is confirmed
+    orderStatus: isCOD ? 'pending' : 'processing', 
     statusHistory: [
       { status: 'pending', message: 'Order placed', timestamp: new Date() },
-      { status: 'processing', message: 'Payment confirmed', timestamp: new Date() },
+      ...(!isCOD ? [{ status: 'processing', message: 'Payment confirmed', timestamp: new Date() }] : []),
     ],
     customerNotes: orderNotes,
     estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days

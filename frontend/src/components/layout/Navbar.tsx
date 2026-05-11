@@ -227,15 +227,19 @@ export default function Navbar() {
                         <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
                           <User size={16} /> My Profile
                         </Link>
-                        <Link href="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
-                          <Package size={16} /> Order History
-                        </Link>
-                        <Link href="/dashboard/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
-                          <Heart size={16} /> Wishlist
-                        </Link>
-                        <Link href="/dashboard/appointments" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
-                          <Calendar size={16} /> My Appointments
-                        </Link>
+                        {user?.role !== 'admin' && (
+                          <>
+                            <Link href="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
+                              <Package size={16} /> Order History
+                            </Link>
+                            <Link href="/dashboard/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
+                              <Heart size={16} /> Wishlist
+                            </Link>
+                            <Link href="/dashboard/appointments" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all">
+                              <Calendar size={16} /> My Appointments
+                            </Link>
+                          </>
+                        )}
                       </div>
 
                       <div className="border-t border-gray-100 dark:border-gray-800 mt-1 p-2">
