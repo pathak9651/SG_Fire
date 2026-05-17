@@ -5,11 +5,11 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Phone, Mail, Camera, Send, MessageCircle, 
-  ChevronRight, LogOut, User, Flame 
+  ChevronRight, LogOut, User, Flame, Search 
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { closeMobileMenu, toggleDarkMode } from '@/redux/slices/uiSlice';
+import { closeMobileMenu, toggleDarkMode, toggleSearch } from '@/redux/slices/uiSlice';
 import { logoutUser } from '@/redux/slices/authSlice';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -144,6 +144,15 @@ export default function MobileMenu() {
 
               <div className="mt-8 pt-8 border-t border-gray-100 dark:border-gray-800">
                 <motion.div variants={itemVariants} className="flex flex-col gap-4">
+                  <button 
+                    onClick={() => {
+                      dispatch(closeMobileMenu());
+                      dispatch(toggleSearch());
+                    }}
+                    className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium p-2"
+                  >
+                    <Search size={20} /> Search Products
+                  </button>
                   <Link href="/dashboard" className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium p-2">
                     <User size={20} /> My Profile
                   </Link>

@@ -135,9 +135,9 @@ export default function ServiceHighlights() {
             transition={{ delay: i * 0.1 }}
             className="text-center"
           >
-            <Icon size={22} className="text-red-500 mx-auto mb-2" />
-            <p className="font-outfit text-2xl md:text-3xl font-bold text-white">{value}</p>
-            <p className="text-gray-400 text-sm mt-1">{label}</p>
+            <Icon size={18} className="text-red-500 mx-auto mb-2" />
+            <p className="font-outfit text-xl sm:text-3xl font-bold text-white">{value}</p>
+            <p className="text-[10px] sm:text-sm text-gray-400 mt-1">{label}</p>
           </motion.div>
         ))}
       </div>

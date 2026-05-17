@@ -23,11 +23,17 @@ import { addToCart } from '@/redux/slices/cartSlice';
 import { optimisticToggle } from '@/redux/slices/wishlistSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import { Product } from '@/types';
+import { useEffect, useState } from 'react';
 
 export default function FeaturedProducts() {
   const dispatch = useDispatch<AppDispatch>();
   const { items: wishlistItems } = useSelector((s: RootState) => s.wishlist);
   const { isAuthenticated } = useSelector((s: RootState) => s.auth);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Fetch featured products — React Query handles caching and revalidation
   const { data, isLoading, error } = useQuery({
@@ -60,13 +66,13 @@ export default function FeaturedProducts() {
     dispatch(optimisticToggle(productId));
   };
 
-  if (isLoading) return <FeaturedProductsSkeleton />;
+  if (!isMounted || isLoading) return <FeaturedProductsSkeleton />;
   if (error) return <p className="text-center text-gray-400">Failed to load products.</p>;
   if (!data || data.length === 0) return null;
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         {data.map((product, index) => {
           const isWishlisted = wishlistItems.includes(product._id);
           const effectivePrice = product.discountPrice || product.price;

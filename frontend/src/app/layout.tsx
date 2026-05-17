@@ -37,6 +37,7 @@ const outfit = Outfit({
 // ── Default SEO Metadata ───────────────────────────────────
 // These are defaults; individual pages override them with their own metadata.
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_CLIENT_URL || 'http://localhost:3000'),
   title: {
     default: 'SG Fire — Premium Fire Safety Equipment & Services',
     template: '%s | SG Fire',  // Individual pages use: '%s' = their own title
@@ -106,6 +107,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${outfit.variable}`}
       suppressHydrationWarning // Prevents hydration mismatch on dark mode
+      data-scroll-behavior="smooth"
     >
       <body className="font-inter antialiased bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         {/* 

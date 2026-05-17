@@ -111,7 +111,7 @@ export default function Navbar() {
           style={{ scaleX }}
         />
 
-        <div className="container-main flex items-center justify-between gap-4">
+        <div className="container-main flex items-center justify-between gap-2 sm:gap-4">
           
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
@@ -122,10 +122,10 @@ export default function Navbar() {
               <Flame size={22} className="text-white" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="font-outfit font-black text-xl leading-none dark:text-white tracking-tight">
+              <span className="font-outfit font-black text-lg sm:text-xl leading-none dark:text-white tracking-tight">
                 SG <span className="gradient-text">FIRE</span>
               </span>
-              <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-[0.2em] uppercase leading-none mt-1">
+              <span className="text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 tracking-[0.2em] uppercase leading-none mt-1 hidden sm:block">
                 Safety First
               </span>
             </div>
@@ -139,21 +139,21 @@ export default function Navbar() {
           />
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-0.5 sm:gap-2">
             
-            {/* Search Trigger */}
+            {/* Search Trigger (Desktop only) */}
             <button
               onClick={() => dispatch(toggleSearch())}
-              className="p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
+              className="hidden sm:flex p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
               aria-label="Search"
             >
               <Search size={20} />
             </button>
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle (Desktop only) */}
             <button
               onClick={() => dispatch(toggleDarkMode())}
-              className="p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
+              className="hidden sm:flex p-2.5 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all active:scale-90"
               aria-label="Toggle theme"
             >
               <AnimatePresence mode="wait">

@@ -26,11 +26,28 @@ const MENU_ITEMS = [
   { label: 'Inventory', icon: BarChart3, href: '/admin/stock' },
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 bg-gray-950 text-white h-screen fixed left-0 top-0 z-[100] flex flex-col border-r border-gray-800">
+    <>
+      {/* Backdrop for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      <div className={cn(
+        "w-64 bg-gray-950 text-white h-screen fixed left-0 top-0 z-[100] flex flex-col border-r border-gray-800 transition-transform duration-300 lg:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
       {/* Brand */}
       <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 bg-fire-gradient rounded-lg flex items-center justify-center">
@@ -82,5 +99,6 @@ export default function AdminSidebar() {
         </button>
       </div>
     </div>
+    </>
   );
 }

@@ -64,9 +64,9 @@ export default function FireSafetyAwareness() {
               transition={{ delay: i * 0.1 }}
               className="text-center p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800"
             >
-              <div className="text-3xl mb-2">{stat.icon}</div>
-              <p className="font-outfit text-2xl md:text-3xl font-bold text-red-600 mb-1">{stat.value}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
+              <div className="text-2xl mb-2">{stat.icon}</div>
+              <p className="font-outfit text-xl sm:text-3xl font-bold text-red-600 mb-1">{stat.value}</p>
+              <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
             </motion.div>
           ))}
         </div>

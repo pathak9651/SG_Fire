@@ -6,7 +6,7 @@ import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
 import { Product } from '@/types';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 interface ProductsClientProps {
   initialProducts: Product[];
@@ -137,6 +137,12 @@ export default function ProductsClient({
               <p className="text-gray-600 dark:text-gray-400">
                 Showing {initialProducts.length} of {totalProducts} products
               </p>
+              <button
+                onClick={() => setIsMobileFiltersOpen(true)}
+                className="md:hidden flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300"
+              >
+                <Filter size={16} /> Filters
+              </button>
             </div>
 
             <ProductGrid 

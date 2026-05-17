@@ -1,11 +1,12 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import AdminSidebar from './AdminSidebar';
 import { motion } from 'framer-motion';
-import { User, Bell, Search } from 'lucide-react';
+import { User, Bell, Search, Menu } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { cn } from '@/lib/utils';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -14,19 +15,28 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps) {
   const { user } = useSelector((s: RootState) => s.auth);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
       {/* Sidebar */}
-      <AdminSidebar />
+      <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         {/* Top Header */}
-        <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-8 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold dark:text-white font-outfit">{title}</h1>
-            <p className="text-xs text-gray-500">Welcome back, Admin</p>
+        <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 lg:hidden rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-all"
+            >
+              <Menu size={24} />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold dark:text-white font-outfit">{title}</h1>
+              <p className="text-xs text-gray-500 hidden sm:block">Welcome back, Admin</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">

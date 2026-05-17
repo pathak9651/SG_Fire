@@ -135,7 +135,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         </div>
 
         <Link href={`/products/${product.slug}`} className="group-hover:text-red-600 transition-colors">
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 leading-tight">
+          <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 line-clamp-2 mb-1 lg:mb-2 leading-tight">
             {product.title}
           </h3>
         </Link>
@@ -144,11 +144,11 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           <div className="flex flex-col">
             {product.discountPrice ? (
               <>
-                <span className="text-sm text-gray-400 line-through">₹{product.price.toLocaleString('en-IN')}</span>
-                <span className="text-xl font-bold text-red-600">₹{product.discountPrice.toLocaleString('en-IN')}</span>
+                <span className="text-[10px] sm:text-sm text-gray-400 line-through">₹{product.price.toLocaleString('en-IN')}</span>
+                <span className="text-base sm:text-xl font-bold text-red-600">₹{product.discountPrice.toLocaleString('en-IN')}</span>
               </>
             ) : (
-              <span className="text-xl font-bold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+              <span className="text-base sm:text-xl font-bold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
             )}
           </div>
           

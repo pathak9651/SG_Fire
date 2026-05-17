@@ -123,9 +123,9 @@ export default function Testimonials() {
             </p>
 
             {/* Customer info */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 ${testimonial.color} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
+                <div className={`w-12 h-12 ${testimonial.color} rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
                   {testimonial.initial}
                 </div>
                 <div>
@@ -139,7 +139,7 @@ export default function Testimonials() {
                 </div>
               </div>
 
-              <span className="text-xs px-3 py-1 bg-red-50 dark:bg-red-950/30 text-red-600 rounded-full font-medium">
+              <span className="text-xs px-4 py-1.5 bg-red-50 dark:bg-red-950/30 text-red-600 rounded-full font-bold uppercase tracking-widest whitespace-nowrap">
                 {testimonial.service}
               </span>
             </div>

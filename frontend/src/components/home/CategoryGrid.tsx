@@ -45,7 +45,7 @@ const CATEGORIES: CategoryItem[] = [
 
 export default function CategoryGrid() {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
       {CATEGORIES.map((category, index) => (
         <motion.div
           key={category.name}
@@ -58,22 +58,22 @@ export default function CategoryGrid() {
             <motion.div
               whileHover={{ y: -5, scale: 1.02 }}  // Lift on hover
               whileTap={{ scale: 0.97 }}
-              className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+              className="flex flex-col items-center p-3 sm:p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-800 hover:shadow-lg transition-all duration-200 cursor-pointer group"
             >
               {/* Icon with gradient background */}
               <div
-                className={`w-14 h-14 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center text-2xl mb-3 shadow-md group-hover:shadow-lg transition-shadow`}
+                className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center text-xl sm:text-2xl mb-2 sm:mb-3 shadow-md group-hover:shadow-lg transition-shadow`}
               >
                 {category.emoji}
               </div>
 
               {/* Category name */}
-              <span className="text-xs md:text-sm font-semibold text-gray-800 dark:text-gray-200 text-center leading-tight group-hover:text-red-600 transition-colors">
+              <span className="text-[10px] sm:text-sm font-semibold text-gray-800 dark:text-gray-200 text-center leading-tight group-hover:text-red-600 transition-colors">
                 {category.name}
               </span>
 
               {/* Product count */}
-              <span className="text-xs text-gray-400 mt-1 text-center">
+              <span className="text-[10px] text-gray-400 mt-1 text-center hidden sm:block">
                 {category.count}
               </span>
             </motion.div>

@@ -163,7 +163,7 @@ export interface CartItem {
 
 /** Full cart with totals */
 export interface Cart {
-  items: CartItem[];
+  validItems: CartItem[];
   itemsTotal: number;
   shippingCharge: number;
   taxAmount: number;

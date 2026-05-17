@@ -102,7 +102,7 @@ export default function HeroBanner() {
   const slide = HERO_SLIDES[currentSlide];
 
   return (
-    <section className="relative h-[560px] md:h-[640px] lg:h-[700px] overflow-hidden">
+    <section className="relative h-[500px] sm:h-[560px] md:h-[640px] lg:h-[700px] overflow-hidden">
 
       {/* ── Animated Background ─────────────────────────── */}
       <AnimatePresence custom={direction} mode="popLayout">
@@ -161,7 +161,7 @@ export default function HeroBanner() {
             </p>
 
             {/* Main headline */}
-            <h1 className="font-outfit text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+            <h1 className="font-outfit text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
               {slide.title}
             </h1>
 
@@ -171,14 +171,14 @@ export default function HeroBanner() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
-              <Link href={slide.primaryCTA.href} className="btn-primary text-base px-6 py-3">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href={slide.primaryCTA.href} className="btn-primary text-base px-6 py-3 w-full sm:w-auto">
                 <ShoppingBag size={18} />
                 {slide.primaryCTA.label}
               </Link>
               <Link
                 href={slide.secondaryCTA.href}
-                className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all text-base"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all text-base w-full sm:w-auto"
               >
                 <Calendar size={18} />
                 {slide.secondaryCTA.label}
@@ -202,17 +202,17 @@ export default function HeroBanner() {
         </AnimatePresence>
       </div>
 
-      {/* ── Navigation Arrows ───────────────────────────── */}
+      {/* ── Navigation Arrows (Desktop only) ────────────────── */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full hidden md:flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
         aria-label="Previous slide"
       >
         <ChevronLeft size={20} />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full hidden md:flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
         aria-label="Next slide"
       >
         <ChevronRight size={20} />

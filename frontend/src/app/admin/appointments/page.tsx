@@ -238,8 +238,8 @@ export default function AdminAppointments() {
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">New Date</label>
                         <input 
                           type="date" 
-                          value={rescheduleData.date}
-                          onChange={(e) => setRescheduleData({...rescheduleData, date: e.target.value})}
+                          value={rescheduleData!.date}
+                          onChange={(e) => setRescheduleData({...rescheduleData!, date: e.target.value})}
                           className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white"
                         />
                       </div>
@@ -247,8 +247,8 @@ export default function AdminAppointments() {
                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">New Time</label>
                         <input 
                           type="text" 
-                          value={rescheduleData.time}
-                          onChange={(e) => setRescheduleData({...rescheduleData, time: e.target.value})}
+                          value={rescheduleData!.time}
+                          onChange={(e) => setRescheduleData({...rescheduleData!, time: e.target.value})}
                           placeholder="e.g. 10:00 AM"
                           className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white"
                         />

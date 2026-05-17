@@ -89,10 +89,30 @@ body {
   font-family: var(--font-inter);
   background-color: var(--color-bg);
   color: var(--color-text);
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
 }
 
 /* Headings use Outfit font for premium feel */
-h1, h2, h3, h4, h5, h6 {
+h1 {
+  font-family: var(--font-outfit);
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: 2rem; /* Mobile */
+}
+
+h2 {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  line-height: 1.2;
+  font-size: 1.75rem; /* Mobile */
+}
+
+@media (min-width: 768px) {
+  h1 { font-size: 3.5rem; }
+  h2 { font-size: 2.5rem; }
+}
+
+h3, h4, h5, h6 {
   font-family: var(--font-outfit);
   font-weight: 700;
   line-height: 1.2;
@@ -172,12 +192,24 @@ img {
 .container-main {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem; /* Reduced for mobile */
+}
+
+@media (min-width: 640px) {
+  .container-main {
+    padding: 0 1.5rem;
+  }
 }
 
 /* Section spacing */
 .section-padding {
-  padding: 5rem 0;
+  padding: 3rem 0; /* Reduced for mobile */
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 5rem 0;
+  }
 }
 
 /* Premium gradient text — used for headings */

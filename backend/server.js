@@ -70,7 +70,7 @@ app.use(helmet());
  */
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'development' ? true : (process.env.CLIENT_URL || 'http://localhost:3000'),
     credentials: true,        // Required for HTTP-only cookie exchange
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -193,3 +193,4 @@ process.on('uncaughtException', (err) => {
 });
 
 export default app;
+// nodemon trigger

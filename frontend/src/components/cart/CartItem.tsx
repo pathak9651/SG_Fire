@@ -43,13 +43,13 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
       <div className="ml-4 flex flex-1 flex-col">
         {/* Title and Price */}
         <div>
-          <div className="flex justify-between text-base font-medium text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:justify-between text-base font-medium text-gray-900">
             <h3>
               <Link href={`/products/${item.product}`} className="hover:text-red-600 line-clamp-2">
                 {item.title}
               </Link>
             </h3>
-            <p className="ml-4 whitespace-nowrap">₹{item.price.toLocaleString('en-IN')}</p>
+            <p className="mt-1 sm:mt-0 sm:ml-4 whitespace-nowrap font-bold text-red-600">₹{item.price.toLocaleString('en-IN')}</p>
           </div>
           {item.price < item.originalPrice && (
             <p className="mt-1 text-sm text-gray-500 line-through">

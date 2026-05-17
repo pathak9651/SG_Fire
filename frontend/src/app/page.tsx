@@ -127,7 +127,7 @@ export default function HomePage() {
 /** Skeleton loader for featured products grid while data loads */
 function ProductGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="rounded-xl overflow-hidden">
           <div className="skeleton h-52 w-full" />
