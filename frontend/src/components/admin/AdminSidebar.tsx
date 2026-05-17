@@ -13,7 +13,9 @@ import {
   Settings,
   LogOut,
   Flame,
-  ArrowLeft
+  ArrowLeft,
+  User as UserIcon,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +26,8 @@ const MENU_ITEMS = [
   { label: 'Upload Product', icon: PlusCircle, href: '/admin/products/upload' },
   { label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
   { label: 'Inventory', icon: BarChart3, href: '/admin/stock' },
+  { label: 'Profile', icon: UserIcon, href: '/admin/profile' },
+  { label: 'Support', icon: MessageSquare, href: '/admin/support' },
 ];
 
 interface AdminSidebarProps {

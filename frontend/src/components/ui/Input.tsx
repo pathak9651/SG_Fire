@@ -6,17 +6,18 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   icon?: React.ReactNode;
+  helperText?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, icon, ...props }, ref) => {
+  ({ className, type, label, error, icon, helperText, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === 'password';
 
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             {label}
           </label>
         )}
@@ -29,7 +30,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             type={isPassword ? (showPassword ? 'text' : 'password') : type}
             className={cn(
-              'flex h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50',
+              'flex h-11 w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50',
               icon ? 'pl-10' : '',
               isPassword ? 'pr-10' : '',
               error ? 'border-red-500 focus-visible:ring-red-500' : '',
@@ -55,6 +56,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {error && (
           <p className="mt-1.5 text-sm text-red-500 flex items-center">
             {error}
+          </p>
+        )}
+        {!error && helperText && (
+          <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+            {helperText}
           </p>
         )}
       </div>

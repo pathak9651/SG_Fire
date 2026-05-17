@@ -40,6 +40,40 @@ const initialState: AuthState = {
 };
 
 // ─────────────────────────────────────────────
+// @desc    Update Profile Details
+// ─────────────────────────────────────────────
+export const updateProfile = createAsyncThunk<
+  User,
+  { name: string; phone: string },
+  { rejectValue: string }
+>('auth/updateProfile', async (profileData, { rejectWithValue }) => {
+  try {
+    const { data } = await api.put('/users/profile', profileData);
+    return data.data; // Returns updated user object
+  } catch (error) {
+    const e = error as AxiosError<{ message: string }>;
+    return rejectWithValue(e.response?.data?.message || 'Failed to update profile');
+  }
+});
+
+// ─────────────────────────────────────────────
+// @desc    Update Password
+// ─────────────────────────────────────────────
+export const updatePassword = createAsyncThunk<
+  string,
+  { currentPassword: string; newPassword: string },
+  { rejectValue: string }
+>('auth/updatePassword', async (passwordData, { rejectWithValue }) => {
+  try {
+    const { data } = await api.put('/users/password', passwordData);
+    return data.message;
+  } catch (error) {
+    const e = error as AxiosError<{ message: string }>;
+    return rejectWithValue(e.response?.data?.message || 'Failed to update password');
+  }
+});
+
+// ─────────────────────────────────────────────
 // ASYNC THUNKS
 // Each thunk handles one async operation with pending/fulfilled/rejected states
 // ─────────────────────────────────────────────
@@ -176,6 +210,10 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
         state.isAuthenticated = false;
+      })
+      // Update Profile
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
 
     // ── Register ───────────────────────────────────────────

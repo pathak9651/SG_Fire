@@ -56,3 +56,68 @@ export const getWishlist = asyncHandler(async (req, res) => {
 
   res.json({ success: true, count: user.wishlist.length, data: user.wishlist });
 });
+
+// ─────────────────────────────────────────────
+// @desc    Update user profile details
+// @route   PUT /api/users/profile
+// @access  Private
+// ─────────────────────────────────────────────
+export const updateProfile = asyncHandler(async (req, res) => {
+  const { name, phone } = req.body;
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new ErrorResponse('User not found', 404);
+
+  if (name) user.name = name;
+  if (phone) user.phone = phone;
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Profile updated successfully',
+    data: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+      isBlocked: user.isBlocked,
+      wishlist: user.wishlist,
+      addresses: user.addresses,
+      notifications: user.notifications,
+      createdAt: user.createdAt,
+    },
+  });
+});
+
+// ─────────────────────────────────────────────
+// @desc    Update user password
+// @route   PUT /api/users/password
+// @access  Private
+// ─────────────────────────────────────────────
+export const updatePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ErrorResponse('Please provide current and new password', 400);
+  }
+
+  // Find user and explicitly select password
+  const user = await User.findById(req.user.id).select('+password');
+  if (!user) throw new ErrorResponse('User not found', 404);
+
+  // Check if current password matches
+  const isMatch = await user.comparePassword(currentPassword);
+  if (!isMatch) {
+    throw new ErrorResponse('Incorrect current password', 401);
+  }
+
+  // Update to new password (pre-save hook will hash it)
+  user.password = newPassword;
+  await user.save();
+
+  res.json({ success: true, message: 'Password updated successfully' });
+});

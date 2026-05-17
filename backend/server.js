@@ -43,6 +43,7 @@ import appointmentRoutes from './src/routes/appointment.routes.js';
 import adminRoutes from './src/routes/admin.routes.js';
 import categoryRoutes from './src/routes/category.routes.js';
 import userRoutes from './src/routes/user.routes.js';
+import supportRoutes from './src/routes/support.routes.js';
 
 // ── Middleware Imports ─────────────────────────────────────
 import errorHandler, { ErrorResponse } from './src/middleware/errorHandler.js';
@@ -139,6 +140,7 @@ app.use('/api/appointments', appointmentRoutes); // Appointments: /api/appointme
 app.use('/api/admin', adminRoutes);            // Admin dashboard: /api/admin/...
 app.use('/api/categories', categoryRoutes);    // Categories: /api/categories/...
 app.use('/api/users', userRoutes);             // User profile/wishlist: /api/users/...
+app.use('/api/support', supportRoutes);        // Support chat: /api/support/...
 
 // ─────────────────────────────────────────────
 // 404 HANDLER
@@ -165,6 +167,83 @@ const server = app.listen(PORT, () => {
   console.log(`🔥 SG Fire API Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   console.log(`📡 Health check: http://localhost:${PORT}/health`);
 });
+
+// ─────────────────────────────────────────────
+// SOCKET.IO SETUP
+// ─────────────────────────────────────────────
+import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import User from './src/models/User.js';
+import Message from './src/models/Message.js';
+import SupportTicket from './src/models/SupportTicket.js';
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'development' ? true : (process.env.CLIENT_URL || 'http://localhost:3000'),
+    credentials: true,
+  },
+});
+
+io.use(async (socket, next) => {
+  try {
+    const cookieString = socket.handshake.headers.cookie || '';
+    const tokenStr = cookieString.split(';').find(c => c.trim().startsWith('jwt='));
+    if (!tokenStr) return next(new Error('Authentication error'));
+    
+    const token = tokenStr.split('=')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = await User.findById(decoded.id).select('-password');
+    if (!socket.user) return next(new Error('User not found'));
+    next();
+  } catch (err) {
+    next(new Error('Authentication error'));
+  }
+});
+
+io.on('connection', (socket) => {
+  // User joins their own personal room
+  socket.join(`user_${socket.user.id}`);
+  
+  if (socket.user.role === 'admin') {
+    socket.join('admins');
+  }
+
+  socket.on('sendMessage', async (data) => {
+    try {
+      const { ticketId, text } = data;
+      const ticket = await SupportTicket.findById(ticketId);
+      if (!ticket) return;
+
+      const message = await Message.create({
+        ticket: ticketId,
+        sender: socket.user.id,
+        text,
+        isAdmin: socket.user.role === 'admin'
+      });
+
+      ticket.lastMessage = text;
+      ticket.lastMessageAt = new Date();
+      if (socket.user.role !== 'admin' && ticket.status === 'closed') {
+        ticket.status = 'open'; // Reopen ticket if user messages again
+      }
+      await ticket.save();
+
+      const populatedMsg = await Message.findById(message._id).populate('sender', 'name avatar role');
+
+      // Emit to the specific user's room and to all admins
+      io.to(`user_${ticket.user}`).emit('receiveMessage', populatedMsg);
+      io.to('admins').emit('receiveMessage', populatedMsg);
+      io.to('admins').emit('ticketUpdated', ticket);
+    } catch (err) {
+      console.error('Socket message error:', err);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    // automatic cleanup
+  });
+});
+
 
 // ─────────────────────────────────────────────
 // GRACEFUL SHUTDOWN HANDLING

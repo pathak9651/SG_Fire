@@ -9,7 +9,8 @@ import {
   Calendar, 
   Settings, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { label: 'My Wishlist', icon: Heart, href: '/dashboard/wishlist', userOnly: true },
   { label: 'Appointments', icon: Calendar, href: '/dashboard/appointments', userOnly: true },
   { label: 'Account Settings', icon: Settings, href: '/dashboard/settings' },
+  { label: 'Help & Support', icon: MessageSquare, href: '/dashboard/support', userOnly: true },
 ];
 
 export default function DashboardSidebar() {
@@ -81,12 +83,12 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Support Card */}
-      <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 text-white overflow-hidden relative group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/20 blur-3xl -mr-16 -mt-16 group-hover:bg-red-600/30 transition-all duration-700" />
+      <div className="bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 text-white overflow-hidden relative group shadow-xl">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl -mr-16 -mt-16 group-hover:bg-orange-500/40 transition-all duration-700" />
         <h4 className="font-outfit font-black text-lg mb-2 relative z-10">Need Help?</h4>
         <p className="text-xs text-gray-400 mb-4 relative z-10">Our safety experts are available 24/7 for emergency support.</p>
-        <Link href="/contact" className="inline-block px-4 py-2 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-red-600 hover:text-white transition-all relative z-10">
-          Contact Us
+        <Link href="/dashboard/support" className="inline-block px-5 py-2.5 bg-orange-500 text-white hover:bg-orange-600 text-xs font-black uppercase tracking-widest rounded-full hover:scale-105 hover:shadow-lg hover:shadow-orange-500/30 transition-all relative z-10">
+          Live Chat
         </Link>
       </div>
     </div>
