@@ -17,7 +17,7 @@ async function getProducts(searchParams: { [key: string]: string | string[] | un
       if (typeof value === 'string') query.append(key, value);
     });
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/products?${query.toString()}`, {
       cache: 'no-store' // Disable caching to show new products immediately
     });
@@ -31,7 +31,7 @@ async function getProducts(searchParams: { [key: string]: string | string[] | un
 
 async function getCategories() {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/categories`, { cache: 'no-store' });
     const data = await res.json();
     return data.data || [];
@@ -43,10 +43,11 @@ async function getCategories() {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const [productsData, categories] = await Promise.all([
-    getProducts(searchParams),
+    getProducts(resolvedSearchParams),
     getCategories()
   ]);
 

@@ -7,7 +7,7 @@ export const revalidate = 3600;
 
 async function getProduct(slug: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/products/${slug}`, {
       next: { revalidate: 3600 }
     });
@@ -27,7 +27,7 @@ async function getProduct(slug: string) {
 
 async function getRelatedProducts(id: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/products/related/${id}`, {
       next: { revalidate: 3600 }
     });
@@ -39,8 +39,9 @@ async function getRelatedProducts(id: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const product = await getProduct(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.slug);
 
   if (!product) {
     return {
@@ -55,8 +56,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug);
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.slug);
 
   if (!product) {
     notFound();

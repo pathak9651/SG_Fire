@@ -36,7 +36,7 @@ const initialState: AuthState = {
   user: null,
   accessToken: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
 };
 
 // ─────────────────────────────────────────────

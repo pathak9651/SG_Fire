@@ -55,7 +55,7 @@ export default function Navbar() {
     restDelta: 0.001
   });
 
-  const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const cartCount = cart?.validItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);

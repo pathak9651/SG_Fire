@@ -15,7 +15,8 @@ import {
   Flame,
   ArrowLeft,
   User as UserIcon,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +28,7 @@ const MENU_ITEMS = [
   { label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
   { label: 'Inventory', icon: BarChart3, href: '/admin/stock' },
   { label: 'Profile', icon: UserIcon, href: '/admin/profile' },
-  { label: 'Support', icon: MessageSquare, href: '/admin/support' },
+  { label: 'Help & Support', icon: MessageSquare, href: '/admin/support' },
 ];
 
 interface AdminSidebarProps {

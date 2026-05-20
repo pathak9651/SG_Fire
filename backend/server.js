@@ -184,10 +184,12 @@ const io = new Server(server, {
   },
 });
 
+app.set('io', io);
+
 io.use(async (socket, next) => {
   try {
     const cookieString = socket.handshake.headers.cookie || '';
-    const tokenStr = cookieString.split(';').find(c => c.trim().startsWith('jwt='));
+    const tokenStr = cookieString.split(';').find(c => c.trim().startsWith('accessToken='));
     if (!tokenStr) return next(new Error('Authentication error'));
     
     const token = tokenStr.split('=')[1];

@@ -32,7 +32,7 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
       {/* Product Image */}
       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
         <Image
-          src={item.image || '/images/placeholder.jpg'}
+          src={item.image || '/images/placeholder.png'}
           alt={item.title}
           width={96}
           height={96}

@@ -22,8 +22,17 @@ import { getAdminProducts, updateProductStock } from '@/redux/slices/productSlic
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Spinner from '@/components/ui/Spinner';
+import { Category } from '@/types';
 
 export default function InventoryPage() {
+  const getCategoryName = (category: string | Category | undefined | null): string => {
+    if (!category) return 'Uncategorized';
+    if (typeof category === 'object' && 'name' in category) {
+      return category.name;
+    }
+    return typeof category === 'string' ? category : 'Uncategorized';
+  };
+
   const dispatch = useDispatch<AppDispatch>();
   const { products, isLoading } = useSelector((state: RootState) => state.product);
   
@@ -62,7 +71,7 @@ export default function InventoryPage() {
 
   const filteredProducts = products.filter(p => 
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    getCategoryName(p.category).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const lowStockItems = products.filter(p => p.stock <= 10).length;
@@ -167,7 +176,7 @@ export default function InventoryPage() {
                             <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors line-clamp-1 max-w-[200px]">
                               {product.title}
                             </p>
-                            <p className="text-[10px] text-gray-500 font-medium">{product.category?.name}</p>
+                            <p className="text-[10px] text-gray-500 font-medium">{getCategoryName(product.category)}</p>
                           </div>
                         </div>
                       </td>
@@ -225,7 +234,7 @@ export default function InventoryPage() {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <p className="text-[10px] text-gray-500 font-medium">
-                          {new Date(product.updatedAt).toLocaleDateString()}
+                          {product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : new Date(product.createdAt).toLocaleDateString()}
                         </p>
                       </td>
                     </motion.tr>

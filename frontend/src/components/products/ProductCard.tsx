@@ -39,8 +39,8 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     
     dispatch(toggleWishlist(product._id))
       .unwrap()
-      .then((res) => {
-        toast.success(res.message);
+      .then(() => {
+        toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
       })
       .catch((err) => {
         dispatch(optimisticToggle(product._id));

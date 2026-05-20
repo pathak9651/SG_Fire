@@ -10,7 +10,8 @@ import {
   Settings, 
   LogOut,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { label: 'Appointments', icon: Calendar, href: '/dashboard/appointments', userOnly: true },
   { label: 'Account Settings', icon: Settings, href: '/dashboard/settings' },
   { label: 'Help & Support', icon: MessageSquare, href: '/dashboard/support', userOnly: true },
+  { label: 'Help', icon: Sparkles, href: '/dashboard/help', userOnly: true },
 ];
 
 export default function DashboardSidebar() {

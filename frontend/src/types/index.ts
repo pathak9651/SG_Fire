@@ -140,6 +140,7 @@ export interface Product {
   inStock: boolean;
   isLowStock: boolean;
   createdAt: string;
+  updatedAt?: string;
   metaTitle?: string;
   metaDescription?: string;
 }

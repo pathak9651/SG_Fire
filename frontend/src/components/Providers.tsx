@@ -27,6 +27,7 @@ import { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import AuthInitializer from '@/components/auth/AuthInitializer';
+import FloatingChatbot from '@/components/chat/FloatingChatbot';
 
 /**
  * Create a stable QueryClient instance.
@@ -64,6 +65,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
           {/* Global footer */}
           <Footer />
+
+          {/* Global Floating AI Safety Chatbot */}
+          <FloatingChatbot />
         </AuthInitializer>
 
         {/* 

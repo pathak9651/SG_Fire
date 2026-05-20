@@ -50,7 +50,7 @@ export default function AboutPage() {
             <div className="space-y-4">
               <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl h-48 sm:h-64 overflow-hidden relative border border-gray-200 dark:border-gray-800">
                 <div className="absolute inset-0 bg-gradient-to-tr from-red-600/20 to-transparent z-10" />
-                <Image src="/images/placeholder.jpg" alt="Fire safety installation" fill className="object-cover" />
+                <Image src="/images/placeholder.png" alt="Fire safety installation" fill className="object-cover" />
               </div>
               <div className="bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 p-6 rounded-2xl flex flex-col justify-center h-32 sm:h-48">
                 <span className="text-4xl font-black text-red-600 dark:text-red-500 mb-1">500+</span>
@@ -63,7 +63,7 @@ export default function AboutPage() {
                 <span className="text-sm font-medium text-gray-400 uppercase tracking-wide">Years Experience</span>
               </div>
               <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl h-48 sm:h-64 overflow-hidden relative border border-gray-200 dark:border-gray-800">
-                <Image src="/images/placeholder.jpg" alt="Fire safety training" fill className="object-cover" />
+                <Image src="/images/placeholder.png" alt="Fire safety training" fill className="object-cover" />
               </div>
             </div>
           </div>

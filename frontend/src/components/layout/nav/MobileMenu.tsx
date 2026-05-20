@@ -34,7 +34,7 @@ export default function MobileMenu() {
     visible: { 
       x: 0,
       transition: { 
-        type: 'spring', 
+        type: 'spring' as const, 
         damping: 25, 
         stiffness: 200,
         staggerChildren: 0.1,
@@ -43,7 +43,7 @@ export default function MobileMenu() {
     },
     exit: { 
       x: '100%',
-      transition: { type: 'spring', damping: 25, stiffness: 200 }
+      transition: { type: 'spring' as const, damping: 25, stiffness: 200 }
     }
   };
 

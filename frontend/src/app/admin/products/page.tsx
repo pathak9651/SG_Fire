@@ -19,8 +19,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { getAdminProducts, deleteAdminProduct } from '@/redux/slices/productSlice';
 import toast from 'react-hot-toast';
+import { Category } from '@/types';
 
 export default function AdminProducts() {
+  const getCategoryName = (category: string | Category | undefined | null): string => {
+    if (!category) return 'Uncategorized';
+    if (typeof category === 'object' && 'name' in category) {
+      return category.name;
+    }
+    return typeof category === 'string' ? category : 'Uncategorized';
+  };
+
   const dispatch = useDispatch<AppDispatch>();
   const { products, isLoading } = useSelector((state: RootState) => state.product);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,10 +54,9 @@ export default function AdminProducts() {
     }
   };
 
-  // Filtering logic
   const filteredProducts = products?.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All Categories' || selectedCategory === 'All' || p.category?.name === selectedCategory;
+    const matchesCategory = selectedCategory === 'All Categories' || selectedCategory === 'All' || getCategoryName(p.category) === selectedCategory;
     return matchesSearch && matchesCategory;
   }) || [];
 
@@ -133,7 +141,7 @@ export default function AdminProducts() {
                         </td>
                         <td className="px-6 py-5">
                           <span className="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full uppercase tracking-widest scale-90 inline-block">
-                            {product.category?.name || 'Uncategorized'}
+                            {getCategoryName(product.category)}
                           </span>
                         </td>
                         <td className="px-6 py-5">

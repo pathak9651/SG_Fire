@@ -8,9 +8,10 @@ import Badge from '@/components/ui/Badge';
 import StarRating from '@/components/ui/StarRating';
 import { cn } from '@/lib/utils';
 import { ShoppingCart, Heart, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/redux/store';
 import { optimisticToggle, toggleWishlist } from '@/redux/slices/wishlistSlice';
+import { addToCart } from '@/redux/slices/cartSlice';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
@@ -69,8 +70,8 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
     dispatch(optimisticToggle(product._id));
     try {
-      const res = await dispatch(toggleWishlist(product._id)).unwrap();
-      toast.success(res.message);
+      await dispatch(toggleWishlist(product._id)).unwrap();
+      toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
     } catch (error) {
       dispatch(optimisticToggle(product._id));
       toast.error('Failed to update wishlist');
@@ -118,7 +119,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               {product.isFeatured && <Badge variant="warning">Featured</Badge>}
               {product.isNewArrival && <Badge variant="success">New Arrival</Badge>}
               {product.isBestSeller && <Badge variant="info">Best Seller</Badge>}
-              {isDiscounted && <Badge variant="error">Save {discountPercent}%</Badge>}
+              {isDiscounted && <Badge variant="danger">Save {discountPercent}%</Badge>}
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
