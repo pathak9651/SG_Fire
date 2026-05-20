@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import {
-  ShoppingCart, Search, Menu, X, Moon, Sun, User,
+  ShoppingCart, Search, Menu, X, User,
   LogOut, Package, Calendar, Heart, Phone, Flame,
   Mail, ShieldAlert, ChevronDown
 } from 'lucide-react';
 import { RootState, AppDispatch } from '@/redux/store';
-import { setDarkMode, toggleDarkMode, toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch } from '@/redux/slices/uiSlice';
+import { toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch } from '@/redux/slices/uiSlice';
 import { logoutUser } from '@/redux/slices/authSlice';
 import toast from 'react-hot-toast';
 
@@ -24,7 +24,7 @@ export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
 
-  const { isDarkMode, isSearchOpen } = useSelector((s: RootState) => s.ui);
+  const { isSearchOpen } = useSelector((s: RootState) => s.ui);
   const { user, isAuthenticated } = useSelector((s: RootState) => s.auth);
   const { cart } = useSelector((s: RootState) => s.cart);
 
@@ -43,9 +43,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    dispatch(setDarkMode(localStorage.getItem('sgfire-theme') === 'dark'));
-  }, [dispatch]);
+
 
   useEffect(() => {
     dispatch(closeMobileMenu());
@@ -141,26 +139,7 @@ export default function Navbar() {
               <Search size={19} />
             </motion.button>
 
-            {/* Theme Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => dispatch(toggleDarkMode())}
-              className="hidden sm:flex p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
-              aria-label="Toggle theme"
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={isDarkMode ? 'dark' : 'light'}
-                  initial={{ opacity: 0, rotate: -90 }}
-                  animate={{ opacity: 1, rotate: 0 }}
-                  exit={{ opacity: 0, rotate: 90 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {isDarkMode ? <Sun size={19} /> : <Moon size={19} />}
-                </motion.div>
-              </AnimatePresence>
-            </motion.button>
+            {/* Theme removed; always using light theme */}
 
             {/* Cart */}
             <Link

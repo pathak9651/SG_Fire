@@ -9,12 +9,11 @@
  *  isMobileMenuOpen  : Mobile hamburger menu open/close
  *  isSearchOpen      : Global search bar open/close
  *  isCartDrawerOpen  : Cart side drawer open/close
- *  isDarkMode        : Dark/light theme toggle
  *  activeModal       : Which modal is currently shown (null = none)
  *
  * USAGE:
  *   dispatch(openCartDrawer())
- *   const { isDarkMode } = useSelector((s) => s.ui)
+ *   // Theme is fixed to light; no dark-mode state available.
  * ============================================================
  */
 
@@ -26,7 +25,6 @@ interface UIState {
   isMobileMenuOpen: boolean;
   isSearchOpen: boolean;
   isCartDrawerOpen: boolean;
-  isDarkMode: boolean;
   activeModal: ModalType;
   modalData: unknown; // Data passed to the active modal
 }
@@ -35,9 +33,6 @@ const initialState: UIState = {
   isMobileMenuOpen: false,
   isSearchOpen: false,
   isCartDrawerOpen: false,
-  // Keep the first client render identical to SSR. The saved preference is
-  // applied after hydration by the navbar.
-  isDarkMode: false,
   activeModal: null,
   modalData: null,
 };
@@ -60,24 +55,7 @@ const uiSlice = createSlice({
     closeCartDrawer: (state) => { state.isCartDrawerOpen = false; },
     toggleCartDrawer: (state) => { state.isCartDrawerOpen = !state.isCartDrawerOpen; },
 
-    // ── Dark Mode ──────────────────────────────────────────
-    setDarkMode: (state, action: PayloadAction<boolean>) => {
-      state.isDarkMode = action.payload;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('sgfire-theme', state.isDarkMode ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', state.isDarkMode);
-      }
-    },
-
-    toggleDarkMode: (state) => {
-      state.isDarkMode = !state.isDarkMode;
-      // Persist preference to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('sgfire-theme', state.isDarkMode ? 'dark' : 'light');
-        // Apply/remove 'dark' class on <html> element for Tailwind dark mode
-        document.documentElement.classList.toggle('dark', state.isDarkMode);
-      }
-    },
+    // Dark mode removed: theme is always light by design.
 
     // ── Modals ─────────────────────────────────────────────
     openModal: (state, action: PayloadAction<{ type: ModalType; data?: unknown }>) => {
@@ -95,7 +73,6 @@ export const {
   toggleMobileMenu, closeMobileMenu,
   toggleSearch, closeSearch,
   openCartDrawer, closeCartDrawer, toggleCartDrawer,
-  setDarkMode, toggleDarkMode,
   openModal, closeModal,
 } = uiSlice.actions;
 

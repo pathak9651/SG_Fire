@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { closeMobileMenu, toggleDarkMode, toggleSearch } from '@/redux/slices/uiSlice';
+import { closeMobileMenu, toggleSearch } from '@/redux/slices/uiSlice';
 import { logoutUser } from '@/redux/slices/authSlice';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -26,7 +26,7 @@ const NAV_LINKS = [
 export default function MobileMenu() {
   const dispatch = useDispatch();
   const pathname = usePathname();
-  const { isMobileMenuOpen, isDarkMode } = useSelector((s: RootState) => s.ui);
+  const { isMobileMenuOpen } = useSelector((s: RootState) => s.ui);
   const { user, isAuthenticated } = useSelector((s: RootState) => s.auth);
 
   const containerVariants = {
@@ -156,15 +156,7 @@ export default function MobileMenu() {
                   <Link href="/dashboard" className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium p-2">
                     <User size={20} /> My Profile
                   </Link>
-                  <button 
-                    onClick={() => dispatch(toggleDarkMode())}
-                    className="flex items-center gap-3 text-gray-600 dark:text-gray-400 font-medium p-2"
-                  >
-                    <div className="w-5 h-5 flex items-center justify-center">
-                      {isDarkMode ? '🌞' : '🌙'}
-                    </div>
-                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                  </button>
+                  {/* Theme removed; always using light theme */}
                   {isAuthenticated && (
                     <button 
                       onClick={handleLogout}
