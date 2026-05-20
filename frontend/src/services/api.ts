@@ -3,7 +3,7 @@
  * FILE: src/services/api.ts
  * PURPOSE: Configures the Axios HTTP client for all API calls.
  *          - Sets base URL from environment variable
- *          - Attaches access token from Redux store to every request
+ *          - Sends cookie-based auth credentials on every request
  *          - Handles 401 errors by attempting token refresh
  *          - Applies consistent error handling and response format
  *
@@ -13,7 +13,7 @@
  * - Centralized token refresh logic (no duplication)
  *
  * INTERCEPTOR FLOW:
- *  Request  → Attach Authorization: Bearer <accessToken> header
+ *  Request  → Send cookies with the request
  *  Response → On 401: try refreshing token → retry original request
  *             On other errors: pass to caller
  *
@@ -23,7 +23,7 @@
  * ============================================================
  */
 
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
 
 /**
  * Base Axios instance with SG Fire backend URL.
@@ -42,34 +42,6 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
-// ─────────────────────────────────────────────
-// REQUEST INTERCEPTOR
-// Runs BEFORE every outgoing request.
-// ─────────────────────────────────────────────
-
-/**
- * Attaches the access token to the Authorization header if available.
- * The access token is stored in Redux state (not localStorage — more secure).
- * HTTP-only cookies handle the actual auth — this header is for API clients.
- */
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Get access token from Redux store via a module-level reference
-    // (This works because Redux store is a singleton)
-    const token =
-      typeof window !== 'undefined'
-        ? (window as any).__REDUX_STORE__?.getState()?.auth?.accessToken
-        : null;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 // ─────────────────────────────────────────────
 // RESPONSE INTERCEPTOR
@@ -103,7 +75,7 @@ api.interceptors.response.use(
 
   // Error handler
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
+    const originalRequest = error.config as AxiosError['config'] & {
       _retry?: boolean;
     };
 

@@ -91,6 +91,14 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const discountPercent = isDiscounted 
     ? Math.round(((product.price - product.discountPrice!) / product.price) * 100)
     : 0;
+  const safeDescription = product.description
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+    .replace(/<br\s*\/?\s*>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
   return (
     <div className="bg-white">
@@ -267,7 +275,9 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
             <div className="lg:col-span-2 prose prose-red max-w-none">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Description</h2>
-              <div className="text-gray-600 leading-relaxed space-y-4" dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br />') }} />
+              <div className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {safeDescription}
+              </div>
             </div>
             
             <div className="lg:col-span-1">

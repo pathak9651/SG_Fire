@@ -21,13 +21,14 @@ import {
 } from '../controllers/appointmentController.js';
 import { protect, adminOnly, authorize } from '../middleware/auth.js';
 import { uploadMultiple } from '../middleware/upload.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 router.use(protect); // All appointment routes require authentication
 
 // ── Customer Routes ────────────────────────────────────────
-router.post('/', uploadMultiple('siteImages', 8), bookAppointment); // Book with site photos
+router.post('/', uploadLimiter, uploadMultiple('siteImages', 8), bookAppointment); // Book with site photos
 router.get('/my', getMyAppointments);                               // User's appointments
 router.get('/:id', getAppointmentById);                             // Single detail
 router.post('/:id/cancel', cancelAppointment);                      // Cancel booking

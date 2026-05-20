@@ -54,6 +54,53 @@ const generateOrderNumber = () => {
   return `SGF-${date}-${random}`;
 };
 
+const buildOrderSummaryFromCart = async (cart) => {
+  const orderItems = [];
+  let itemsTotal = 0;
+
+  for (const cartItem of cart.items) {
+    const product = await Product.findById(cartItem.product);
+    if (!product || !product.isActive) continue;
+
+    if (product.stock < cartItem.quantity) {
+      throw new ErrorResponse(`Insufficient stock for: ${product.title}`, 400);
+    }
+
+    const effectivePrice = product.discountPrice || product.price;
+    orderItems.push({
+      product: product._id,
+      title: product.title,
+      image: product.images[0]?.url || '',
+      price: effectivePrice,
+      quantity: cartItem.quantity,
+    });
+
+    itemsTotal += effectivePrice * cartItem.quantity;
+  }
+
+  const shippingCharge = itemsTotal >= 1000 ? 0 : 99;
+  const taxAmount = Math.round(itemsTotal * 0.18);
+
+  let discountAmount = 0;
+  let couponData = {};
+  if (cart.appliedCoupon) {
+    discountAmount = cart.appliedCoupon.discount || 0;
+    couponData = { code: cart.appliedCoupon.code, discount: discountAmount };
+  }
+
+  const totalAmount = itemsTotal + shippingCharge + taxAmount - discountAmount;
+
+  return {
+    orderItems,
+    itemsTotal,
+    shippingCharge,
+    taxAmount,
+    discountAmount,
+    couponData,
+    totalAmount,
+  };
+};
+
 // ─────────────────────────────────────────────
 // @desc    Create Razorpay order (Step 1 of payment)
 // @route   POST /api/orders/razorpay-order
@@ -61,11 +108,17 @@ const generateOrderNumber = () => {
 // Body: { amount } (in paise, e.g., 50000 = ₹500)
 // ─────────────────────────────────────────────
 export const createRazorpayOrder = asyncHandler(async (req, res) => {
-  const { amount } = req.body;
+  const cart = await Cart.findOne({ user: req.user.id });
+
+  if (!cart || cart.items.length === 0) {
+    throw new ErrorResponse('Your cart is empty.', 400);
+  }
+
+  const { totalAmount } = await buildOrderSummaryFromCart(cart);
 
   // Razorpay requires amount in paise (1 rupee = 100 paise)
   const options = {
-    amount: Math.round(amount * 100), // Convert rupees to paise
+    amount: Math.round(totalAmount * 100), // Convert rupees to paise
     currency: 'INR',
     receipt: `receipt_${Date.now()}`,
     notes: { userId: req.user.id.toString() },
@@ -98,6 +151,16 @@ export const placeOrder = asyncHandler(async (req, res) => {
     throw new ErrorResponse('Your cart is empty.', 400);
   }
 
+  const {
+    orderItems,
+    itemsTotal,
+    shippingCharge,
+    taxAmount,
+    discountAmount,
+    couponData,
+    totalAmount,
+  } = await buildOrderSummaryFromCart(cart);
+
   // ── Step 2: Verify Razorpay payment signature ──
   if (paymentMethod === 'razorpay') {
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = paymentDetails;
@@ -115,53 +178,24 @@ export const placeOrder = asyncHandler(async (req, res) => {
     }
   }
 
-  // ── Step 3: Build order items from cart (with current DB prices) ──
-  const orderItems = [];
-  let itemsTotal = 0;
-
-  for (const cartItem of cart.items) {
-    const product = await Product.findById(cartItem.product);
-    if (!product || !product.isActive) continue;
-    if (product.stock < cartItem.quantity) {
-      throw new ErrorResponse(`Insufficient stock for: ${product.title}`, 400);
+  // Deduct stock only after payment payload has been validated and order amount derived server-side.
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+    if (!product) {
+      throw new ErrorResponse(`Product not found: ${item.title}`, 404);
     }
-
-    const effectivePrice = product.discountPrice || product.price;
-    orderItems.push({
-      product: product._id,
-      title: product.title,
-      image: product.images[0]?.url || '',
-      price: effectivePrice,
-      quantity: cartItem.quantity,
-    });
-
-    itemsTotal += effectivePrice * cartItem.quantity;
-
-    // Deduct from stock
-    product.stock -= cartItem.quantity;
-    product.totalSold += cartItem.quantity;
+    product.stock -= item.quantity;
+    product.totalSold += item.quantity;
     await product.save();
   }
 
-  // ── Step 4: Calculate charges ──
-  const shippingCharge = itemsTotal >= 1000 ? 0 : 99;
-  const taxAmount = Math.round(itemsTotal * 0.18);
-
   // Apply coupon discount if present
-  let discountAmount = 0;
-  let couponData = {};
-  if (cart.appliedCoupon) {
-    discountAmount = cart.appliedCoupon.discount || 0;
-    couponData = { code: cart.appliedCoupon.code, discount: discountAmount };
-
-    // Increment coupon usage
+  if (cart.appliedCoupon?.couponId) {
     await Coupon.findByIdAndUpdate(cart.appliedCoupon.couponId, {
       $inc: { usedCount: 1 },
       $push: { usedBy: { user: req.user.id } },
     });
   }
-
-  const totalAmount = itemsTotal + shippingCharge + taxAmount - discountAmount;
 
   // ── Step 5: Create the Order document ──
   const isCOD = paymentMethod === 'cod';

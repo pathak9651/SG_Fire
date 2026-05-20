@@ -45,10 +45,8 @@ function VerifyContent() {
       if (data.success) {
         setSuccessMessage('Email verified successfully!');
         
-        // The backend automatically sends tokens after verification, we can update Redux manually
-        // OR the user can just be redirected to home since cookies are set
-        if (data.user && data.accessToken) {
-          dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
+        if (data.user) {
+          dispatch(setCredentials({ user: data.user }));
         }
 
         setTimeout(() => {

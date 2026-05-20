@@ -48,17 +48,17 @@ const storage = multer.memoryStorage();
  * Validates that uploaded files are allowed image types.
  * Rejects non-image files with a descriptive error.
  *
- * Allowed formats: JPEG, JPG, PNG, WEBP, SVG
+ * Allowed formats: JPEG, JPG, PNG, WEBP
  */
 const fileFilter = (req, file, cb) => {
   // Check MIME type (e.g., image/jpeg, image/png)
-  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'];
+  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true); // Accept the file
   } else {
     cb(
-      new Error('Invalid file type. Only JPEG, PNG, WEBP, and SVG images are allowed.'),
+      new Error('Invalid file type. Only JPEG, PNG, and WEBP images are allowed.'),
       false // Reject the file
     );
   }

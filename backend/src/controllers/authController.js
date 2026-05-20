@@ -222,7 +222,7 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     maxAge: expiresIn,
   });
 
-  res.json({ success: true, accessToken: newAccessToken });
+  res.json({ success: true });
 });
 
 // ─────────────────────────────────────────────
@@ -258,7 +258,6 @@ export const getSession = asyncHandler(async (req, res, next) => {
     res.json({
       success: true,
       authenticated: true,
-      accessToken,
       data: user,
     });
   } catch (error) {

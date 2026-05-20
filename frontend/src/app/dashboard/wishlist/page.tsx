@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/redux/store';
 import { Heart, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
+import StarRating from '@/components/ui/StarRating';
+import { addToCart } from '@/redux/slices/cartSlice';
 import Link from 'next/link';
 import Image from 'next/image';
 import api from '@/services/api';
@@ -45,6 +47,18 @@ export default function WishlistPage() {
       toast.error('Failed to remove item');
       // No easy rollback for products state here without refetching, 
       // but Redux state is rolled back by slice if needed.
+    }
+  };
+
+  const handleMoveToCart = async (productId: string) => {
+    try {
+      await dispatch(addToCart({ productId, quantity: 1 })).unwrap();
+      // Remove from wishlist after successful add to cart
+      await dispatch(toggleWishlist(productId)).unwrap();
+      setProducts(prev => prev.filter(p => p._id !== productId));
+      toast.success('Moved to cart');
+    } catch (error) {
+      toast.error('Failed to move to cart');
     }
   };
 
@@ -97,7 +111,7 @@ export default function WishlistPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden group shadow-sm hover:shadow-md transition-all"
             >
-              <div className="relative aspect-square">
+              <div className="relative aspect-square bg-gray-50">
                 <Image
                   src={product.images[0]?.url || '/placeholder.png'}
                   alt={product.title}
@@ -106,7 +120,7 @@ export default function WishlistPage() {
                 />
                 <button
                   onClick={() => handleRemove(product._id)}
-                  className="absolute top-3 right-3 p-2 bg-white/90 dark:bg-gray-800/90 text-gray-400 hover:text-red-500 rounded-full shadow-sm transition-colors"
+                  className="absolute top-3 right-3 p-2 bg-white/90 text-gray-400 hover:text-red-500 rounded-full shadow-sm transition-colors"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -120,6 +134,14 @@ export default function WishlistPage() {
                     {product.title}
                   </h3>
                 </Link>
+                <div className="mt-2 flex items-center justify-between">
+                  <StarRating rating={product.ratings || 0} count={product.numReviews} />
+                  {product.inStock ? (
+                    <span className="text-xs font-medium text-green-600">In stock</span>
+                  ) : (
+                    <span className="text-xs font-medium text-red-600">Out of stock</span>
+                  )}
+                </div>
                 <div className="mt-3 flex items-center justify-between">
                   <div>
                     {product.discountPrice ? (
@@ -131,9 +153,21 @@ export default function WishlistPage() {
                       <span className="text-lg font-bold text-gray-900 dark:text-white">₹{product.price}</span>
                     )}
                   </div>
-                  <button className="p-2.5 bg-gray-900 dark:bg-gray-800 text-white rounded-xl hover:bg-red-600 transition-colors shadow-sm">
-                    <ShoppingBag className="w-5 h-5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleMoveToCart(product._id)}
+                      className="px-3 py-2 bg-gradient-to-br from-red-600 to-orange-500 text-white rounded-xl hover:from-red-700 hover:to-orange-600 transition-colors shadow-md flex items-center gap-2"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Move to cart</span>
+                    </button>
+                    <button
+                      onClick={() => handleRemove(product._id)}
+                      className="p-2.5 bg-white border border-gray-100 rounded-xl text-red-600 hover:bg-red-50 transition-colors shadow-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>

@@ -22,6 +22,7 @@ import {
 } from '../controllers/productController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { uploadMultiple, uploadSingle } from '../middleware/upload.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -36,8 +37,8 @@ router.get('/related/:id', getRelatedProducts);           // Related products si
 // protect: verifies JWT | adminOnly: checks role === 'admin'
 // uploadMultiple: handles up to 5 image uploads per product
 
-router.post('/', protect, adminOnly, uploadMultiple('images', 5), createProduct);
-router.put('/:id', protect, adminOnly, uploadMultiple('images', 5), updateProduct);
+router.post('/', protect, adminOnly, uploadLimiter, uploadMultiple('images', 5), createProduct);
+router.put('/:id', protect, adminOnly, uploadLimiter, uploadMultiple('images', 5), updateProduct);
 router.delete('/:id', protect, adminOnly, deleteProduct);
 router.get('/:id', protect, adminOnly, getProductById);
 router.patch('/:id/stock', protect, adminOnly, updateStock);   // Quick stock update

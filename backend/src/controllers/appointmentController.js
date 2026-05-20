@@ -301,27 +301,38 @@ export const assignTechnician = asyncHandler(async (req, res) => {
 export const completeAppointment = asyncHandler(async (req, res) => {
   const { completionReport, actualCost, technicianNotes } = req.body;
 
-  const appointment = await Appointment.findByIdAndUpdate(
-    req.params.id,
-    {
-      status: 'completed',
-      completedAt: new Date(),
-      completionReport,
-      actualCost,
-      technicianNotes,
-      $push: {
-        statusHistory: {
-          status: 'completed',
-          message: 'Service completed successfully',
-          timestamp: new Date(),
-          updatedBy: req.user.id,
-        },
-      },
-    },
-    { new: true }
-  );
+  const appointment = await Appointment.findById(req.params.id);
 
   if (!appointment) throw new ErrorResponse('Appointment not found.', 404);
+
+  if (appointment.status === 'cancelled' || appointment.status === 'completed') {
+    throw new ErrorResponse('This appointment cannot be completed in its current state.', 400);
+  }
+
+  if (req.user.role === 'technician') {
+    const assignedTechnicianId = appointment.technician?.toString();
+    if (!assignedTechnicianId || assignedTechnicianId !== req.user.id.toString()) {
+      throw new ErrorResponse('You are not assigned to this appointment.', 403);
+    }
+
+    if (!['assigned', 'approved', 'in_progress'].includes(appointment.status)) {
+      throw new ErrorResponse('Technicians can only complete assigned appointments.', 400);
+    }
+  }
+
+  appointment.status = 'completed';
+  appointment.completedAt = new Date();
+  appointment.completionReport = completionReport;
+  appointment.actualCost = actualCost;
+  appointment.technicianNotes = technicianNotes;
+  appointment.statusHistory.push({
+    status: 'completed',
+    message: 'Service completed successfully',
+    timestamp: new Date(),
+    updatedBy: req.user.id,
+  });
+
+  await appointment.save();
 
   res.json({ success: true, data: appointment });
 });

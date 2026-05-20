@@ -2,12 +2,10 @@
  * ============================================================
  * FILE: src/redux/slices/authSlice.ts
  * PURPOSE: Manages authentication state in Redux.
- *          Stores the logged-in user's profile, access token,
- *          and authentication loading states.
+ *          Stores the logged-in user's profile and authentication loading states.
  *
  * STATE SHAPE:
  *  user           : User profile object (null if not logged in)
- *  accessToken    : JWT access token string (null if not logged in)
  *  isAuthenticated: Derived boolean — true when user is not null
  *  isLoading      : True while auth API calls are in progress
  *  error          : Error message from failed auth operations
@@ -34,9 +32,9 @@ import { AxiosError } from 'axios';
 // ─────────────────────────────────────────────
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
   isAuthenticated: false,
-  isLoading: true,
+  // Start as not loading to avoid SSR/client hydration mismatches.
+  isLoading: false,
 };
 
 // ─────────────────────────────────────────────
@@ -86,13 +84,13 @@ export const updatePassword = createAsyncThunk<
  * The refresh token is set as HTTP-only cookie by the server automatically.
  */
 export const loginUser = createAsyncThunk<
-  { user: User; accessToken: string },
+  { user: User },
   { email: string; password: string },
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/login', credentials);
-    return { user: data.user, accessToken: data.accessToken };
+    return { user: data.user };
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     return rejectWithValue(axiosError.response?.data?.message || 'Login failed');
@@ -136,7 +134,7 @@ export const logoutUser = createAsyncThunk('auth/logout', async () => {
  * If refresh cookie is expired/invalid, user is logged out.
  */
 export const fetchMe = createAsyncThunk<
-  { user: User; accessToken: string },
+  { user: User },
   void,
   { rejectValue: string }
 >('auth/fetchMe', async (_, { rejectWithValue }) => {
@@ -147,7 +145,7 @@ export const fetchMe = createAsyncThunk<
       return rejectWithValue('No active session');
     }
 
-    return { user: data.data, accessToken: data.accessToken };
+    return { user: data.data };
   } catch (error) {
     return rejectWithValue('Session expired');
   }
@@ -167,10 +165,9 @@ const authSlice = createSlice({
      */
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; accessToken: string }>
+      action: PayloadAction<{ user: User }>
     ) => {
       state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
     },
 
@@ -179,7 +176,6 @@ const authSlice = createSlice({
      */
     clearCredentials: (state) => {
       state.user = null;
-      state.accessToken = null;
       state.isAuthenticated = false;
     },
 
@@ -204,7 +200,6 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state) => {
@@ -225,7 +220,6 @@ const authSlice = createSlice({
     // ── Logout ─────────────────────────────────────────────
     builder.addCase(logoutUser.fulfilled, (state) => {
       state.user = null;
-      state.accessToken = null;
       state.isAuthenticated = false;
     });
 
@@ -235,7 +229,6 @@ const authSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
       })
       .addCase(fetchMe.rejected, (state) => {

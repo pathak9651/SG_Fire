@@ -23,6 +23,20 @@ import ApiFeatures from '../utils/apiFeatures.js';
 import { createSlug, ensureUniqueSlug } from '../utils/slugify.js';
 import { bufferToBase64, deleteFromCloudinary } from '../middleware/upload.js';
 
+const sanitizeText = (value) => {
+  if (typeof value !== 'string') return value;
+
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<\/(p|div|li|h[1-6])>/gi, '\n')
+    .replace(/<br\s*\/?\s*>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/[\t\v\f\r ]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
+
 // ─────────────────────────────────────────────
 // @desc    Get all products with search, filter, sort, pagination
 // @route   GET /api/products
@@ -159,8 +173,15 @@ export const createProduct = asyncHandler(async (req, res) => {
   const categoryExists = await Category.findById(category);
   if (!categoryExists) throw new ErrorResponse('Category not found.', 404);
 
+  req.body.title = sanitizeText(title);
+  req.body.description = sanitizeText(description);
+  req.body.shortDescription = sanitizeText(shortDescription);
+  req.body.brand = sanitizeText(brand);
+  req.body.metaTitle = sanitizeText(metaTitle);
+  req.body.metaDescription = sanitizeText(metaDescription);
+
   // Generate URL slug from title
-  const baseSlug = createSlug(title);
+  const baseSlug = createSlug(req.body.title);
   const slug = await ensureUniqueSlug(baseSlug, Product);
 
   // Convert all product images to Base64 for MongoDB storage
@@ -194,6 +215,13 @@ export const createProduct = asyncHandler(async (req, res) => {
 export const updateProduct = asyncHandler(async (req, res) => {
   let product = await Product.findById(req.params.id);
   if (!product) throw new ErrorResponse('Product not found.', 404);
+
+  if (req.body.title) req.body.title = sanitizeText(req.body.title);
+  if (req.body.description) req.body.description = sanitizeText(req.body.description);
+  if (req.body.shortDescription) req.body.shortDescription = sanitizeText(req.body.shortDescription);
+  if (req.body.brand) req.body.brand = sanitizeText(req.body.brand);
+  if (req.body.metaTitle) req.body.metaTitle = sanitizeText(req.body.metaTitle);
+  if (req.body.metaDescription) req.body.metaDescription = sanitizeText(req.body.metaDescription);
 
   // If new images are uploaded, convert to Base64
   if (req.files && req.files.length > 0) {

@@ -22,6 +22,7 @@ import {
 } from '../controllers/adminController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { uploadSingle } from '../middleware/upload.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -36,8 +37,8 @@ router.get('/low-stock', getLowStockProducts);  // Low stock alert table
 
 // ── Banner Management ──────────────────────────────────────
 router.get('/banners', getBanners);                                      // List all
-router.post('/banners', uploadSingle('image'), createBanner);            // Create with image
-router.put('/banners/:id', uploadSingle('image'), updateBanner);         // Update banner
+router.post('/banners', uploadLimiter, uploadSingle('image'), createBanner);            // Create with image
+router.put('/banners/:id', uploadLimiter, uploadSingle('image'), updateBanner);         // Update banner
 router.delete('/banners/:id', deleteBanner);                             // Delete banner
 
 // ── User Management ────────────────────────────────────────

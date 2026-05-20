@@ -11,6 +11,8 @@
  *                      (Prevents brute-force password guessing)
  *  - otpLimiter      : Applied to OTP endpoints. 5 req/15min per IP.
  *  - uploadLimiter   : Applied to file upload endpoints. 20 req/hour.
+ *  - contactLimiter  : Applied to public contact form submissions.
+ *  - supportLimiter  : Applied to support ticket creation requests.
  *
  * USAGE in routes:
  *   import { authLimiter } from '../middleware/rateLimiter.js';
@@ -100,5 +102,39 @@ export const uploadLimiter = rateLimit({
   message: {
     success: false,
     message: 'Upload limit reached. Please wait an hour before uploading more files.',
+  },
+});
+
+/**
+ * contactLimiter
+ * --------------
+ * Rate limiter for public contact form submissions.
+ * Keeps spam and email flooding low.
+ */
+export const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour window
+  max: 5,                   // 5 submissions per hour
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many contact requests. Please try again later.',
+  },
+});
+
+/**
+ * supportLimiter
+ * --------------
+ * Rate limiter for support ticket creation requests.
+ * Prevents users from spamming live-chat ticket creation.
+ */
+export const supportLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many support requests. Please wait before trying again.',
   },
 });

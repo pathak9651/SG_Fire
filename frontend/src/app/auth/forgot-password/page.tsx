@@ -78,8 +78,8 @@ export default function ForgotPasswordPage() {
         password: values.password,
       });
 
-      if (data.user && data.accessToken) {
-        dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
+      if (data.user) {
+        dispatch(setCredentials({ user: data.user }));
       }
 
       setSuccessMessage('Password updated successfully. Redirecting...');
