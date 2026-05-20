@@ -15,6 +15,7 @@ const categories = [
     name: 'Fire Extinguishers',
     description: 'ABC Powder, CO2, Water, and Foam extinguishers for all fire classes.',
     icon: Flame,
+    image: '/images/hero-1.png',
     color: 'bg-red-50 text-red-600 border-red-100',
     link: '/products?category=fire-extinguishers'
   },
@@ -23,6 +24,7 @@ const categories = [
     name: 'Fire Alarms & Detectors',
     description: 'Smoke detectors, heat sensors, and complete addressable alarm systems.',
     icon: BellRing,
+    image: '/images/hero-3.png',
     color: 'bg-amber-50 text-amber-600 border-amber-100',
     link: '/products?category=fire-alarms'
   },
@@ -31,6 +33,7 @@ const categories = [
     name: 'Hydrant Systems',
     description: 'Hoses, nozzles, valves, and full hydrant network accessories.',
     icon: Droplets,
+    image: '/images/hero-2.png',
     color: 'bg-blue-50 text-blue-600 border-blue-100',
     link: '/products?category=hydrant-systems'
   },
@@ -39,6 +42,7 @@ const categories = [
     name: 'Personal Protective Equipment',
     description: 'Fire suits, helmets, gloves, and breathing apparatus.',
     icon: HardHat,
+    image: '/images/hero-2.png',
     color: 'bg-green-50 text-green-600 border-green-100',
     link: '/products?category=safety-gear'
   },
@@ -47,6 +51,7 @@ const categories = [
     name: 'Suppression Systems',
     description: 'Automated clean agent and water sprinkler systems for server rooms and factories.',
     icon: ShieldAlert,
+    image: '/images/hero-3.png',
     color: 'bg-purple-50 text-purple-600 border-purple-100',
     link: '/products?category=suppression-systems'
   },
@@ -55,6 +60,7 @@ const categories = [
     name: 'Spare Parts & Accessories',
     description: 'Signage, brackets, cabinets, and maintenance tools.',
     icon: Settings,
+    image: '/images/hero-1.png',
     color: 'bg-gray-50 text-gray-600 border-gray-200',
     link: '/products?category=accessories'
   }
@@ -85,8 +91,18 @@ export default function CategoriesPage() {
                 href={category.link}
                 className="group flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-xl dark:hover:shadow-red-900/10 transition-all duration-300 hover:border-red-200 dark:hover:border-red-900/50"
               >
-                <div className={`p-8 ${category.color} border-b dark:border-gray-800 flex justify-center items-center h-48 transition-colors group-hover:bg-red-50 dark:group-hover:bg-red-950/20`}>
-                  <Icon className={`w-20 h-20 ${category.color.split(' ')[1]} transition-transform duration-300 group-hover:scale-110 group-hover:text-red-600 dark:group-hover:text-red-500`} />
+                <div className="relative h-48 overflow-hidden border-b border-gray-200 dark:border-gray-800">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-950/85 via-gray-950/35 to-transparent" />
+                  <div className={`absolute left-5 bottom-5 w-16 h-16 ${category.color} border rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110`}>
+                    <Icon className={`w-8 h-8 ${category.color.split(' ')[1]} group-hover:text-red-600 dark:group-hover:text-red-500`} />
+                  </div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">

@@ -19,6 +19,7 @@ import {
   forgotPassword,
   resetPassword,
   refreshToken,
+  getSession,
   getMe,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
@@ -36,6 +37,7 @@ router.post('/resend-otp', otpLimiter, resendOTP);          // Resend OTP email
 router.post('/forgot-password', authLimiter, forgotPassword); // Send reset link
 router.post('/reset-password/:token', authLimiter, resetPassword); // Reset with token
 router.post('/refresh-token', refreshToken);                // Issue new access token
+router.get('/session', getSession);                         // Guest-safe session check
 
 // ── Protected Routes ───────────────────────────────────────
 // Require valid JWT (via protect middleware)

@@ -226,6 +226,47 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 // ─────────────────────────────────────────────
+// @desc    Check current session without returning 401 for guests
+// @route   GET /api/auth/session
+// @access  Public
+// ─────────────────────────────────────────────
+export const getSession = asyncHandler(async (req, res, next) => {
+  const token = req.cookies.refreshToken;
+  if (!token) {
+    return res.json({ success: true, authenticated: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user || user.isBlocked) {
+      return res.json({ success: true, authenticated: false });
+    }
+
+    const isAdmin = user.role === 'admin';
+    const expiresIn = isAdmin ? 30 * 60 * 1000 : 5 * 60 * 1000;
+    const accessToken = generateAccessToken(user._id, isAdmin ? '30m' : '5m');
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: expiresIn,
+    });
+
+    res.json({
+      success: true,
+      authenticated: true,
+      accessToken,
+      data: user,
+    });
+  } catch (error) {
+    res.json({ success: true, authenticated: false });
+  }
+});
+
+// ─────────────────────────────────────────────
 // @desc    Send password reset email
 // @route   POST /api/auth/forgot-password
 // @access  Public

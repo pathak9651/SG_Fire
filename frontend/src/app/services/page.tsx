@@ -1,6 +1,7 @@
 import React from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import { ClipboardCheck, Wrench, GraduationCap, Flame, ArrowRight } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const services = [
     title: 'Fire Safety Audits',
     description: 'Comprehensive risk assessments and compliance audits by certified professionals to identify vulnerabilities and ensure regulatory compliance.',
     icon: ClipboardCheck,
+    image: '/images/hero-3.png',
     features: ['Regulatory Compliance Check', 'Risk Assessment Report', 'Evacuation Plan Review', 'Actionable Recommendations']
   },
   {
@@ -22,6 +24,7 @@ const services = [
     title: 'System Installation',
     description: 'End-to-end installation of fire alarms, hydrant systems, and automated suppression systems tailored to your infrastructure.',
     icon: Wrench,
+    image: '/images/hero-2.png',
     features: ['Turnkey Projects', 'NBC Compliant Design', 'Testing & Commissioning', '1-Year Warranty']
   },
   {
@@ -29,6 +32,7 @@ const services = [
     title: 'AMC & Maintenance',
     description: 'Annual Maintenance Contracts (AMC) to keep your fire safety equipment fully operational and ready for emergencies.',
     icon: Flame,
+    image: '/images/hero-1.png',
     features: ['Scheduled Inspections', 'Extinguisher Refilling', 'Mock Drill Assistance', '24/7 Emergency Support']
   },
   {
@@ -36,6 +40,7 @@ const services = [
     title: 'Corporate Training',
     description: 'Hands-on fire safety training for employees, teaching proper extinguisher usage and emergency evacuation protocols.',
     icon: GraduationCap,
+    image: '/images/hero-2.png',
     features: ['Live Fire Demonstrations', 'Evacuation Drills', 'First Aid Basics', 'Certification Provided']
   }
 ];
@@ -46,10 +51,13 @@ export default function ServicesPage() {
       {/* Hero Section */}
       <div className="relative bg-gray-900 py-24 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
         <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=2000&auto=format&fit=crop" 
+          <Image
+            src="/images/hero-2.png"
             alt="Firefighter background" 
-            className="w-full h-full object-cover opacity-20"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
         </div>
@@ -101,10 +109,23 @@ export default function ServicesPage() {
                   </Link>
                 </div>
                 <div className="w-full lg:w-1/2">
-                  <div className="aspect-w-16 aspect-h-10 rounded-2xl overflow-hidden shadow-2xl dark:shadow-black/50 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                    {/* Placeholder for actual service images */}
-                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                      <Icon className="w-32 h-32 text-gray-400 dark:text-gray-600 opacity-50" />
+                  <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-2xl dark:shadow-black/50 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 group">
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-gray-950/20 to-transparent" />
+                    <div className="absolute left-6 bottom-6 right-6 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-300 mb-2">SG Fire Service</p>
+                        <h3 className="font-outfit text-2xl font-black text-white">{service.title}</h3>
+                      </div>
+                      <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white flex-shrink-0">
+                        <Icon className="w-7 h-7" />
+                      </div>
                     </div>
                   </div>
                 </div>

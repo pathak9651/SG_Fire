@@ -141,13 +141,13 @@ export const fetchMe = createAsyncThunk<
   { rejectValue: string }
 >('auth/fetchMe', async (_, { rejectWithValue }) => {
   try {
-    // First, get a fresh access token using the refresh cookie
-    const { data: refreshData } = await api.post('/auth/refresh-token');
+    const { data } = await api.get('/auth/session');
 
-    // Then get the user profile
-    const { data: meData } = await api.get('/auth/me');
+    if (!data.authenticated) {
+      return rejectWithValue('No active session');
+    }
 
-    return { user: meData.data, accessToken: refreshData.accessToken };
+    return { user: data.data, accessToken: data.accessToken };
   } catch (error) {
     return rejectWithValue('Session expired');
   }

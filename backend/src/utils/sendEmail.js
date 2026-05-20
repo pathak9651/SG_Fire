@@ -37,7 +37,7 @@ import nodemailer from 'nodemailer';
  * @returns {nodemailer.Transporter}
  */
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,       // e.g., smtp.gmail.com
     port: parseInt(process.env.EMAIL_PORT) || 587, // 587 for TLS, 465 for SSL
     secure: process.env.EMAIL_PORT === '465', // true only for port 465 (SSL)
@@ -156,12 +156,39 @@ const passwordResetTemplate = ({ name, resetUrl }) => `
   </div>
 `;
 
+/**
+ * contactTemplate()
+ * Purpose: Sent to the SG Fire admin inbox when a visitor submits the contact form
+ */
+const contactTemplate = ({ name, email, phone, subject, message }) => `
+  <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #dc2626, #ea580c); padding: 28px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">🔥 SG Fire</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 6px 0 0 0;">New Contact Form Inquiry</p>
+    </div>
+    <div style="padding: 32px;">
+      <h2 style="color: #111827; margin: 0 0 20px 0;">${subject}</h2>
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px; margin-bottom: 22px;">
+        <p style="margin: 0 0 10px 0; color: #374151;"><strong>Name:</strong> ${name}</p>
+        <p style="margin: 0 0 10px 0; color: #374151;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #dc2626;">${email}</a></p>
+        <p style="margin: 0; color: #374151;"><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+      </div>
+      <p style="color: #6b7280; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Message</p>
+      <div style="white-space: pre-wrap; color: #111827; line-height: 1.6; background: #fff7ed; border-left: 4px solid #ea580c; padding: 18px; border-radius: 8px;">${message}</div>
+    </div>
+    <div style="background: #111827; padding: 18px; text-align: center;">
+      <p style="color: #9ca3af; margin: 0; font-size: 12px;">Reply directly to this email to contact the customer.</p>
+    </div>
+  </div>
+`;
+
 // Map template names to their functions for easy lookup
 const templates = {
   otp: otpTemplate,
   orderConfirm: orderConfirmTemplate,
   appointment: appointmentTemplate,
   passwordReset: passwordResetTemplate,
+  contact: contactTemplate,
 };
 
 /**
@@ -177,41 +204,41 @@ const templates = {
  * @param {Object} options.data     - Data to pass into the template
  * @returns {Promise<void>}
  */
-const sendEmail = async ({ to, subject, template, data }) => {
-  // --- DEVELOPMENT MOCK ---
-  // Since we don't have real SMTP credentials set up in the .env, 
-  // we are mocking the email sending to prevent the server from crashing.
-  console.log('----------------------------------------------------');
-  console.log(`📧 MOCK EMAIL SENT TO: ${to}`);
-  console.log(`📌 SUBJECT: ${subject}`);
-  if (data.otp) {
-    console.log(`🔑 OTP: ${data.otp}`);
+const sendEmail = async ({ to, subject, template, data, replyTo }) => {
+  const templateFn = templates[template];
+  if (!templateFn) {
+    throw new Error(`Unknown email template: "${template}"`);
   }
-  console.log('----------------------------------------------------');
-  return Promise.resolve();
-  // -------------------------
 
-  // // Create a fresh transporter for each send (safe for serverless environments)
-  // const transporter = createTransporter();
-  // 
-  // // Render the HTML template with provided data
-  // const templateFn = templates[template];
-  // if (!templateFn) {
-  //   throw new Error(`Unknown email template: "${template}"`);
-  // }
-  // const html = templateFn(data);
-  // 
-  // // Email message configuration
-  // const mailOptions = {
-  //   from: process.env.EMAIL_FROM || 'SG Fire <noreply@sgfire.com>',
-  //   to,
-  //   subject,
-  //   html, // HTML version of the email
-  //   // text: (plain text fallback could be added here)
-  // };
-  // 
-  // // Send the email — throws if SMTP fails
-  // await transporter.sendMail(mailOptions);
+  const html = templateFn(data);
+  const hasSmtpCredentials =
+    process.env.EMAIL_HOST &&
+    process.env.EMAIL_USER &&
+    process.env.EMAIL_PASS &&
+    !process.env.EMAIL_USER.startsWith('your_') &&
+    !process.env.EMAIL_PASS.startsWith('your_');
+
+  if (!hasSmtpCredentials) {
+    console.log('----------------------------------------------------');
+    console.log(`📧 MOCK EMAIL SENT TO: ${to}`);
+    console.log(`📌 SUBJECT: ${subject}`);
+    if (replyTo) console.log(`↩️ REPLY TO: ${replyTo}`);
+    if (data.otp) console.log(`🔑 OTP: ${data.otp}`);
+    console.log('----------------------------------------------------');
+    return { mocked: true };
+  }
+
+  const transporter = createTransporter();
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || `SG Fire <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html,
+    ...(replyTo && { replyTo }),
+  };
+
+  const info = await transporter.sendMail(mailOptions);
+  return { mocked: false, messageId: info.messageId };
 };
 
 export default sendEmail;

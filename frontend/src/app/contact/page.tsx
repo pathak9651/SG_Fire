@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import api from '@/services/api';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -13,24 +14,29 @@ export default function ContactPage() {
     subject: '',
     message: ''
   });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
+    setErrorMessage('');
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await api.post('/contact', formData);
       setStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       
       // Reset success message after 5 seconds
       setTimeout(() => setStatus('idle'), 5000);
-    }, 1500);
+    } catch (error: any) {
+      setStatus('error');
+      setErrorMessage(error?.response?.data?.message || 'Unable to send your message. Please try again.');
+    }
   };
 
   return (
@@ -138,6 +144,12 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {status === 'error' && (
+                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-xl p-4 text-sm font-medium text-red-700 dark:text-red-300">
+                      {errorMessage}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <Input
                       label="Full Name"

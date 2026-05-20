@@ -44,6 +44,7 @@ import adminRoutes from './src/routes/admin.routes.js';
 import categoryRoutes from './src/routes/category.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 import supportRoutes from './src/routes/support.routes.js';
+import contactRoutes from './src/routes/contact.routes.js';
 
 // ── Middleware Imports ─────────────────────────────────────
 import errorHandler, { ErrorResponse } from './src/middleware/errorHandler.js';
@@ -141,6 +142,7 @@ app.use('/api/admin', adminRoutes);            // Admin dashboard: /api/admin/..
 app.use('/api/categories', categoryRoutes);    // Categories: /api/categories/...
 app.use('/api/users', userRoutes);             // User profile/wishlist: /api/users/...
 app.use('/api/support', supportRoutes);        // Support chat: /api/support/...
+app.use('/api/contact', contactRoutes);        // Contact form: /api/contact
 
 // ─────────────────────────────────────────────
 // 404 HANDLER
