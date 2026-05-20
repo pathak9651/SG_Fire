@@ -156,32 +156,58 @@ img {
    ANIMATION KEYFRAMES
 ───────────────────────────────────────────── */
 
-/* Fade in from below — used for page section entrance animations */
+/* Fade in from below */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Fade in from left */
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 /* Pulse animation for fire/emergency indicators */
 @keyframes firePulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0);
-  }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  50% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
 }
 
 /* Shimmer animation for skeleton loaders */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+/* Rotating border glow */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floating element */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Glow pulse for premium CTAs */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.7), 0 0 80px rgba(234, 88, 12, 0.2); }
+}
+
+/* Marquee (for brand scroll) */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Shine sweep */
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 200%; }
 }
 
 /* ─────────────────────────────────────────────
@@ -240,28 +266,74 @@ img {
 
 /* Card hover effect */
 .card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .card-hover:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
 }
 
-/* Focus ring — used for accessibility */
+/* Premium glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Focus ring — accessibility */
 .focus-ring {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Animate on scroll — add class via Framer Motion or Intersection Observer */
-.animate-fade-up {
-  animation: fadeInUp 0.6s ease forwards;
+/* Animation utilities */
+.animate-fade-up { animation: fadeInUp 0.6s ease forwards; }
+.animate-fade-left { animation: fadeInLeft 0.6s ease forwards; }
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-glow-pulse { animation: glowPulse 2.5s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+/* Fire pulse indicator */
+.fire-pulse { animation: firePulse 2s infinite; }
+
+/* Glow borders */
+.glow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.35), 0 0 60px rgba(220, 38, 38, 0.1);
+}
+.glow-orange {
+  box-shadow: 0 0 20px rgba(234, 88, 12, 0.35), 0 0 60px rgba(234, 88, 12, 0.1);
 }
 
-/* Fire pulse indicator (for emergency/urgent items) */
-.fire-pulse {
-  animation: firePulse 2s infinite;
+/* Shine effect on hover for cards */
+.shine-on-hover {
+  position: relative;
+  overflow: hidden;
 }
+.shine-on-hover::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+.shine-on-hover:hover::after {
+  animation: shine 0.6s ease forwards;
+}
+
+/* Border radius extended */
+.rounded-4xl { border-radius: 2rem; }
+.rounded-5xl { border-radius: 2.5rem; }
 
 /* ─────────────────────────────────────────────
    PRODUCT CARD STYLES

@@ -31,8 +31,25 @@ import { bufferToBase64, deleteFromCloudinary } from '../middleware/upload.js';
 //               ratings[gte], sort, page, limit, fields
 // ─────────────────────────────────────────────
 export const getProducts = asyncHandler(async (req, res) => {
+  // Clone query to a local mutable object to bypass Express's read-only/proxy query object restriction
+  const queryObj = { ...req.query };
+
+  // If category filter is passed, check if it's a slug or ObjectId
+  if (queryObj.category) {
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(queryObj.category);
+    if (!isObjectId) {
+      const categoryDoc = await Category.findOne({ slug: queryObj.category });
+      if (categoryDoc) {
+        queryObj.category = categoryDoc._id.toString();
+      } else {
+        // If not found, use a non-existent ObjectId to return 0 results
+        queryObj.category = '000000000000000000000000';
+      }
+    }
+  }
+
   // Count total matching documents (for pagination metadata)
-  const totalQuery = new ApiFeatures(Product.find(), req.query)
+  const totalQuery = new ApiFeatures(Product.find(), queryObj)
     .search()
     .filter();
 
@@ -41,7 +58,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   // Fetch the paginated/sorted/filtered results
   const features = new ApiFeatures(
     Product.find().populate('category', 'name slug'),
-    req.query
+    queryObj
   )
     .search()
     .filter()
@@ -52,8 +69,8 @@ export const getProducts = asyncHandler(async (req, res) => {
   const products = await features.query;
 
   // Calculate pagination metadata for the frontend
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
+  const page = parseInt(queryObj.page, 10) || 1;
+  const limit = parseInt(queryObj.limit, 10) || 10;
   const totalPages = Math.ceil(totalProducts / limit);
 
   res.json({
@@ -135,6 +152,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     title, description, shortDescription, category, brand,
     price, discountPrice, stock, specifications, tags,
     taxRate, lowStockThreshold, isFeatured, isNewArrival, metaTitle, metaDescription,
+    isActive,
   } = req.body;
 
   // Validate that the category exists
@@ -162,6 +180,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     category, brand, price, discountPrice, stock,
     specifications: parsedSpecs, tags, taxRate, lowStockThreshold,
     isFeatured, isNewArrival, images, metaTitle, metaDescription,
+    isActive: isActive !== undefined ? (isActive === 'true' || isActive === true) : true,
   });
 
   res.status(201).json({ success: true, data: product });

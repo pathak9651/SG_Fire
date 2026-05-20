@@ -1,27 +1,11 @@
 'use client';
 
-/**
- * ============================================================
- * FILE: src/components/home/HeroBanner.tsx
- * PURPOSE: Full-width animated hero slider on the homepage.
- *          Shows fire safety promotional banners with:
- *          - Auto-playing carousel (Framer Motion)
- *          - Overlaid text with CTA buttons
- *          - Gradient overlays for text readability
- *          - Navigation dots and arrow controls
- *          - Responsive design (different heights mobile/desktop)
- *
- * DATA: Initially uses static placeholder slides.
- *       TODO: Fetch banners from /api/admin/banners?position=hero
- * ============================================================
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ShoppingBag, Calendar, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingBag, Calendar, Shield, Zap, ArrowRight } from 'lucide-react';
 
-/** Hero slide data structure */
 interface HeroSlide {
   id: number;
   title: string;
@@ -29,11 +13,11 @@ interface HeroSlide {
   description: string;
   primaryCTA: { label: string; href: string };
   secondaryCTA: { label: string; href: string };
-  bgGradient: string; // Tailwind gradient classes
+  image: string;
   badge?: string;
+  accentColor: string;
 }
 
-// Static hero slides (will be replaced by API data in production)
 const HERO_SLIDES: HeroSlide[] = [
   {
     id: 1,
@@ -41,9 +25,10 @@ const HERO_SLIDES: HeroSlide[] = [
     subtitle: 'Premium Fire Safety Equipment',
     description: 'ISI certified fire extinguishers, smoke detectors, and alarms delivered to your doorstep. Trusted by 10,000+ homes and businesses.',
     primaryCTA: { label: 'Shop Now', href: '/products' },
-    secondaryCTA: { label: 'Book Service', href: '/services' },
-    bgGradient: 'from-gray-950 via-red-950 to-gray-900',
+    secondaryCTA: { label: 'Book Service', href: '/appointments' },
+    image: '/images/hero-1.png',
     badge: '🔥 Up to 30% OFF',
+    accentColor: 'from-red-600 to-orange-600',
   },
   {
     id: 2,
@@ -52,8 +37,9 @@ const HERO_SLIDES: HeroSlide[] = [
     description: 'Book certified technicians for fire safety installation, annual inspection, and maintenance services. Same-week appointments available.',
     primaryCTA: { label: 'Book Appointment', href: '/appointments' },
     secondaryCTA: { label: 'Learn More', href: '/about' },
-    bgGradient: 'from-gray-950 via-orange-950 to-gray-900',
+    image: '/images/hero-2.png',
     badge: '📅 Instant Booking',
+    accentColor: 'from-orange-500 to-red-600',
   },
   {
     id: 3,
@@ -62,16 +48,22 @@ const HERO_SLIDES: HeroSlide[] = [
     description: 'Comprehensive Annual Maintenance Contracts for offices, factories, and commercial buildings. Stay compliant with fire safety regulations.',
     primaryCTA: { label: 'Get AMC Quote', href: '/appointments?type=amc' },
     secondaryCTA: { label: 'View Products', href: '/products' },
-    bgGradient: 'from-gray-950 via-red-900 to-orange-950',
+    image: '/images/hero-3.png',
     badge: '🏢 B2B Solutions',
+    accentColor: 'from-red-700 to-orange-500',
   },
+];
+
+const TRUST_BADGES = [
+  { icon: Shield, text: 'ISI Certified' },
+  { icon: Zap, text: 'Fast Delivery' },
+  { icon: Shield, text: 'Expert Techs' },
 ];
 
 export default function HeroBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const [direction, setDirection] = useState(1);
 
-  // Auto-advance slides every 5 seconds
   const nextSlide = useCallback(() => {
     setDirection(1);
     setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
@@ -89,22 +81,21 @@ export default function HeroBanner() {
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 6000);
-    return () => clearInterval(timer); // Cleanup on unmount
+    return () => clearInterval(timer);
   }, [nextSlide]);
 
-  // Animation variants for slide transitions
   const slideVariants = {
-    enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? '-100%' : '100%', opacity: 0 }),
+    enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0, scale: 1.02 }),
+    center: { x: 0, opacity: 1, scale: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? '-100%' : '100%', opacity: 0, scale: 0.98 }),
   };
 
   const slide = HERO_SLIDES[currentSlide];
 
   return (
-    <section className="relative h-[500px] sm:h-[560px] md:h-[640px] lg:h-[700px] overflow-hidden">
+    <section className="relative h-[520px] sm:h-[580px] md:h-[660px] lg:h-[720px] overflow-hidden bg-gray-950">
 
-      {/* ── Animated Background ─────────────────────────── */}
+      {/* ── Background Image with Overlay ──────────────────── */}
       <AnimatePresence custom={direction} mode="popLayout">
         <motion.div
           key={currentSlide}
@@ -113,125 +104,163 @@ export default function HeroBanner() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ type: 'tween', duration: 0.6, ease: 'easeInOut' }}
-          className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient}`}
+          transition={{ type: 'tween', duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="absolute inset-0"
         >
-          {/* Decorative fire particles */}
+          <Image
+            src={slide.image}
+            alt={slide.title}
+            fill
+            className="object-cover object-center"
+            priority={currentSlide === 0}
+            quality={90}
+          />
+          {/* Multi-layer overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-950/75 to-gray-950/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-transparent to-gray-950/20" />
+
+          {/* Animated particles */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-10 right-10 w-96 h-96 bg-red-600/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-10 left-10 w-72 h-72 bg-orange-600/10 rounded-full blur-3xl" />
-            {/* Grid pattern overlay */}
-            <div
-              className="absolute inset-0 opacity-5"
-              style={{
-                backgroundImage: `radial-gradient(circle, #dc2626 1px, transparent 1px)`,
-                backgroundSize: '40px 40px',
-              }}
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute top-20 right-20 w-72 h-72 bg-red-600 rounded-full blur-3xl"
+            />
+            <motion.div
+              animate={{ scale: [1.1, 1, 1.1], opacity: [0.04, 0.08, 0.04] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              className="absolute bottom-20 left-1/3 w-96 h-96 bg-orange-600 rounded-full blur-3xl"
             />
           </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* ── Slide Content ───────────────────────────────── */}
+      {/* ── Slide Content ────────────────────────────────────── */}
       <div className="relative z-10 container-main h-full flex items-center">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="max-w-3xl"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 40 }}
+            transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
+            className="max-w-2xl"
           >
-            {/* Promotional badge */}
+            {/* Badge */}
             {slide.badge && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center px-4 py-1.5 bg-red-600/20 border border-red-500/30 rounded-full text-red-300 text-sm font-semibold mb-4"
+                initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.25 }}
+                className="inline-flex items-center px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-bold mb-5 shadow-lg"
               >
                 {slide.badge}
               </motion.div>
             )}
 
             {/* Subtitle */}
-            <p className="text-orange-400 font-semibold text-sm md:text-base uppercase tracking-widest mb-2">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className={`text-sm md:text-base font-bold uppercase tracking-[0.2em] mb-3 text-transparent bg-clip-text bg-gradient-to-r ${slide.accentColor}`}
+            >
               {slide.subtitle}
-            </p>
+            </motion.p>
 
-            {/* Main headline */}
-            <h1 className="font-outfit text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+            {/* Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="font-outfit text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-black text-white leading-[1.1] mb-5"
+            >
               {slide.title}
-            </h1>
+            </motion.h1>
 
             {/* Description */}
-            <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="text-gray-300 text-base md:text-lg leading-relaxed mb-8 max-w-xl"
+            >
               {slide.description}
-            </p>
+            </motion.p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href={slide.primaryCTA.href} className="btn-primary text-base px-6 py-3 w-full sm:w-auto">
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              className="flex flex-col sm:flex-row gap-3"
+            >
+              <Link
+                href={slide.primaryCTA.href}
+                className={`group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-gradient-to-r ${slide.accentColor} text-white font-bold rounded-2xl shadow-xl shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 transition-all text-base`}
+              >
                 <ShoppingBag size={18} />
                 {slide.primaryCTA.label}
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href={slide.secondaryCTA.href}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all text-base w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/10 backdrop-blur-md text-white font-semibold rounded-2xl border border-white/20 hover:bg-white/20 hover:-translate-y-0.5 transition-all text-base"
               >
                 <Calendar size={18} />
                 {slide.secondaryCTA.label}
               </Link>
-            </div>
+            </motion.div>
 
-            {/* Trust indicators */}
-            <div className="flex flex-wrap gap-6 mt-8">
-              {[
-                { icon: Shield, text: 'ISI Certified Products' },
-                { icon: Shield, text: 'Expert Technicians' },
-                { icon: Shield, text: 'Free Shipping ₹1000+' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-sm text-gray-300">
-                  <Icon size={16} className="text-red-400" />
+            {/* Trust badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-wrap gap-4 mt-8"
+            >
+              {TRUST_BADGES.map(({ icon: Icon, text }) => (
+                <div key={text} className="flex items-center gap-2 text-sm text-gray-300 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
+                  <Icon size={13} className="text-orange-400" />
                   {text}
                 </div>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* ── Navigation Arrows (Desktop only) ────────────────── */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full hidden md:flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={20} />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 bg-black/30 hover:bg-black/50 text-white rounded-full hidden md:flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
-        aria-label="Next slide"
-      >
-        <ChevronRight size={20} />
-      </button>
+      {/* ── Nav Arrows ─────────────────────────────────────── */}
+      {['prev', 'next'].map((dir) => (
+        <motion.button
+          key={dir}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={dir === 'prev' ? prevSlide : nextSlide}
+          className={`absolute ${dir === 'prev' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 hover:bg-black/60 text-white rounded-full hidden md:flex items-center justify-center transition-all backdrop-blur-md border border-white/15 shadow-xl`}
+          aria-label={dir === 'prev' ? 'Previous slide' : 'Next slide'}
+        >
+          {dir === 'prev' ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+        </motion.button>
+      ))}
 
-      {/* ── Dot Indicators ──────────────────────────────── */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      {/* ── Dots ──────────────────────────────────────────── */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         {HERO_SLIDES.map((_, index) => (
-          <button
+          <motion.button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === currentSlide
-                ? 'w-8 h-2 bg-red-500'     // Active dot: elongated pill
-                : 'w-2 h-2 bg-white/40 hover:bg-white/60' // Inactive dot
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
+            animate={{ width: index === currentSlide ? 32 : 8, opacity: index === currentSlide ? 1 : 0.5 }}
+            transition={{ duration: 0.3 }}
+            className={`h-2 rounded-full ${index === currentSlide ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-white/50'}`}
+            aria-label={`Slide ${index + 1}`}
           />
         ))}
+      </div>
+
+      {/* ── Slide counter ─────────────────────────────────── */}
+      <div className="absolute bottom-6 right-6 z-20 text-xs text-white/40 font-mono hidden md:block">
+        {String(currentSlide + 1).padStart(2, '0')} / {String(HERO_SLIDES.length).padStart(2, '0')}
       </div>
     </section>
   );

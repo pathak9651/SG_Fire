@@ -28,8 +28,9 @@ export default function ProductFilters({
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  const handleCategoryChange = (category: string) => {
-    setFilters({ ...filters, category: filters.category === category ? undefined : category });
+  const handleCategoryChange = (catId: string, catSlug: string) => {
+    const isCurrent = filters.category === catId || filters.category === catSlug;
+    setFilters({ ...filters, category: isCurrent ? undefined : catId });
   };
 
   const handleBrandChange = (brand: string) => {
@@ -88,8 +89,8 @@ export default function ProductFilters({
                     <input
                       type="checkbox"
                       className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 bg-white checked:border-red-600 checked:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 transition-all"
-                      checked={filters.category === cat._id}
-                      onChange={() => handleCategoryChange(cat._id)}
+                      checked={filters.category === cat._id || filters.category === cat.slug}
+                      onChange={() => handleCategoryChange(cat._id, cat.slug)}
                     />
                     <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">

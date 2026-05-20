@@ -130,8 +130,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-800/50 p-4 text-center">
-              <p className="text-xs text-gray-500">
-                Tip: Press <kbd className="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 font-sans shadow-sm">ESC</kbd> to close
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Tip: Press <kbd className="px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-sans shadow-sm text-xs">ESC</kbd> to close
               </p>
             </div>
           </motion.div>

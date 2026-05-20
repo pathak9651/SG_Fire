@@ -46,9 +46,9 @@ export default function NavLinks({ onMouseEnterMega, onMouseLeaveMega, showMegaM
               href={link.href}
               className={cn(
                 "relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-300",
-                isActive 
-                  ? "text-red-600 font-semibold" 
-                  : "text-gray-700 dark:text-gray-300 hover:text-red-600"
+                isActive
+                  ? "text-red-400 font-semibold"
+                  : "text-gray-300 hover:text-white"
               )}
             >
               {link.label}
@@ -66,7 +66,7 @@ export default function NavLinks({ onMouseEnterMega, onMouseLeaveMega, showMegaM
               {isActive && (
                 <motion.div
                   layoutId="nav-underline"
-                  className="absolute bottom-0 left-4 right-4 h-0.5 bg-red-600 rounded-full"
+                  className="absolute bottom-0 left-4 right-4 h-0.5 bg-red-400 rounded-full shadow-sm shadow-red-400/50"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}

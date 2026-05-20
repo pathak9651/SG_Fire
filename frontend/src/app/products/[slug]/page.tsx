@@ -2,14 +2,14 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ProductDetailClient from './ProductDetailClient';
 
-// We can revalidate product pages every hour to keep cache fresh
-export const revalidate = 3600;
+// Force dynamic to show newly uploaded or edited products instantly
+export const dynamic = 'force-dynamic';
 
 async function getProduct(slug: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-    const res = await fetch(`${apiUrl}/products/${slug}`, {
-      next: { revalidate: 3600 }
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api';
+    const res = await fetch(`${apiUrl}/products/slug/${slug}`, {
+      cache: 'no-store'
     });
 
     if (!res.ok) {
@@ -27,9 +27,9 @@ async function getProduct(slug: string) {
 
 async function getRelatedProducts(id: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api';
     const res = await fetch(`${apiUrl}/products/related/${id}`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     });
     if (!res.ok) return [];
     const data = await res.json();

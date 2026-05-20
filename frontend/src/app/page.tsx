@@ -43,57 +43,84 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* 1. Hero Banner — Full-width animated slider */}
+      {/* 1. Hero Banner */}
       <HeroBanner />
 
-      {/* 2. Category Grid — Quick browse icons */}
-      <section className="section-padding bg-gray-50 dark:bg-gray-900">
-        <div className="container-main">
-          <div className="text-center mb-10">
-            <p className="text-red-600 font-semibold text-sm uppercase tracking-widest mb-2">
+      {/* 2. Category Grid */}
+      <section className="section-padding bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/[0.03] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/[0.03] rounded-full blur-3xl" />
+        </div>
+        <div className="container-main relative">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-red-100 dark:border-red-900/50 mb-4">
               Browse By Category
-            </p>
-            <h2 className="font-outfit text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              Find What You Need
+            </span>
+            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
+              Find What You{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">Need</span>
             </h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-xl mx-auto">
+              From extinguishers to detectors — everything to keep you safe.
+            </p>
           </div>
           <CategoryGrid />
         </div>
       </section>
 
-      {/* 3. Featured Products — Lazy loaded with Suspense */}
-      <section className="section-padding">
+      {/* 3. Featured Products */}
+      <section className="section-padding bg-white dark:bg-gray-950">
         <div className="container-main">
-          <div className="text-center mb-10">
-            <p className="text-red-600 font-semibold text-sm uppercase tracking-widest mb-2">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-orange-50 dark:bg-orange-950/30 text-orange-600 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-orange-100 dark:border-orange-900/40 mb-4">
               Top Picks
-            </p>
-            <h2 className="font-outfit text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              Featured Products
+            </span>
+            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
+              Featured{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">
+                Products
+              </span>
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-2xl mx-auto">
               ISI certified and BIS approved fire safety equipment trusted by thousands of homes and businesses across India.
             </p>
           </div>
-          {/* Suspense: streams the product grid while server fetches data */}
           <Suspense fallback={<ProductGridSkeleton />}>
             <FeaturedProducts />
           </Suspense>
         </div>
       </section>
 
-      {/* 4. Fire Safety Awareness Section */}
+      {/* 4. Fire Safety Awareness */}
       <FireSafetyAwareness />
 
       {/* 5. Service Highlights */}
-      <section className="section-padding bg-gray-950 text-white">
-        <div className="container-main">
-          <div className="text-center mb-10">
-            <p className="text-orange-400 font-semibold text-sm uppercase tracking-widest mb-2">
+      <section className="section-padding bg-gray-950 text-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 right-10 w-80 h-80 bg-red-600/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-10 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" />
+          {/* Dot grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.015]"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+          />
+        </div>
+        <div className="container-main relative">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-orange-500/10 text-orange-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-orange-500/20 mb-4">
               Professional Services
-            </p>
-            <h2 className="font-outfit text-3xl md:text-4xl font-bold">
-              Expert Fire Safety Services
+            </span>
+            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-white">
+              Expert Fire Safety{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
+                Services
+              </span>
             </h2>
             <p className="text-gray-400 mt-3 max-w-2xl mx-auto">
               From installation to annual maintenance, our certified technicians ensure your fire safety systems are always operational.
@@ -103,26 +130,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Customer Testimonials */}
-      <section className="section-padding bg-gray-50 dark:bg-gray-900">
-        <div className="container-main">
-          <div className="text-center mb-10">
-            <p className="text-red-600 font-semibold text-sm uppercase tracking-widest mb-2">
+      {/* 6. Testimonials */}
+      <section className="section-padding bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-red-500/[0.04] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-72 h-72 bg-orange-500/[0.04] rounded-full blur-3xl" />
+        </div>
+        <div className="container-main relative">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-amber-100 dark:border-amber-900/40 mb-4">
               Customer Reviews
-            </p>
-            <h2 className="font-outfit text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              Trusted by 10,000+ Customers
+            </span>
+            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
+              Trusted by{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">
+                10,000+
+              </span>{' '}
+              Customers
             </h2>
           </div>
           <Testimonials />
         </div>
       </section>
 
-      {/* 7. Partner Brands */}
+      {/* 7. Brands */}
       <BrandsSection />
     </>
   );
 }
+
 
 /** Skeleton loader for featured products grid while data loads */
 function ProductGridSkeleton() {

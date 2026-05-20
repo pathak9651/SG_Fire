@@ -95,14 +95,14 @@ export default function MegaMenu({ isOpen }: MegaMenuProps) {
                 <Link href="/services" className="flex items-center justify-between group">
                   <div className="flex items-center gap-3">
                     <AlertTriangle size={16} className="text-red-500" />
-                    <span className="text-sm font-medium dark:text-gray-300 group-hover:text-red-600 transition-colors">Emergency Support</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-red-600 transition-colors">Emergency Support</span>
                   </div>
                   <ArrowRight size={14} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link href="/appointments" className="flex items-center justify-between group">
                   <div className="flex items-center gap-3">
                     <Calendar size={16} className="text-red-500" />
-                    <span className="text-sm font-medium dark:text-gray-300 group-hover:text-red-600 transition-colors">Schedule Site Visit</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-red-600 transition-colors">Schedule Site Visit</span>
                   </div>
                   <ArrowRight size={14} className="text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </Link>
