@@ -23,7 +23,7 @@
  * ============================================================
  */
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 /**
  * Base Axios instance with SG Fire backend URL.
@@ -42,6 +42,25 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// ─────────────────────────────────────────────
+// REQUEST INTERCEPTOR
+// Runs BEFORE every outgoing request to append Authorization header.
+// ─────────────────────────────────────────────
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    if (typeof window !== 'undefined') {
+      const store = (window as any).__REDUX_STORE__;
+      const token = store?.getState()?.auth?.accessToken;
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // ─────────────────────────────────────────────
 // RESPONSE INTERCEPTOR
@@ -75,7 +94,7 @@ api.interceptors.response.use(
 
   // Error handler
   async (error: AxiosError) => {
-    const originalRequest = error.config as AxiosError['config'] & {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
 
@@ -100,10 +119,23 @@ api.interceptors.response.use(
 
       try {
         // Call refresh endpoint — sends the HTTP-only refresh token cookie automatically
-        await api.post('/auth/refresh-token');
+        const { data } = await api.post('/auth/refresh-token');
+
+        if (data?.success && data?.accessToken && typeof window !== 'undefined') {
+          const store = (window as any).__REDUX_STORE__;
+          if (store) {
+            const user = store.getState()?.auth?.user;
+            if (user) {
+              store.dispatch({
+                type: 'auth/setCredentials',
+                payload: { user, accessToken: data.accessToken },
+              });
+            }
+          }
+        }
 
         processQueue(null); // Resume all queued requests
-        return api(originalRequest); // Retry the original failed request
+        return api(originalRequest as any); // Retry the original failed request
       } catch (refreshError) {
         processQueue(refreshError as AxiosError);
 

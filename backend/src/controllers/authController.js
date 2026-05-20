@@ -29,7 +29,7 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import { sendTokenResponse, generateAccessToken } from '../utils/generateToken.js';
+import { sendTokenResponse, generateAccessToken, getCookieOptions } from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 
@@ -173,8 +173,8 @@ export const login = asyncHandler(async (req, res, next) => {
 // ─────────────────────────────────────────────
 export const logout = asyncHandler(async (req, res, next) => {
   // Clear both authentication cookies by setting maxAge to 0
-  res.cookie('accessToken', '', { httpOnly: true, expires: new Date(0) });
-  res.cookie('refreshToken', '', { httpOnly: true, expires: new Date(0) });
+  res.cookie('accessToken', '', getCookieOptions(res, 0));
+  res.cookie('refreshToken', '', getCookieOptions(res, 0));
 
   res.json({ success: true, message: 'Logged out successfully.' });
 });
@@ -215,14 +215,9 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
   const newAccessToken = generateAccessToken(user._id, isAdmin ? '30m' : '5m');
 
   // Set new access token in cookie
-  res.cookie('accessToken', newAccessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: expiresIn,
-  });
+  res.cookie('accessToken', newAccessToken, getCookieOptions(res, expiresIn));
 
-  res.json({ success: true });
+  res.json({ success: true, accessToken: newAccessToken });
 });
 
 // ─────────────────────────────────────────────
@@ -248,16 +243,12 @@ export const getSession = asyncHandler(async (req, res, next) => {
     const expiresIn = isAdmin ? 30 * 60 * 1000 : 5 * 60 * 1000;
     const accessToken = generateAccessToken(user._id, isAdmin ? '30m' : '5m');
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: expiresIn,
-    });
+    res.cookie('accessToken', accessToken, getCookieOptions(res, expiresIn));
 
     res.json({
       success: true,
       authenticated: true,
+      accessToken,
       data: user,
     });
   } catch (error) {

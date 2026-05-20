@@ -32,9 +32,11 @@ import { AxiosError } from 'axios';
 // ─────────────────────────────────────────────
 const initialState: AuthState = {
   user: null,
+  accessToken: null,
   isAuthenticated: false,
   // Start as not loading to avoid SSR/client hydration mismatches.
   isLoading: false,
+  isInitialized: false,
 };
 
 // ─────────────────────────────────────────────
@@ -84,13 +86,13 @@ export const updatePassword = createAsyncThunk<
  * The refresh token is set as HTTP-only cookie by the server automatically.
  */
 export const loginUser = createAsyncThunk<
-  { user: User },
+  { user: User; accessToken: string },
   { email: string; password: string },
   { rejectValue: string }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/login', credentials);
-    return { user: data.user };
+    return { user: data.user, accessToken: data.accessToken };
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     return rejectWithValue(axiosError.response?.data?.message || 'Login failed');
@@ -134,7 +136,7 @@ export const logoutUser = createAsyncThunk('auth/logout', async () => {
  * If refresh cookie is expired/invalid, user is logged out.
  */
 export const fetchMe = createAsyncThunk<
-  { user: User },
+  { user: User; accessToken: string | null },
   void,
   { rejectValue: string }
 >('auth/fetchMe', async (_, { rejectWithValue }) => {
@@ -145,7 +147,7 @@ export const fetchMe = createAsyncThunk<
       return rejectWithValue('No active session');
     }
 
-    return { user: data.data };
+    return { user: data.data, accessToken: data.accessToken || null };
   } catch (error) {
     return rejectWithValue('Session expired');
   }
@@ -165,10 +167,12 @@ const authSlice = createSlice({
      */
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User }>
+      action: PayloadAction<{ user: User; accessToken: string | null }>
     ) => {
       state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
+      state.isInitialized = true;
     },
 
     /**
@@ -176,7 +180,9 @@ const authSlice = createSlice({
      */
     clearCredentials: (state) => {
       state.user = null;
+      state.accessToken = null;
       state.isAuthenticated = false;
+      state.isInitialized = true;
     },
 
     /**
@@ -200,11 +206,15 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
+        state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
+        state.isInitialized = true;
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
+        state.accessToken = null;
         state.isAuthenticated = false;
+        state.isInitialized = true;
       })
       // Update Profile
       .addCase(updateProfile.fulfilled, (state, action) => {
@@ -220,7 +230,9 @@ const authSlice = createSlice({
     // ── Logout ─────────────────────────────────────────────
     builder.addCase(logoutUser.fulfilled, (state) => {
       state.user = null;
+      state.accessToken = null;
       state.isAuthenticated = false;
+      state.isInitialized = true;
     });
 
     // ── Fetch Me (session restore) ─────────────────────────
@@ -229,11 +241,15 @@ const authSlice = createSlice({
       .addCase(fetchMe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
+        state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
+        state.isInitialized = true;
       })
       .addCase(fetchMe.rejected, (state) => {
         state.isLoading = false;
+        state.accessToken = null;
         state.isAuthenticated = false;
+        state.isInitialized = true;
       });
   },
 });

@@ -46,7 +46,7 @@ function VerifyContent() {
         setSuccessMessage('Email verified successfully!');
         
         if (data.user) {
-          dispatch(setCredentials({ user: data.user }));
+          dispatch(setCredentials({ user: data.user, accessToken: data.accessToken }));
         }
 
         setTimeout(() => {

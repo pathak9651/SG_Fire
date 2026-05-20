@@ -51,6 +51,33 @@ export const generateRefreshToken = (userId) => {
 };
 
 /**
+ * getCookieOptions()
+ * -----------------
+ * Helper to generate consistent, robust cookie options.
+ * Automatically disables the 'secure' flag in local development environments
+ * (localhost or 127.0.0.1) even if NODE_ENV is set to production.
+ * This prevents modern browsers from silently rejecting auth cookies.
+ *
+ * @param {Object} res    - Express response object
+ * @param {number} maxAge - Cookie lifetime in milliseconds
+ * @returns {Object} Cookie options object
+ */
+export const getCookieOptions = (res, maxAge) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isLocal = res.req && res.req.headers && res.req.headers.host && (
+    res.req.headers.host.includes('localhost') ||
+    res.req.headers.host.includes('127.0.0.1')
+  );
+
+  return {
+    httpOnly: true,
+    secure: isProduction && !isLocal,
+    sameSite: 'lax',
+    ...(maxAge !== undefined && { maxAge }),
+  };
+};
+
+/**
  * sendTokenResponse()
  * -------------------
  * Helper that creates tokens, sets HTTP-only cookies, and sends response.
@@ -69,28 +96,26 @@ export const sendTokenResponse = (user, statusCode, res) => {
   const accessToken = generateAccessToken(user._id, accessExpireStr);
   const refreshToken = generateRefreshToken(user._id);
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax', // Use 'lax' for better cross-port support in development
-  };
-
   // Refresh token always 7 days
-  res.cookie('refreshToken', refreshToken, {
-    ...cookieOptions,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie(
+    'refreshToken',
+    refreshToken,
+    getCookieOptions(res, 7 * 24 * 60 * 60 * 1000)
+  );
 
   // Access token based on role
-  res.cookie('accessToken', accessToken, {
-    ...cookieOptions,
-    maxAge: accessMaxAge,
-  });
+  res.cookie(
+    'accessToken',
+    accessToken,
+    getCookieOptions(res, accessMaxAge)
+  );
 
   user.password = undefined;
 
   res.status(statusCode).json({
     success: true,
+    accessToken,
     user,
   });
 };
+

@@ -16,15 +16,15 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, isLoading, isInitialized } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isInitialized && !isLoading && !isAuthenticated) {
       router.replace('/auth/login?returnUrl=/dashboard');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isInitialized, isLoading, isAuthenticated, router]);
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
         <Spinner className="w-10 h-10 border-red-600" />

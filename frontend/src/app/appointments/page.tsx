@@ -75,7 +75,7 @@ const inputClass =
 function AppointmentFormContent() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated, user, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user, isLoading: authLoading, isInitialized } = useSelector((state: RootState) => state.auth);
   const { isLoading: bookingLoading } = useSelector((state: RootState) => state.appointment);
 
   const [formData, setFormData] = useState({
@@ -117,11 +117,11 @@ function AppointmentFormContent() {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (isInitialized && !authLoading && !isAuthenticated) {
       toast.error('Please login to book an appointment');
       router.push(`/auth/login?returnUrl=/appointments?service=${formData.serviceType}`);
     }
-  }, [isAuthenticated, authLoading, router, formData.serviceType]);
+  }, [isInitialized, isAuthenticated, authLoading, router, formData.serviceType]);
 
   useEffect(() => {
     setFormData((prev) => ({
@@ -193,7 +193,7 @@ function AppointmentFormContent() {
     }
   };
 
-  if (authLoading) {
+  if (!isInitialized || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
         <Spinner className="w-12 h-12 border-red-600" />

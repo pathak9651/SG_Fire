@@ -12,19 +12,19 @@ interface AdminGuardProps {
 
 export default function AdminGuard({ children }: AdminGuardProps) {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, isLoading, isInitialized } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    // If not loading and not authenticated, or not an admin, redirect to login
-    if (!isLoading) {
+    // If initialized and not loading and not authenticated, or not an admin, redirect to login
+    if (isInitialized && !isLoading) {
       if (!isAuthenticated || !user || user.role !== 'admin') {
         router.replace('/auth/login?returnUrl=/admin');
       }
     }
-  }, [isLoading, isAuthenticated, user, router]);
+  }, [isInitialized, isLoading, isAuthenticated, user, router]);
 
-  // Show loading spinner while checking auth
-  if (isLoading) {
+  // Show loading spinner while checking auth or during initialization
+  if (!isInitialized || isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-white dark:bg-gray-950">
         <div className="text-center">

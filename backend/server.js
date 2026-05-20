@@ -70,14 +70,37 @@ app.use(helmet());
  * Allows only the frontend domain to make API requests.
  * credentials: true is required to send/receive HTTP-only cookies.
  */
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'development' ? true : (process.env.CLIENT_URL || 'http://localhost:3000'),
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, postman, curl)
+      if (!origin) return callback(null, true);
+      
+      if (
+        process.env.NODE_ENV === 'development' || 
+        allowedOrigins.includes(origin) ||
+        origin.startsWith('http://localhost:') ||
+        origin.startsWith('http://127.0.0.1:')
+      ) {
+        return callback(null, true);
+      }
+      
+      return callback(new ErrorResponse('Not allowed by CORS', 403));
+    },
     credentials: true,        // Required for HTTP-only cookie exchange
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+
 
 /**
  * generalLimiter: Applies rate limiting to ALL routes.
