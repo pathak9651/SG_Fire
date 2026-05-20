@@ -267,7 +267,7 @@ export const getSession = asyncHandler(async (req, res, next) => {
 });
 
 // ─────────────────────────────────────────────
-// @desc    Send password reset email
+// @desc    Send password reset OTP email
 // @route   POST /api/auth/forgot-password
 // @access  Public
 // ─────────────────────────────────────────────
@@ -278,32 +278,63 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return res.json({
       success: true,
-      message: 'If an account with that email exists, a reset link has been sent.',
+      message: 'If an account with that email exists, a reset OTP has been sent.',
     });
   }
 
-  // Generate a secure random token (not JWT — simpler for one-time links)
-  const resetToken = crypto.randomBytes(32).toString('hex');
-
-  // Hash and store the token (never store plain tokens in DB)
-  user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  user.resetPasswordExpire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+  const otp = await user.generateOTP();
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
   await user.save({ validateBeforeSave: false });
-
-  // Build the reset URL (link in the email)
-  const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${resetToken}`;
 
   await sendEmail({
     to: user.email,
-    subject: 'SG Fire — Reset Your Password',
-    template: 'passwordReset',
-    data: { name: user.name, resetUrl },
+    subject: 'SG Fire — Password Reset OTP',
+    template: 'passwordResetOtp',
+    data: { name: user.name, otp },
   });
 
   res.json({
     success: true,
-    message: 'If an account with that email exists, a reset link has been sent.',
+    message: 'If an account with that email exists, a reset OTP has been sent.',
   });
+});
+
+// ─────────────────────────────────────────────
+// @desc    Reset password using email OTP
+// @route   POST /api/auth/reset-password-otp
+// @access  Public
+// ─────────────────────────────────────────────
+export const resetPasswordWithOTP = asyncHandler(async (req, res, next) => {
+  const { email, otp, password } = req.body;
+
+  if (!email || !otp || !password) {
+    throw new ErrorResponse('Email, OTP, and new password are required.', 400);
+  }
+
+  if (password.length < 8) {
+    throw new ErrorResponse('Password must be at least 8 characters.', 400);
+  }
+
+  const user = await User.findOne({ email }).select('+otp +otpExpiry');
+  if (!user) {
+    throw new ErrorResponse('Invalid or expired OTP. Please request a new one.', 400);
+  }
+
+  const isValidOTP = await user.verifyOTP(otp);
+  if (!isValidOTP) {
+    throw new ErrorResponse('Invalid or expired OTP. Please request a new one.', 400);
+  }
+
+  user.password = password;
+  user.otp = undefined;
+  user.otpExpiry = undefined;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  user.isVerified = true;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 });
 
 // ─────────────────────────────────────────────

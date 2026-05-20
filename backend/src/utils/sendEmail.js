@@ -157,6 +157,32 @@ const passwordResetTemplate = ({ name, resetUrl }) => `
 `;
 
 /**
+ * passwordResetOtpTemplate()
+ * Purpose: Sent when user requests a password reset OTP
+ */
+const passwordResetOtpTemplate = ({ name, otp }) => `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #dc2626, #ea580c); padding: 30px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">🔥 SG Fire</h1>
+      <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">Password Reset OTP</p>
+    </div>
+    <div style="padding: 40px 30px;">
+      <h2 style="color: #1a1a1a; margin: 0 0 20px 0;">Reset Your Password</h2>
+      <p style="color: #4a4a4a; line-height: 1.6;">Hello <strong>${name}</strong>,</p>
+      <p style="color: #4a4a4a; line-height: 1.6;">Use this one-time password to reset your SG Fire account password:</p>
+      <div style="background: #fef2f2; border: 2px dashed #dc2626; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0;">
+        <span style="font-size: 42px; font-weight: bold; color: #dc2626; letter-spacing: 10px;">${otp}</span>
+      </div>
+      <p style="color: #4a4a4a; line-height: 1.6;">⏰ This OTP is valid for <strong>10 minutes</strong> only.</p>
+      <p style="color: #4a4a4a; line-height: 1.6;">If you didn't request this, please ignore this email.</p>
+    </div>
+    <div style="background: #1a1a1a; padding: 20px; text-align: center;">
+      <p style="color: #888; margin: 0; font-size: 12px;">© ${new Date().getFullYear()} SG Fire. All rights reserved.</p>
+    </div>
+  </div>
+`;
+
+/**
  * contactTemplate()
  * Purpose: Sent to the SG Fire admin inbox when a visitor submits the contact form
  */
@@ -188,6 +214,7 @@ const templates = {
   orderConfirm: orderConfirmTemplate,
   appointment: appointmentTemplate,
   passwordReset: passwordResetTemplate,
+  passwordResetOtp: passwordResetOtpTemplate,
   contact: contactTemplate,
 };
 

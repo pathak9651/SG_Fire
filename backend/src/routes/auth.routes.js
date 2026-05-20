@@ -17,6 +17,7 @@ import {
   verifyOTP,
   resendOTP,
   forgotPassword,
+  resetPasswordWithOTP,
   resetPassword,
   refreshToken,
   getSession,
@@ -34,7 +35,8 @@ router.post('/register', authLimiter, register);            // New user registra
 router.post('/login', authLimiter, login);                  // Email + password login
 router.post('/verify-otp', otpLimiter, verifyOTP);          // Verify email with OTP
 router.post('/resend-otp', otpLimiter, resendOTP);          // Resend OTP email
-router.post('/forgot-password', authLimiter, forgotPassword); // Send reset link
+router.post('/forgot-password', authLimiter, forgotPassword); // Send reset OTP
+router.post('/reset-password-otp', authLimiter, resetPasswordWithOTP); // Reset with OTP
 router.post('/reset-password/:token', authLimiter, resetPassword); // Reset with token
 router.post('/refresh-token', refreshToken);                // Issue new access token
 router.get('/session', getSession);                         // Guest-safe session check
