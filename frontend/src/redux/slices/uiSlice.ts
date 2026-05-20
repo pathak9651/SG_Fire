@@ -35,11 +35,9 @@ const initialState: UIState = {
   isMobileMenuOpen: false,
   isSearchOpen: false,
   isCartDrawerOpen: false,
-  // Initialize dark mode from localStorage (if in browser)
-  isDarkMode:
-    typeof window !== 'undefined'
-      ? localStorage.getItem('sgfire-theme') === 'dark'
-      : false,
+  // Keep the first client render identical to SSR. The saved preference is
+  // applied after hydration by the navbar.
+  isDarkMode: false,
   activeModal: null,
   modalData: null,
 };
@@ -63,6 +61,14 @@ const uiSlice = createSlice({
     toggleCartDrawer: (state) => { state.isCartDrawerOpen = !state.isCartDrawerOpen; },
 
     // ── Dark Mode ──────────────────────────────────────────
+    setDarkMode: (state, action: PayloadAction<boolean>) => {
+      state.isDarkMode = action.payload;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('sgfire-theme', state.isDarkMode ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', state.isDarkMode);
+      }
+    },
+
     toggleDarkMode: (state) => {
       state.isDarkMode = !state.isDarkMode;
       // Persist preference to localStorage
@@ -89,7 +95,7 @@ export const {
   toggleMobileMenu, closeMobileMenu,
   toggleSearch, closeSearch,
   openCartDrawer, closeCartDrawer, toggleCartDrawer,
-  toggleDarkMode,
+  setDarkMode, toggleDarkMode,
   openModal, closeModal,
 } = uiSlice.actions;
 

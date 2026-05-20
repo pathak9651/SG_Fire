@@ -11,7 +11,7 @@ import {
   Mail, ShieldAlert, ChevronDown
 } from 'lucide-react';
 import { RootState, AppDispatch } from '@/redux/store';
-import { toggleDarkMode, toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch } from '@/redux/slices/uiSlice';
+import { setDarkMode, toggleDarkMode, toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch } from '@/redux/slices/uiSlice';
 import { logoutUser } from '@/redux/slices/authSlice';
 import toast from 'react-hot-toast';
 
@@ -44,6 +44,10 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    dispatch(setDarkMode(localStorage.getItem('sgfire-theme') === 'dark'));
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(closeMobileMenu());
     dispatch(closeSearch());
   }, [pathname, dispatch]);
@@ -60,10 +64,10 @@ export default function Navbar() {
       <div className="hidden lg:block bg-gradient-to-r from-red-700 via-red-600 to-orange-600 text-white py-2 text-xs font-medium">
         <div className="container-main flex justify-between items-center">
           <div className="flex items-center gap-6">
-            <a href="tel:+919876543210" className="flex items-center gap-2 hover:text-yellow-200 transition-colors">
+            <a href="tel:+919876543210" className="flex items-center gap-2 !text-white hover:!text-yellow-200 transition-colors">
               <Phone size={13} className="text-yellow-300" /> +91 98765 43210
             </a>
-            <a href="mailto:info@sgfire.com" className="flex items-center gap-2 hover:text-yellow-200 transition-colors">
+            <a href="mailto:info@sgfire.com" className="flex items-center gap-2 !text-white hover:!text-yellow-200 transition-colors">
               <Mail size={13} className="text-yellow-300" /> info@sgfire.com
             </a>
           </div>
@@ -72,8 +76,8 @@ export default function Navbar() {
               <span className="w-2 h-2 bg-yellow-300 rounded-full animate-pulse" />
               Emergency Support 24/7
             </span>
-            <Link href="/track-order" className="hover:text-yellow-200 transition-colors">Track Order</Link>
-            <Link href="/about" className="hover:text-yellow-200 transition-colors">Help Center</Link>
+            <Link href="/track-order" className="!text-white hover:!text-yellow-200 transition-colors">Track Order</Link>
+            <Link href="/about" className="!text-white hover:!text-yellow-200 transition-colors">Help Center</Link>
           </div>
         </div>
       </div>
@@ -189,7 +193,7 @@ export default function Navbar() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-xl border border-gray-700 hover:border-red-500/50 hover:bg-white/5 transition-all"
                 >
-                  <span className="text-xs font-semibold text-gray-300 hidden md:block">
+                  <span className="text-xs font-semibold !text-gray-100 hidden md:block">
                     {user?.name?.split(' ')[0]}
                   </span>
                   <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-md">
@@ -215,22 +219,22 @@ export default function Navbar() {
 
                       <div className="p-1.5">
                         {user?.role === 'admin' && (
-                          <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-red-600 hover:text-white rounded-xl transition-all">
+                          <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium !text-gray-100 hover:bg-red-600 hover:!text-white rounded-xl transition-all">
                             <ShieldAlert size={15} /> Admin Dashboard
                           </Link>
                         )}
-                        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white rounded-xl transition-all">
+                        <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium !text-gray-100 hover:bg-white/10 hover:!text-white rounded-xl transition-all">
                           <User size={15} /> My Profile
                         </Link>
                         {user?.role !== 'admin' && (
                           <>
-                            <Link href="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white rounded-xl transition-all">
+                            <Link href="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium !text-gray-100 hover:bg-white/10 hover:!text-white rounded-xl transition-all">
                               <Package size={15} /> Order History
                             </Link>
-                            <Link href="/dashboard/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white rounded-xl transition-all">
+                            <Link href="/dashboard/wishlist" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium !text-gray-100 hover:bg-white/10 hover:!text-white rounded-xl transition-all">
                               <Heart size={15} /> Wishlist
                             </Link>
-                            <Link href="/dashboard/appointments" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white rounded-xl transition-all">
+                            <Link href="/dashboard/appointments" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium !text-gray-100 hover:bg-white/10 hover:!text-white rounded-xl transition-all">
                               <Calendar size={15} /> My Appointments
                             </Link>
                           </>

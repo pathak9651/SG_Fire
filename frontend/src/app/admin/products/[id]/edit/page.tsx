@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { 
@@ -44,6 +44,19 @@ export default function EditProduct() {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const fillForm = useCallback((product: any) => {
+    setFormData({
+      title: product.title || '',
+      description: product.description || '',
+      price: product.price?.toString() || '',
+      discountPrice: product.discountPrice?.toString() || '',
+      stock: product.stock?.toString() || '',
+      category: product.category?._id || product.category || '',
+      brand: product.brand || '',
+    });
+    setImages(product.images || []);
+  }, []);
+
   useEffect(() => {
     dispatch(getCategories());
     if (id) {
@@ -59,20 +72,7 @@ export default function EditProduct() {
         });
       }
     }
-  }, [id, dispatch]);
-
-  const fillForm = (product: any) => {
-    setFormData({
-      title: product.title || '',
-      description: product.description || '',
-      price: product.price?.toString() || '',
-      discountPrice: product.discountPrice?.toString() || '',
-      stock: product.stock?.toString() || '',
-      category: product.category?._id || product.category || '',
-      brand: product.brand || '',
-    });
-    setImages(product.images || []);
-  };
+  }, [id, dispatch, products, fillForm]);
 
   const handleInputChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

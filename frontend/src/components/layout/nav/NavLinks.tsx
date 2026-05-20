@@ -47,8 +47,8 @@ export default function NavLinks({ onMouseEnterMega, onMouseLeaveMega, showMegaM
               className={cn(
                 "relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-300",
                 isActive
-                  ? "text-red-400 font-semibold"
-                  : "text-gray-300 hover:text-white"
+                  ? "!text-white font-semibold"
+                  : "!text-gray-200 hover:!text-white"
               )}
             >
               {link.label}

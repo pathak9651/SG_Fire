@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Product } from '@/types';
 import ProductImageGallery from '@/components/products/ProductImageGallery';
-import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import StarRating from '@/components/ui/StarRating';
 import { cn } from '@/lib/utils';
@@ -97,9 +97,9 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
       {/* Breadcrumb */}
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-gray-100">
         <ol className="flex items-center space-x-2 text-sm text-gray-500">
-          <li><a href="/" className="hover:text-red-600">Home</a></li>
+          <li><Link href="/" className="hover:text-red-600">Home</Link></li>
           <li><span className="mx-2">/</span></li>
-          <li><a href="/products" className="hover:text-red-600">Products</a></li>
+          <li><Link href="/products" className="hover:text-red-600">Products</Link></li>
           <li><span className="mx-2">/</span></li>
           <li className="text-gray-900 font-medium truncate">{product.title}</li>
         </ol>
@@ -172,60 +172,75 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <div className="flex items-center border border-gray-300 rounded-md bg-white">
-                <button 
-                  onClick={() => handleQuantityChange('dec')}
-                  className="px-4 py-3 text-gray-600 hover:text-red-600 hover:bg-gray-50 focus:outline-none transition-colors"
-                  disabled={quantity <= 1}
-                >
-                  -
-                </button>
-                <span className="px-4 py-3 text-gray-900 font-medium w-12 text-center select-none">
-                  {quantity}
-                </span>
-                <button 
-                  onClick={() => handleQuantityChange('inc')}
-                  className="px-4 py-3 text-gray-600 hover:text-red-600 hover:bg-gray-50 focus:outline-none transition-colors"
-                  disabled={quantity >= product.stock}
-                >
-                  +
-                </button>
+            <div className="flex flex-col gap-4 mb-8">
+
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-gray-600 w-20">Quantity:</span>
+                <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                  <button
+                    onClick={() => handleQuantityChange('dec')}
+                    disabled={quantity <= 1}
+                    className="w-11 h-11 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg font-bold"
+                  >
+                    −
+                  </button>
+                  <span className="w-12 h-11 flex items-center justify-center text-gray-900 font-bold text-base border-x border-gray-200 select-none">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => handleQuantityChange('inc')}
+                    disabled={quantity >= product.stock}
+                    className="w-11 h-11 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg font-bold"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
-              <div className="flex-1 flex flex-col sm:flex-row gap-4">
-                <Button 
+              {/* CTA Buttons Row */}
+              <div className="flex items-stretch gap-3">
+
+                {/* Add to Cart */}
+                <button
                   onClick={() => handleAddToCart(false)}
                   disabled={product.stock === 0}
-                  size="lg"
-                  variant="outline"
-                  className="flex-1 text-base border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white"
+                  className="flex-1 flex items-center justify-center gap-2.5 h-14 px-6 rounded-2xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-600 hover:text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-sm hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                 >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
-                </Button>
+                  <ShoppingCart className="w-5 h-5 flex-shrink-0" />
+                  <span>Add to Cart</span>
+                </button>
 
-                <Button 
+                {/* Buy Now */}
+                <button
                   onClick={handleBuyNow}
                   disabled={product.stock === 0}
-                  size="lg"
-                  className="flex-[1.5] text-base shadow-lg shadow-red-500/30 bg-red-600 hover:bg-red-700"
+                  className="flex-[1.5] flex items-center justify-center gap-2 h-14 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 active:scale-[0.98]"
                 >
-                  Buy Now
-                </Button>
-                
-                <Button 
+                  <span>Buy Now</span>
+                </button>
+
+                {/* Wishlist */}
+                <button
                   onClick={handleWishlistToggle}
-                  variant="outline" 
-                  size="lg" 
                   className={cn(
-                    "px-4 border-gray-300 transition-all",
-                    isWishlisted ? "text-red-600 border-red-600 bg-red-50" : "text-gray-600 hover:text-red-600 hover:border-red-600"
+                    "w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-2xl border-2 transition-all duration-200 active:scale-95",
+                    isWishlisted
+                      ? "border-red-500 bg-red-500 text-white shadow-lg shadow-red-500/30"
+                      : "border-gray-200 bg-white text-gray-400 hover:border-red-400 hover:text-red-500 hover:bg-red-50"
                   )}
                 >
-                  <Heart className={cn("w-6 h-6", isWishlisted && "fill-current")} />
-                </Button>
+                  <Heart className={cn("w-5 h-5 flex-shrink-0", isWishlisted && "fill-current")} />
+                </button>
               </div>
+
+              {/* Out of stock notice */}
+              {product.stock === 0 && (
+                <p className="text-sm text-red-500 font-medium flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                  This product is currently out of stock
+                </p>
+              )}
             </div>
 
             {/* Value Props */}
