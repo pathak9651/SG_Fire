@@ -146,6 +146,22 @@ const userSchema = new mongoose.Schema(
       sms: { type: Boolean, default: false },    // SMS notifications
       push: { type: Boolean, default: true },    // Browser push notifications
     },
+
+    // ── Security Hardening ────────────────────────────────
+    loginAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+    lockUntil: {
+      type: Date,
+      select: false,
+    },
+    otpAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
   },
   {
     // ── Schema Options ────────────────────────────────────
@@ -218,6 +234,9 @@ userSchema.methods.generateOTP = async function () {
 
   // OTP expires in 10 minutes
   this.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+  // Reset OTP attempts on a new generation
+  this.otpAttempts = 0;
 
   return plainOTP; // Return plain OTP to send via email/SMS
 };

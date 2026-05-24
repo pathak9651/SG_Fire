@@ -50,6 +50,13 @@ const api = axios.create({
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (typeof window !== 'undefined') {
+      // Dynamic hostname resolution to prevent cross-site cookie blocking in local development
+      if (window.location.hostname === 'localhost' && config.baseURL?.includes('127.0.0.1')) {
+        config.baseURL = config.baseURL.replace('127.0.0.1', 'localhost');
+      } else if (window.location.hostname === '127.0.0.1' && config.baseURL?.includes('localhost')) {
+        config.baseURL = config.baseURL.replace('localhost', '127.0.0.1');
+      }
+
       const store = (window as any).__REDUX_STORE__;
       const token = store?.getState()?.auth?.accessToken;
       if (token) {

@@ -72,7 +72,7 @@ export const getCookieOptions = (res, maxAge) => {
   return {
     httpOnly: true,
     secure: isProduction && !isLocal,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'strict' : 'lax',
     ...(maxAge !== undefined && { maxAge }),
   };
 };

@@ -78,7 +78,7 @@ export const verifyOTP = asyncHandler(async (req, res, next) => {
   const { userId, otp } = req.body;
 
   // Fetch user with OTP fields (normally excluded by select: false)
-  const user = await User.findById(userId).select('+otp +otpExpiry');
+  const user = await User.findById(userId).select('+otp +otpExpiry +otpAttempts');
 
   if (!user) {
     throw new ErrorResponse('User not found.', 404);
@@ -88,16 +88,38 @@ export const verifyOTP = asyncHandler(async (req, res, next) => {
     throw new ErrorResponse('Email is already verified.', 400);
   }
 
+  // Check if OTP attempts exceeded
+  if (user.otpAttempts >= 3) {
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    user.otpAttempts = 0;
+    await user.save({ validateBeforeSave: false });
+    throw new ErrorResponse('Maximum OTP verification attempts exceeded. Please request a new OTP.', 400);
+  }
+
   // Verify OTP (checks expiry + bcrypt comparison internally)
   const isValidOTP = await user.verifyOTP(otp);
   if (!isValidOTP) {
-    throw new ErrorResponse('Invalid or expired OTP. Please request a new one.', 400);
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+    await user.save({ validateBeforeSave: false });
+
+    const attemptsLeft = 3 - user.otpAttempts;
+    if (attemptsLeft <= 0) {
+      user.otp = undefined;
+      user.otpExpiry = undefined;
+      user.otpAttempts = 0;
+      await user.save({ validateBeforeSave: false });
+      throw new ErrorResponse('Invalid OTP. Maximum attempts exceeded. Please request a new OTP.', 400);
+    }
+
+    throw new ErrorResponse(`Invalid or expired OTP. You have ${attemptsLeft} attempts remaining.`, 400);
   }
 
   // Mark account as verified and clear OTP fields
   user.isVerified = true;
   user.otp = undefined;
   user.otpExpiry = undefined;
+  user.otpAttempts = 0;
   await user.save({ validateBeforeSave: false });
 
   // Auto-login after verification by sending tokens
@@ -138,18 +160,18 @@ export const resendOTP = asyncHandler(async (req, res, next) => {
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Find user and include password field (excluded by default for security)
-  const user = await User.findOne({ email }).select('+password');
+  // Find user and include password, loginAttempts, and lockUntil fields
+  const user = await User.findOne({ email }).select('+password +loginAttempts +lockUntil');
 
   if (!user) {
     // Use generic message — don't reveal whether email exists
     throw new ErrorResponse('Invalid email or password.', 401);
   }
 
-  // Check password using bcrypt comparison method
-  const isPasswordCorrect = await user.comparePassword(password);
-  if (!isPasswordCorrect) {
-    throw new ErrorResponse('Invalid email or password.', 401);
+  // Check if account is locked
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    const minutesLeft = Math.ceil((user.lockUntil - Date.now()) / (60 * 1000));
+    throw new ErrorResponse(`Your account is temporarily locked. Please try again in ${minutesLeft} minutes.`, 403);
   }
 
   // Check if account is blocked
@@ -160,6 +182,29 @@ export const login = asyncHandler(async (req, res, next) => {
   // Prompt unverified users to verify their email
   if (!user.isVerified) {
     throw new ErrorResponse('Please verify your email first. Check your inbox for the OTP.', 403);
+  }
+
+  // Check password using bcrypt comparison method
+  const isPasswordCorrect = await user.comparePassword(password);
+  if (!isPasswordCorrect) {
+    // Increment login attempts
+    user.loginAttempts = (user.loginAttempts || 0) + 1;
+    if (user.loginAttempts >= 5) {
+      user.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // Lock for 15 minutes
+      user.loginAttempts = 0; // Reset attempts after locking
+      await user.save({ validateBeforeSave: false });
+      throw new ErrorResponse('Invalid credentials. Too many failed attempts. Your account has been temporarily locked for 15 minutes.', 401);
+    }
+    await user.save({ validateBeforeSave: false });
+    const attemptsLeft = 5 - user.loginAttempts;
+    throw new ErrorResponse(`Invalid email or password. You have ${attemptsLeft} attempts remaining before account lockout.`, 401);
+  }
+
+  // Reset login attempts on successful login
+  if (user.loginAttempts > 0 || user.lockUntil) {
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
+    await user.save({ validateBeforeSave: false });
   }
 
   // Send tokens in cookies + response body
@@ -209,11 +254,14 @@ export const refreshToken = asyncHandler(async (req, res, next) => {
     throw new ErrorResponse('Invalid session. Please login again.', 401);
   }
 
-  // Issue a new access token with role-based expiry
+  // Issue a new access token and a new refresh token (RTR)
   const isAdmin = user.role === 'admin';
   const expiresIn = isAdmin ? 30 * 60 * 1000 : 5 * 60 * 1000; // 30m for admin, 5m for user
   const newAccessToken = generateAccessToken(user._id, isAdmin ? '30m' : '5m');
+  const newRefreshToken = generateRefreshToken(user._id);
 
+  // Set new refresh token in cookie (7 days)
+  res.cookie('refreshToken', newRefreshToken, getCookieOptions(res, 7 * 24 * 60 * 60 * 1000));
   // Set new access token in cookie
   res.cookie('accessToken', newAccessToken, getCookieOptions(res, expiresIn));
 
@@ -306,19 +354,40 @@ export const resetPasswordWithOTP = asyncHandler(async (req, res, next) => {
     throw new ErrorResponse('Password must be at least 8 characters.', 400);
   }
 
-  const user = await User.findOne({ email }).select('+otp +otpExpiry');
+  const user = await User.findOne({ email }).select('+otp +otpExpiry +otpAttempts');
   if (!user) {
     throw new ErrorResponse('Invalid or expired OTP. Please request a new one.', 400);
   }
 
+  // Check if OTP attempts exceeded
+  if (user.otpAttempts >= 3) {
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    user.otpAttempts = 0;
+    await user.save({ validateBeforeSave: false });
+    throw new ErrorResponse('Maximum OTP verification attempts exceeded. Please request a new OTP.', 400);
+  }
+
   const isValidOTP = await user.verifyOTP(otp);
   if (!isValidOTP) {
-    throw new ErrorResponse('Invalid or expired OTP. Please request a new one.', 400);
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+    await user.save({ validateBeforeSave: false });
+
+    const attemptsLeft = 3 - user.otpAttempts;
+    if (attemptsLeft <= 0) {
+      user.otp = undefined;
+      user.otpExpiry = undefined;
+      user.otpAttempts = 0;
+      await user.save({ validateBeforeSave: false });
+      throw new ErrorResponse('Invalid OTP. Maximum attempts exceeded. Please request a new OTP.', 400);
+    }
+    throw new ErrorResponse(`Invalid or expired OTP. You have ${attemptsLeft} attempts remaining.`, 400);
   }
 
   user.password = password;
   user.otp = undefined;
   user.otpExpiry = undefined;
+  user.otpAttempts = 0;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
   user.isVerified = true;

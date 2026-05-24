@@ -343,14 +343,26 @@ export default function AdminOrders() {
                             {selectedOrder.paymentInfo.status}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center gap-4">
                           <span className="text-xs font-bold text-gray-500">Order Status</span>
-                          <div className={cn(
-                            "inline-flex items-center gap-1 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider",
-                            getStatusColor(selectedOrder.orderStatus)
-                          )}>
-                            {selectedOrder.orderStatus}
-                          </div>
+                          <select
+                            value={selectedOrder.orderStatus}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              handleStatusUpdate(selectedOrder._id, newStatus);
+                              setSelectedOrder((prev: any) => prev ? { ...prev, orderStatus: newStatus } : null);
+                            }}
+                            className={cn(
+                              "px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider outline-none cursor-pointer focus:ring-2 focus:ring-red-500 transition-all dark:bg-gray-900",
+                              getStatusColor(selectedOrder.orderStatus)
+                            )}
+                          >
+                            <option value="pending" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Pending</option>
+                            <option value="processing" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Processing</option>
+                            <option value="shipped" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Shipped</option>
+                            <option value="delivered" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Delivered</option>
+                            <option value="cancelled" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Cancelled</option>
+                          </select>
                         </div>
                       </div>
                     </div>

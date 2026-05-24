@@ -85,7 +85,14 @@ export default function UserSupportPage() {
 
   // Socket Setup
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api';
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api';
+    if (typeof window !== 'undefined') {
+      if (window.location.hostname === 'localhost' && apiUrl.includes('127.0.0.1')) {
+        apiUrl = apiUrl.replace('127.0.0.1', 'localhost');
+      } else if (window.location.hostname === '127.0.0.1' && apiUrl.includes('localhost')) {
+        apiUrl = apiUrl.replace('localhost', '127.0.0.1');
+      }
+    }
     const socketUrl = apiUrl.replace('/api', '');
 
     const newSocket = io(socketUrl, {

@@ -26,6 +26,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import { mongoSanitize } from './src/middleware/mongoSanitize.js';
 
 // ── Load Environment Variables ─────────────────────────────
 // Already loaded via import 'dotenv/config' above
@@ -84,11 +85,11 @@ app.use(
       // Allow requests with no origin (like mobile apps, postman, curl)
       if (!origin) return callback(null, true);
       
+      const isDev = process.env.NODE_ENV === 'development';
       if (
-        process.env.NODE_ENV === 'development' || 
+        isDev || 
         allowedOrigins.includes(origin) ||
-        origin.startsWith('http://localhost:') ||
-        origin.startsWith('http://127.0.0.1:')
+        (isDev && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')))
       ) {
         return callback(null, true);
       }
@@ -123,6 +124,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Parse HTTP-only cookies from request headers (req.cookies)
 // Required for JWT cookie authentication
 app.use(cookieParser());
+
+// Sanitize user-supplied data to prevent NoSQL injection attacks
+app.use(mongoSanitize);
 
 // ─────────────────────────────────────────────
 // REQUEST LOGGING (Development only)
