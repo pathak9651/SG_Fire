@@ -54,6 +54,9 @@ import { generalLimiter } from './src/middleware/rateLimiter.js';
 // ── Initialize Express App ─────────────────────────────────
 const app = express();
 
+// Render sits behind a proxy, so trust the forwarded headers for IP-based logic.
+app.set('trust proxy', 1);
+
 // ─────────────────────────────────────────────
 // SECURITY MIDDLEWARE
 // Applied first to protect all subsequent operations
@@ -71,12 +74,13 @@ app.use(helmet());
  * Allows only the frontend domain to make API requests.
  * credentials: true is required to send/receive HTTP-only cookies.
  */
-const allowedOrigins = [
+const allowedOrigins = new Set([
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-];
+]);
+
 if (process.env.CLIENT_URL) {
-  allowedOrigins.push(process.env.CLIENT_URL);
+  allowedOrigins.add(process.env.CLIENT_URL.replace(/\/$/, ''));
 }
 
 app.use(
@@ -84,11 +88,12 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, postman, curl)
       if (!origin) return callback(null, true);
-      
+
       const isDev = process.env.NODE_ENV === 'development';
+      const normalizedOrigin = origin.replace(/\/$/, '');
       if (
-        isDev || 
-        allowedOrigins.includes(origin) ||
+        isDev ||
+        allowedOrigins.has(normalizedOrigin) ||
         (isDev && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')))
       ) {
         return callback(null, true);

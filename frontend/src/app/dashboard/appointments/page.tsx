@@ -24,6 +24,13 @@ export default function MyAppointments() {
   const dispatch = useDispatch<AppDispatch>();
   const { myAppointments, isLoading } = useSelector((state: RootState) => state.appointment);
 
+  const sortedAppointments = [...(myAppointments || [])].sort((a, b) => {
+    const dateA = a.preferredDate ? new Date(a.preferredDate).getTime() : 0;
+    const dateB = b.preferredDate ? new Date(b.preferredDate).getTime() : 0;
+    if (dateA !== dateB) return dateB - dateA; // Latest/newest visit dates at the top
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
+
   useEffect(() => {
     dispatch(getMyAppointments());
   }, [dispatch]);
@@ -49,7 +56,7 @@ export default function MyAppointments() {
             <Spinner className="w-12 h-12 border-red-600" />
             <p className="text-sm font-bold text-gray-400">Loading your bookings...</p>
           </div>
-        ) : myAppointments.length === 0 ? (
+        ) : sortedAppointments.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 p-12 text-center">
             <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-6">
               <Calendar size={40} />
@@ -64,7 +71,7 @@ export default function MyAppointments() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {myAppointments.map((apt, i) => (
+            {sortedAppointments.map((apt, i) => (
               <motion.div
                 key={apt._id}
                 initial={{ opacity: 0, y: 20 }}

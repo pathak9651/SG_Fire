@@ -7,10 +7,14 @@ import {
   acceptTicket,
   closeTicket 
 } from '../controllers/supportController.js';
+import { handleAiChat } from '../controllers/aiSupportController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { supportLimiter } from '../middleware/rateLimiter.js';
+import { supportLimiter, aiChatLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
+
+// Public route for the AI safety co-pilot (so prospective clients & guest users can ask queries)
+router.post('/ai-chat', aiChatLimiter, handleAiChat);
 
 router.use(protect);
 

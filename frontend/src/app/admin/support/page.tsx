@@ -7,6 +7,7 @@ import io, { Socket } from 'socket.io-client';
 import api from '@/services/api';
 import { Send, MessageSquare, AlertCircle, CheckCircle, Power, User as UserIcon, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface SupportTicket {
   _id: string;
@@ -100,7 +101,7 @@ export default function AdminSupportPage() {
 
   // Socket Setup
   useEffect(() => {
-    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api';
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
     if (typeof window !== 'undefined') {
       if (window.location.hostname === 'localhost' && apiUrl.includes('127.0.0.1')) {
         apiUrl = apiUrl.replace('127.0.0.1', 'localhost');
@@ -192,200 +193,198 @@ export default function AdminSupportPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-6rem)] bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col lg:flex-row transition-all">
-      
-      {/* Sidebar: Tickets List */}
-      <div className="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 flex flex-col h-1/3 lg:h-full">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
-            <MessageSquare size={20} className="mr-2 text-red-600 animate-pulse" />
-            Support Desk
-          </h2>
-          <span className="text-xs font-bold bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400 px-2 py-0.5 rounded-full">
-            {tickets.filter(t => t.status !== 'closed').length} Active
-          </span>
+    <AdminLayout title="Help & Support">
+      <div className="h-[calc(100vh-12rem)] bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col lg:flex-row transition-all">
+        
+        {/* Sidebar: Tickets List */}
+        <div className="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-800 flex flex-col h-1/3 lg:h-full">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+              <MessageSquare size={20} className="mr-2 text-red-600 animate-pulse" />
+              Support Desk
+            </h2>
+            <span className="text-xs font-bold bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400 px-2 py-0.5 rounded-full">
+              {tickets.filter(t => t.status !== 'closed').length} Active
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-white dark:bg-gray-900">
+            {tickets.map((ticket) => {
+              const isSelected = activeTicket?._id === ticket._id;
+              return (
+                <button
+                  key={ticket._id}
+                  onClick={() => {
+                    setActiveTicket(ticket);
+                    if (socket && ticket.status === 'in_progress') {
+                      socket.emit('join_ticket', ticket._id);
+                    }
+                  }}
+                  className={`w-full text-left p-3 rounded-xl border transition-all flex gap-3 items-start relative group ${
+                    isSelected 
+                      ? 'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20' 
+                      : 'bg-gray-50/30 dark:bg-gray-850/10 hover:bg-gray-50 dark:hover:bg-gray-850 border-gray-200 dark:border-gray-800'
+                  }`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-white/20 text-white' : 'bg-red-50 dark:bg-red-950/20 text-red-600'}`}>
+                    <UserIcon size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-0.5">
+                      <h4 className={`text-xs font-bold truncate ${isSelected ? 'text-white' : 'text-gray-900 dark:text-white'}`}>{ticket.user.name}</h4>
+                      <span className={`text-[8.5px] ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
+                        {ticket.lastMessageAt ? new Date(ticket.lastMessageAt).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''}
+                      </span>
+                    </div>
+                    <p className={`text-[10px] font-bold truncate ${isSelected ? 'text-white/80' : 'text-red-600 dark:text-red-500'} mb-1`}>{ticket.subject}</p>
+                    <p className={`text-[9.5px] truncate ${isSelected ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>{ticket.lastMessage || 'No messages yet'}</p>
+                  </div>
+                  {ticket.status === 'open' && (
+                    <span className="absolute top-2 right-2 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            {tickets.length === 0 && (
+              <div className="text-center py-8 text-gray-400 dark:text-gray-600">
+                <MessageSquare className="mx-auto mb-2 opacity-50" size={28} />
+                <p className="text-xs">No support tickets found.</p>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-white dark:bg-gray-900">
-          {tickets.map((ticket) => {
-            const isSelected = activeTicket?._id === ticket._id;
-            return (
-              <button
-                key={ticket._id}
-                onClick={() => setActiveTicket(ticket)}
-                className={`w-full text-left p-3.5 rounded-xl border transition-all duration-200 flex flex-col gap-1.5 ${
-                  isSelected 
-                    ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 shadow-sm' 
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 border-transparent'
-                }`}
-              >
-                <div className="flex justify-between items-start w-full">
-                  <span className="font-bold text-gray-950 dark:text-white text-sm truncate pr-2">
-                    {ticket.user?.name || 'Unknown User'}
-                  </span>
-                  <span className="text-[10px] font-semibold text-gray-400 whitespace-nowrap">
-                    {new Date(ticket.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col h-2/3 lg:h-full bg-gray-50/30 dark:bg-gray-950/10">
+          {activeTicket ? (
+            <>
+              {/* Active Ticket Header */}
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex justify-between items-center shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-fire-gradient rounded-xl flex items-center justify-center text-white font-bold shadow-md shadow-red-500/20">
+                    {activeTicket.user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">{activeTicket.user.name}</h3>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">{activeTicket.user.email}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate w-full">
-                  {ticket.lastMessage || 'No messages in session'}
-                </p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <span className={`px-2 py-0.5 text-[9px] uppercase font-bold rounded-full ${
-                    ticket.status === 'open' 
-                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 animate-pulse' 
-                      : ticket.status === 'in_progress'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                  }`}>
-                    {ticket.status === 'open' ? 'Requested' : ticket.status === 'in_progress' ? 'Live Chatting' : 'Closed'}
-                  </span>
+                {activeTicket.status === 'in_progress' && (
+                  <button 
+                    onClick={handleCloseChat}
+                    className="px-3.5 py-1.5 border border-red-200 dark:border-red-900/50 hover:bg-red-500 hover:text-white hover:border-red-500 text-red-600 dark:text-red-400 text-xs font-bold rounded-lg transition-all active:scale-95 flex items-center gap-1.5"
+                  >
+                    <Power size={12} /> Close Chat
+                  </button>
+                )}
+              </div>
+
+              {/* Chat Open/Pending Accept State Screen */}
+              {activeTicket.status === 'open' && (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50/50 dark:bg-gray-950/20">
+                  <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 flex items-center justify-center text-red-600 mb-4 animate-pulse">
+                    <MessageSquare size={28} />
+                  </div>
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white mb-1 font-outfit">
+                    Pending Support Request
+                  </h3>
+                  <p className="text-xs text-gray-500 max-w-xs text-center mb-6 leading-relaxed">
+                    User requested a live support chat about: <strong className="text-gray-800 dark:text-gray-200 font-bold">"{activeTicket.subject}"</strong>
+                  </p>
+                  <Button 
+                    onClick={handleAcceptChat}
+                    disabled={isSubmitting}
+                    className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-600/25 flex items-center gap-2 transform active:scale-95 transition-all"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="animate-spin" size={18} /> Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle size={18} /> Accept Support Request
+                      </>
+                    )}
+                  </Button>
                 </div>
-              </button>
-            );
-          })}
-          {tickets.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center p-8 text-center text-gray-400 dark:text-gray-600">
-              <MessageSquare size={32} className="mb-2 opacity-50" />
-              <p className="text-xs">No support requests yet.</p>
+              )}
+
+              {/* Chat Closed State Screen */}
+              {activeTicket.status === 'closed' && (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50/50 dark:bg-gray-950">
+                  <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                    <Power size={28} className="text-gray-400 dark:text-gray-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-700 dark:text-white mb-1">
+                    Chat Session Closed
+                  </h3>
+                  <p className="text-xs text-gray-400 max-w-xs text-center mb-6">
+                    This chat session has ended. To start another session, the user must submit another support request.
+                  </p>
+                </div>
+              )}
+
+              {/* Messaging Chat Frame */}
+              {activeTicket.status === 'in_progress' && (
+                <>
+                  {/* Messages list */}
+                  <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {messages.length === 0 && (
+                      <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
+                        <MessageSquare size={36} className="mb-2 opacity-50" />
+                        <p className="text-xs">No messages yet. Send a greeting to the client!</p>
+                      </div>
+                    )}
+                    {messages.map((msg) => {
+                      const isMe = msg.sender._id === user?._id;
+                      return (
+                        <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                            isMe 
+                              ? 'bg-red-600 text-white rounded-br-none' 
+                              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-750 rounded-bl-none'
+                          }`}>
+                            {!isMe && (
+                              <div className="text-[10px] font-bold mb-1 text-red-500">
+                                {msg.sender.name}
+                              </div>
+                            )}
+                            <p className="leading-relaxed break-words">{msg.text}</p>
+                            <div className={`text-[9px] mt-1.5 ${isMe ? 'text-red-200' : 'text-gray-400'} text-right`}>
+                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Input Area */}
+                  <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex gap-2">
+                    <input
+                      type="text"
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      placeholder="Type your reply to the user..."
+                      className="flex-1 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 focus:border-red-500 focus:bg-white dark:focus:bg-gray-950 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500 transition-all"
+                    />
+                    <Button type="submit" disabled={!inputText.trim()} className="px-5 bg-red-600 hover:bg-red-700 text-white rounded-xl flex items-center justify-center transform active:scale-95 transition-all">
+                      <Send size={16} />
+                    </Button>
+                  </form>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-50 dark:bg-gray-950/20">
+              <MessageSquare size={48} className="mb-4 text-gray-300 dark:text-gray-800 animate-pulse" />
+              <p className="text-sm font-semibold">Select a support ticket to start live chatting</p>
             </div>
           )}
         </div>
       </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col h-2/3 lg:h-full bg-gray-50 dark:bg-gray-950">
-        {activeTicket ? (
-          <>
-            {/* Chat Header */}
-            <div className="p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-600 dark:text-red-400 font-bold border border-red-100 dark:border-red-900/30 shadow-inner">
-                  {activeTicket.user?.name?.charAt(0) || 'U'}
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-sm md:text-base">
-                    {activeTicket.user?.name}
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {activeTicket.user?.email}
-                  </p>
-                </div>
-              </div>
-              
-              {activeTicket.status === 'in_progress' && (
-                <button
-                  onClick={handleCloseChat}
-                  disabled={isSubmitting}
-                  className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 transition-all flex items-center gap-1 text-xs font-bold"
-                >
-                  <Power size={14} /> End Chat
-                </button>
-              )}
-            </div>
-
-            {/* Accept Request Screen Overlay / Banner */}
-            {activeTicket.status === 'open' && (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-950">
-                <div className="w-20 h-20 rounded-full bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center mb-6 shadow-inner animate-pulse">
-                  <AlertCircle size={40} className="text-amber-500" />
-                </div>
-                <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
-                  Live Chat Request
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-8 text-center leading-relaxed">
-                  <strong>{activeTicket.user?.name}</strong> is online and has requested a live connection. Click Accept to join the live support chat.
-                </p>
-                <Button 
-                  onClick={handleAcceptChat}
-                  disabled={isSubmitting}
-                  className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-600/25 flex items-center gap-2 transform active:scale-95 transition-all"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="animate-spin" size={18} /> Connecting...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle size={18} /> Accept Support Request
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {/* Chat Closed State Screen */}
-            {activeTicket.status === 'closed' && (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-950">
-                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                  <Power size={28} className="text-gray-400 dark:text-gray-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-700 dark:text-white mb-1">
-                  Chat Session Closed
-                </h3>
-                <p className="text-xs text-gray-400 max-w-xs text-center mb-6">
-                  This chat session has ended. To start another session, the user must submit another support request.
-                </p>
-              </div>
-            )}
-
-            {/* Messaging Chat Frame */}
-            {activeTicket.status === 'in_progress' && (
-              <>
-                {/* Messages list */}
-                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
-                      <MessageSquare size={36} className="mb-2 opacity-50" />
-                      <p className="text-xs">No messages yet. Send a greeting to the client!</p>
-                    </div>
-                  )}
-                  {messages.map((msg) => {
-                    const isMe = msg.sender._id === user?._id;
-                    return (
-                      <div key={msg._id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                          isMe 
-                            ? 'bg-red-600 text-white rounded-br-none' 
-                            : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-none'
-                        }`}>
-                          {!isMe && (
-                            <div className="text-[10px] font-bold mb-1 text-red-500">
-                              {msg.sender.name}
-                            </div>
-                          )}
-                          <p className="leading-relaxed break-words">{msg.text}</p>
-                          <div className={`text-[9px] mt-1.5 ${isMe ? 'text-red-200' : 'text-gray-400'} text-right`}>
-                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Input Area */}
-                <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex gap-2">
-                  <input
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Type your reply to the user..."
-                    className="flex-1 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 focus:border-red-500 focus:bg-white dark:focus:bg-gray-950 rounded-xl px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500 transition-all"
-                  />
-                  <Button type="submit" disabled={!inputText.trim()} className="px-5 bg-red-600 hover:bg-red-700 text-white rounded-xl flex items-center justify-center transform active:scale-95 transition-all">
-                    <Send size={16} />
-                  </Button>
-                </form>
-              </>
-            )}
-          </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-gray-50 dark:bg-gray-950/20">
-            <MessageSquare size={48} className="mb-4 text-gray-300 dark:text-gray-800 animate-pulse" />
-            <p className="text-sm font-semibold">Select a support ticket to start live chatting</p>
-          </div>
-        )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 }

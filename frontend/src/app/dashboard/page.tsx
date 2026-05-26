@@ -345,7 +345,7 @@ export default function ProfilePage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
-                <Button type="submit" fullWidth isLoading={profileLoading} className="mt-2">
+                <Button type="submit" fullWidth isLoading={profileLoading} className="mt-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-md shadow-red-600/10 active:scale-95 transition-all">
                   <Save size={16} className="mr-2" /> Save Changes
                 </Button>
               </form>
@@ -400,7 +400,7 @@ export default function ProfilePage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
-                <Button type="submit" fullWidth isLoading={passwordLoading} className="mt-2">
+                <Button type="submit" fullWidth isLoading={passwordLoading} className="mt-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-md shadow-red-600/10 active:scale-95 transition-all">
                   <Lock size={16} className="mr-2" /> Update Password
                 </Button>
               </form>

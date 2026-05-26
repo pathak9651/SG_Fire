@@ -30,7 +30,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
  * NEXT_PUBLIC_ prefix makes this accessible in browser (Next.js convention).
  */
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5001/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
 
   // Include cookies (HTTP-only JWT cookies) in cross-origin requests
   withCredentials: true,

@@ -44,8 +44,8 @@ export default function DashboardSidebar() {
   return (
     <div className="w-full lg:w-80 space-y-4">
       {/* Navigation Card */}
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div className="p-4 border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Account Menu</p>
         </div>
         
@@ -73,10 +73,10 @@ export default function DashboardSidebar() {
           })}
         </nav>
 
-        <div className="p-3 border-t border-gray-50 dark:border-gray-800">
+        <div className="p-3 border-t border-gray-200 dark:border-gray-800">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all"
+            className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-955/20 transition-all"
           >
             <LogOut size={18} />
             Sign Out

@@ -121,3 +121,117 @@ export const updatePassword = asyncHandler(async (req, res) => {
 
   res.json({ success: true, message: 'Password updated successfully' });
 });
+
+// ─────────────────────────────────────────────
+// @desc    Add a new address
+// @route   POST /api/users/addresses
+// @access  Private
+// ─────────────────────────────────────────────
+export const addAddress = asyncHandler(async (req, res) => {
+  const { type, fullName, phone, addressLine1, addressLine2, city, state, pincode, country, isDefault } = req.body;
+
+  if (!fullName || !phone || !addressLine1 || !city || !state || !pincode) {
+    throw new ErrorResponse('Please provide all required address fields', 400);
+  }
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new ErrorResponse('User not found', 404);
+
+  // If this address is set as default, turn off other defaults
+  if (isDefault) {
+    user.addresses.forEach(addr => {
+      addr.isDefault = false;
+    });
+  }
+
+  // Create the new address object
+  const newAddress = {
+    type: type || 'home',
+    fullName,
+    phone,
+    addressLine1,
+    addressLine2,
+    city,
+    state,
+    pincode,
+    country: country || 'India',
+    isDefault: isDefault || user.addresses.length === 0 // Make default if it's the first one
+  };
+
+  user.addresses.push(newAddress);
+  await user.save();
+
+  res.status(201).json({
+    success: true,
+    message: 'Address added successfully',
+    data: user.addresses
+  });
+});
+
+// ─────────────────────────────────────────────
+// @desc    Update a saved address
+// @route   PUT /api/users/addresses/:addressId
+// @access  Private
+// ─────────────────────────────────────────────
+export const updateAddress = asyncHandler(async (req, res) => {
+  const { addressId } = req.params;
+  const { type, fullName, phone, addressLine1, addressLine2, city, state, pincode, country, isDefault } = req.body;
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new ErrorResponse('User not found', 404);
+
+  // Find the address
+  const address = user.addresses.id(addressId);
+  if (!address) {
+    throw new ErrorResponse('Address not found', 404);
+  }
+
+  // If this address is set as default, turn off other defaults
+  if (isDefault) {
+    user.addresses.forEach(addr => {
+      addr.isDefault = false;
+    });
+  }
+
+  // Update fields
+  if (type) address.type = type;
+  if (fullName) address.fullName = fullName;
+  if (phone) address.phone = phone;
+  if (addressLine1) address.addressLine1 = addressLine1;
+  if (addressLine2 !== undefined) address.addressLine2 = addressLine2;
+  if (city) address.city = city;
+  if (state) address.state = state;
+  if (pincode) address.pincode = pincode;
+  if (country) address.country = country;
+  if (isDefault !== undefined) address.isDefault = isDefault;
+
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Address updated successfully',
+    data: user.addresses
+  });
+});
+
+// ─────────────────────────────────────────────
+// @desc    Delete a saved address
+// @route   DELETE /api/users/addresses/:addressId
+// @access  Private
+// ─────────────────────────────────────────────
+export const deleteAddress = asyncHandler(async (req, res) => {
+  const { addressId } = req.params;
+
+  const user = await User.findById(req.user.id);
+  if (!user) throw new ErrorResponse('User not found', 404);
+
+  // Remove the address
+  user.addresses = user.addresses.filter(addr => addr._id.toString() !== addressId);
+  await user.save();
+
+  res.json({
+    success: true,
+    message: 'Address deleted successfully',
+    data: user.addresses
+  });
+});

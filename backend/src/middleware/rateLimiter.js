@@ -138,3 +138,20 @@ export const supportLimiter = rateLimit({
     message: 'Too many support requests. Please wait before trying again.',
   },
 });
+
+/**
+ * aiChatLimiter
+ * -------------
+ * Rate limiter for AI safety chatbot queries.
+ * 100 requests per 15 minutes (generous for conversational flow).
+ */
+export const aiChatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'You have reached the conversation limit. Please wait 15 minutes before chatting again.',
+  },
+});

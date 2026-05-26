@@ -18,7 +18,8 @@ import {
   Mail,
   MapPin,
   CalendarDays,
-  Save
+  Save,
+  RotateCw,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -31,23 +32,35 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Spinner from '@/components/ui/Spinner';
+import { cn } from '@/lib/utils';
 
 export default function AdminAppointments() {
   const dispatch = useDispatch<AppDispatch>();
-  const { appointments, isLoading, totalPages, currentPage } = useSelector((state: RootState) => state.appointment);
+  const { appointments, isLoading, totalPages, currentPage, isError, message } = useSelector((state: RootState) => state.appointment);
   
   const [statusFilter, setStatusFilter] = useState('');
   const [rescheduleData, setRescheduleData] = useState<{ id: string, date: string, time: string } | null>(null);
 
-  useEffect(() => {
+  const fetchAppointments = () => {
     dispatch(getAllAdminAppointments({ page: 1, status: statusFilter }));
+  };
+
+  useEffect(() => {
+    fetchAppointments();
   }, [dispatch, statusFilter]);
+
+  useEffect(() => {
+    if (isError && message) {
+      toast.error(message || 'Failed to retrieve appointments');
+    }
+  }, [isError, message]);
 
   const handleApprove = async (id: string) => {
     try {
       const result = await dispatch(approveAppointment(id));
       if (approveAppointment.fulfilled.match(result)) {
         toast.success('Appointment approved');
+        fetchAppointments(); // Re-fetch to synchronize state
       }
     } catch (err) {
       toast.error('Approval failed');
@@ -62,6 +75,7 @@ export default function AdminAppointments() {
       const result = await dispatch(rejectAppointment({ id, reason }));
       if (rejectAppointment.fulfilled.match(result)) {
         toast.success('Appointment rejected');
+        fetchAppointments(); // Re-fetch to synchronize state
       }
     } catch (err) {
       toast.error('Rejection failed');
@@ -79,6 +93,7 @@ export default function AdminAppointments() {
       if (rescheduleAppointment.fulfilled.match(result)) {
         toast.success('Appointment rescheduled');
         setRescheduleData(null);
+        fetchAppointments(); // Re-fetch to synchronize state
       }
     } catch (err) {
       toast.error('Reschedule failed');
@@ -95,10 +110,17 @@ export default function AdminAppointments() {
     }
   };
 
+  const sortedAppointments = [...(appointments || [])].sort((a, b) => {
+    const dateA = a.preferredDate ? new Date(a.preferredDate).getTime() : 0;
+    const dateB = b.preferredDate ? new Date(b.preferredDate).getTime() : 0;
+    if (dateA !== dateB) return dateB - dateA; // Latest/newest visit dates at the top
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
+
   return (
     <AdminLayout title="Appointments Management">
       <div className="space-y-6">
-        {/* Filters */}
+        {/* Filters and Controls */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative">
@@ -115,6 +137,16 @@ export default function AdminAppointments() {
                 <option value="completed">Completed</option>
               </select>
             </div>
+
+            <button
+              onClick={fetchAppointments}
+              disabled={isLoading}
+              type="button"
+              className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500 hover:border-red-200 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+            >
+              <RotateCw size={14} className={cn("text-gray-400 transition-all", isLoading && "animate-spin text-red-500")} />
+              Refresh
+            </button>
           </div>
         </div>
 
@@ -126,7 +158,7 @@ export default function AdminAppointments() {
         ) : (
           <div className="grid grid-cols-1 gap-6">
             <AnimatePresence>
-              {appointments.map((apt, i) => (
+              {sortedAppointments.map((apt, i) => (
                 <motion.div 
                   key={apt._id}
                   initial={{ opacity: 0, x: -20 }}
@@ -179,7 +211,7 @@ export default function AdminAppointments() {
                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Date</p>
                           <p className="text-sm font-bold dark:text-white flex items-center gap-2">
                             <CalendarDays size={14} className="text-red-500" />
-                            {new Date(apt.preferredDate).toLocaleDateString()}
+                            {apt.preferredDate ? new Date(apt.preferredDate).toLocaleDateString() : 'N/A'}
                           </p>
                         </div>
                         <div>
@@ -205,21 +237,21 @@ export default function AdminAppointments() {
                           <>
                             <button 
                               onClick={() => handleApprove(apt._id)}
-                              className="px-4 py-2 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-600/10"
+                              className="px-4 py-2 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-700 transition-all shadow-lg shadow-green-600/10 cursor-pointer"
                             >
                               Accept
                             </button>
                             <button 
                               onClick={() => handleReject(apt._id)}
-                              className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/10"
+                              className="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/10 cursor-pointer"
                             >
                               Reject
                             </button>
                           </>
                         )}
                         <button 
-                          onClick={() => setRescheduleData({ id: apt._id, date: apt.preferredDate.split('T')[0], time: apt.preferredTime })}
-                          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                          onClick={() => setRescheduleData({ id: apt._id, date: apt.preferredDate ? apt.preferredDate.split('T')[0] : '', time: apt.preferredTime })}
+                          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all cursor-pointer"
                         >
                           Reschedule
                         </button>
@@ -239,8 +271,8 @@ export default function AdminAppointments() {
                         <input 
                           type="date" 
                           value={rescheduleData!.date}
-                          onChange={(e) => setRescheduleData({...rescheduleData!, date: e.target.value})}
-                          className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white"
+                          onChange={(e) => setRescheduleData((prev) => prev ? { ...prev, date: e.target.value } : null)}
+                          className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white border border-gray-150 dark:border-gray-700 outline-none focus:border-red-500"
                         />
                       </div>
                       <div>
@@ -248,21 +280,21 @@ export default function AdminAppointments() {
                         <input 
                           type="text" 
                           value={rescheduleData!.time}
-                          onChange={(e) => setRescheduleData({...rescheduleData!, time: e.target.value})}
+                          onChange={(e) => setRescheduleData((prev) => prev ? { ...prev, time: e.target.value } : null)}
                           placeholder="e.g. 10:00 AM"
-                          className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white"
+                          className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl text-xs font-bold dark:text-white border border-gray-150 dark:border-gray-700 outline-none focus:border-red-500"
                         />
                       </div>
                       <div className="flex items-end gap-2">
                         <button 
                           onClick={handleReschedule}
-                          className="flex-1 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all"
+                          className="flex-1 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-red-700 transition-all cursor-pointer"
                         >
                           Confirm
                         </button>
                         <button 
                           onClick={() => setRescheduleData(null)}
-                          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-xl hover:bg-gray-200 transition-all"
+                          className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-xl hover:bg-gray-200 transition-all cursor-pointer border border-transparent hover:border-gray-200"
                         >
                           Cancel
                         </button>
@@ -273,7 +305,7 @@ export default function AdminAppointments() {
               ))}
             </AnimatePresence>
             
-            {appointments.length === 0 && (
+            {sortedAppointments.length === 0 && (
               <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800">
                 <Calendar size={64} className="mx-auto text-gray-200 mb-4" />
                 <h3 className="text-xl font-black dark:text-white">No appointments found</h3>
