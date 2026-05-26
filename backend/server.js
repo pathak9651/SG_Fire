@@ -31,6 +31,10 @@ import { mongoSanitize } from './src/middleware/mongoSanitize.js';
 // ── Load Environment Variables ─────────────────────────────
 // Already loaded via import 'dotenv/config' above
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = process.env.RENDER ? 'production' : 'development';
+}
+
 // ── Database Connection ────────────────────────────────────
 import connectDB from './src/config/db.js';
 connectDB();
@@ -151,6 +155,14 @@ if (process.env.NODE_ENV === 'development') {
 // Simple endpoint to verify the server is running.
 // Used by deployment platforms (Render, Railway) for health monitoring.
 // ─────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'SG Fire API',
+    environment: process.env.NODE_ENV,
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
