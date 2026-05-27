@@ -101,7 +101,7 @@ export default function AdminSupportPage() {
 
   // Socket Setup
   useEffect(() => {
-    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     if (typeof window !== 'undefined') {
       if (window.location.hostname === 'localhost' && apiUrl.includes('127.0.0.1')) {
         apiUrl = apiUrl.replace('127.0.0.1', 'localhost');

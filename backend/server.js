@@ -19,7 +19,8 @@
  * ============================================================
  */
 
-import 'dotenv/config'; // Must be the absolute first import!
+import dotenv from 'dotenv';
+dotenv.config({ override: true }); // Prefer the workspace .env over inherited shell variables.
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';

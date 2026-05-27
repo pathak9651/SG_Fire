@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 async function getProduct(slug: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/products/slug/${slug}`, {
       cache: 'no-store'
     });
@@ -27,7 +27,7 @@ async function getProduct(slug: string) {
 
 async function getRelatedProducts(id: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const res = await fetch(`${apiUrl}/products/related/${id}`, {
       cache: 'no-store'
     });

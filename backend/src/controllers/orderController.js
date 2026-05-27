@@ -27,7 +27,6 @@
 
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
-import Stripe from 'stripe';
 import Order from '../models/Order.js';
 import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
@@ -35,14 +34,16 @@ import Coupon from '../models/Coupon.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import sendEmail from '../utils/sendEmail.js';
 
-// Initialize Razorpay SDK with API credentials from .env
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+const getRazorpayClient = () => {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new ErrorResponse('Razorpay is not configured on this server.', 503);
+  }
 
-// Initialize Stripe SDK
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+};
 
 // ─────────────────────────────────────────────
 // Helper: Generate unique order number
@@ -108,6 +109,7 @@ const buildOrderSummaryFromCart = async (cart) => {
 // Body: { amount } (in paise, e.g., 50000 = ₹500)
 // ─────────────────────────────────────────────
 export const createRazorpayOrder = asyncHandler(async (req, res) => {
+  const razorpay = getRazorpayClient();
   const cart = await Cart.findOne({ user: req.user.id });
 
   if (!cart || cart.items.length === 0) {
