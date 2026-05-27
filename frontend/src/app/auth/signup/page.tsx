@@ -42,6 +42,7 @@ export default function SignupPage() {
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [registeredUserId, setRegisteredUserId] = useState('');
+  const [debugOtp, setDebugOtp] = useState('');
 
   const {
     register,
@@ -54,6 +55,7 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormValues) => {
     setServerError('');
     setSuccessMessage('');
+    setDebugOtp('');
     
     try {
       const resultAction = await dispatch(registerUser({
@@ -65,6 +67,9 @@ export default function SignupPage() {
 
       if (registerUser.fulfilled.match(resultAction)) {
         setSuccessMessage(resultAction.payload.message);
+        if (resultAction.payload.debugOtp) {
+          setDebugOtp(resultAction.payload.debugOtp);
+        }
         setRegisteredUserId(resultAction.payload.userId);
         
         // Redirect to OTP verification page after 2 seconds
@@ -110,6 +115,13 @@ export default function SignupPage() {
           <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg flex items-center">
             <CheckCircle2 className="h-5 w-5 text-green-500 mr-3" />
             <p className="text-sm text-green-700">{successMessage}</p>
+          </div>
+        )}
+
+        {debugOtp && (
+          <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg text-left">
+            <p className="text-sm font-semibold text-amber-900">Development OTP</p>
+            <p className="text-sm text-amber-800 mt-1">Use this code on the verification page: <span className="font-mono font-bold">{debugOtp}</span></p>
           </div>
         )}
 

@@ -106,13 +106,13 @@ export const loginUser = createAsyncThunk<
  * redirect to OTP verification page.
  */
 export const registerUser = createAsyncThunk<
-  { userId: string; message: string },
+  { userId: string; message: string; debugOtp?: string },
   { name: string; email: string; phone: string; password: string },
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/register', userData);
-    return { userId: data.userId, message: data.message };
+    return { userId: data.userId, message: data.message, debugOtp: data.debugOtp };
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
     return rejectWithValue(axiosError.response?.data?.message || 'Registration failed');

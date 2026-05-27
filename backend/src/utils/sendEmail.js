@@ -264,8 +264,23 @@ const sendEmail = async ({ to, subject, template, data, replyTo }) => {
     ...(replyTo && { replyTo }),
   };
 
-  const info = await transporter.sendMail(mailOptions);
-  return { mocked: false, messageId: info.messageId };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return { mocked: false, messageId: info.messageId };
+  } catch (error) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('----------------------------------------------------');
+      console.log(`📧 EMAIL DELIVERY FAILED, USING DEV FALLBACK`);
+      console.log(`📌 SUBJECT: ${subject}`);
+      if (replyTo) console.log(`↩️ REPLY TO: ${replyTo}`);
+      if (data.otp) console.log(`🔑 OTP: ${data.otp}`);
+      console.log(`⚠️ SMTP ERROR: ${error.message}`);
+      console.log('----------------------------------------------------');
+      return { mocked: true, error: error.message };
+    }
+
+    throw error;
+  }
 };
 
 export default sendEmail;

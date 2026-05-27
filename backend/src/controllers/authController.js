@@ -54,19 +54,32 @@ export const register = asyncHandler(async (req, res, next) => {
   const otp = await user.generateOTP();
   await user.save({ validateBeforeSave: false }); // Save OTP without re-validating all fields
 
-  // Send OTP via email using the 'otp' template
-  await sendEmail({
-    to: user.email,
-    subject: 'Verify your SG Fire account',
-    template: 'otp',
-    data: { name: user.name, otp },
-  });
+    // Send OTP via email using the 'otp' template.
+    // Registration must still succeed even if mail delivery fails.
+    let emailResult = null;
+    try {
+      emailResult = await sendEmail({
+        to: user.email,
+        subject: 'Verify your SG Fire account',
+        template: 'otp',
+        data: { name: user.name, otp },
+      });
+    } catch (emailError) {
+      console.warn('OTP email delivery failed during registration:', emailError.message);
+    }
 
-  res.status(201).json({
+  const responseBody = {
     success: true,
     message: 'Account created! Please check your email for the OTP to verify your account.',
-    userId: user._id, // Send userId so frontend knows which user to verify
-  });
+    userId: user._id,
+  };
+
+  if (process.env.NODE_ENV !== 'production' && emailResult?.mocked) {
+    responseBody.debugOtp = otp;
+    responseBody.message = 'Account created! Email delivery is using the development fallback. Use the OTP shown in the response.';
+  }
+
+  res.status(201).json(responseBody);
 });
 
 // ─────────────────────────────────────────────
@@ -142,14 +155,25 @@ export const resendOTP = asyncHandler(async (req, res, next) => {
   const otp = await user.generateOTP();
   await user.save({ validateBeforeSave: false });
 
-  await sendEmail({
-    to: user.email,
-    subject: 'Your new SG Fire OTP',
-    template: 'otp',
-    data: { name: user.name, otp },
-  });
+    let emailResult = null;
+    try {
+      emailResult = await sendEmail({
+        to: user.email,
+        subject: 'Your new SG Fire OTP',
+        template: 'otp',
+        data: { name: user.name, otp },
+      });
+    } catch (emailError) {
+      console.warn('OTP email delivery failed during resend:', emailError.message);
+    }
 
-  res.json({ success: true, message: 'New OTP sent to your email.' });
+  const responseBody = { success: true, message: 'New OTP sent to your email.' };
+  if (process.env.NODE_ENV !== 'production' && emailResult?.mocked) {
+    responseBody.debugOtp = otp;
+    responseBody.message = 'Development fallback used. Use the OTP shown in the response.';
+  }
+
+  res.json(responseBody);
 });
 
 // ─────────────────────────────────────────────
