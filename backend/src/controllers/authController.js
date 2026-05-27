@@ -29,7 +29,7 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import { sendTokenResponse, generateAccessToken, getCookieOptions } from '../utils/generateToken.js';
+import { sendTokenResponse, generateAccessToken, generateRefreshToken, getCookieOptions } from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 

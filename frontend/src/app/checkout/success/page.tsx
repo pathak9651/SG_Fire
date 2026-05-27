@@ -43,9 +43,14 @@ function SuccessContent() {
           <div className="flex justify-between items-center">
             <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Status</span>
             <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[10px] font-black uppercase rounded-full tracking-wider">
-              Processing
+              Confirmed
             </span>
           </div>
+        </div>
+
+        <div className="mb-8 rounded-2xl border border-green-200 bg-green-50 dark:border-green-900/40 dark:bg-green-950/20 px-4 py-3 text-left">
+          <p className="text-sm font-semibold text-green-800 dark:text-green-300">Your order has been confirmed successfully.</p>
+          <p className="text-xs text-green-700 dark:text-green-400 mt-1">You can track its progress from your order history.</p>
         </div>
 
         <div className="space-y-4">

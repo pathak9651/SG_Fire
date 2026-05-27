@@ -82,6 +82,7 @@ export default function CheckoutPage() {
         const orderPayload = {
           shippingAddress,
           paymentMethod: 'cod',
+          cartItems: cart.validItems,
           orderNotes
         };
         const finalOrder = await dispatch(placeOrder(orderPayload)).unwrap();
@@ -118,6 +119,7 @@ export default function CheckoutPage() {
             shippingAddress,
             paymentMethod: 'razorpay',
             paymentDetails,
+            cartItems: cart.validItems,
             orderNotes
           };
 

@@ -28,11 +28,22 @@ export default function MyOrders() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending': return 'bg-green-100 text-green-700';
       case 'delivered': return 'bg-green-100 text-green-700';
       case 'shipped': return 'bg-blue-100 text-blue-700';
       case 'processing': return 'bg-amber-100 text-amber-700';
       case 'cancelled': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pending':
+      case 'processing':
+        return 'confirmed';
+      default:
+        return status;
     }
   };
 
@@ -92,7 +103,7 @@ export default function MyOrders() {
                     <div className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-2 ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus === 'delivered' ? <CheckCircle size={14} /> : 
                        order.orderStatus === 'shipped' ? <Truck size={14} /> : <Clock size={14} />}
-                      {order.orderStatus}
+                      {getStatusLabel(order.orderStatus)}
                     </div>
 
                     <Link 

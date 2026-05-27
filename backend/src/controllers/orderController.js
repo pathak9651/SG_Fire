@@ -35,13 +35,22 @@ import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import sendEmail from '../utils/sendEmail.js';
 
 const getRazorpayClient = () => {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  const hasValidRazorpayConfig =
+    keyId &&
+    keySecret &&
+    !keyId.includes('your_key_id') &&
+    !keySecret.includes('your_razorpay_key_secret');
+
+  if (!hasValidRazorpayConfig) {
     throw new ErrorResponse('Razorpay is not configured on this server.', 503);
   }
 
   return new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: keyId,
+    key_secret: keySecret,
   });
 };
 
@@ -56,10 +65,14 @@ const generateOrderNumber = () => {
 };
 
 const buildOrderSummaryFromCart = async (cart) => {
+  return buildOrderSummaryFromItems(cart.items, cart.appliedCoupon);
+};
+
+const buildOrderSummaryFromItems = async (cartItems, appliedCoupon = null) => {
   const orderItems = [];
   let itemsTotal = 0;
 
-  for (const cartItem of cart.items) {
+  for (const cartItem of cartItems) {
     const product = await Product.findById(cartItem.product);
     if (!product || !product.isActive) continue;
 
@@ -84,9 +97,9 @@ const buildOrderSummaryFromCart = async (cart) => {
 
   let discountAmount = 0;
   let couponData = {};
-  if (cart.appliedCoupon) {
-    discountAmount = cart.appliedCoupon.discount || 0;
-    couponData = { code: cart.appliedCoupon.code, discount: discountAmount };
+  if (appliedCoupon) {
+    discountAmount = appliedCoupon.discount || 0;
+    couponData = { code: appliedCoupon.code, discount: discountAmount };
   }
 
   const totalAmount = itemsTotal + shippingCharge + taxAmount - discountAmount;
@@ -145,11 +158,14 @@ export const createRazorpayOrder = asyncHandler(async (req, res) => {
 // Body: { shippingAddress, paymentMethod, paymentDetails, orderNotes }
 // ─────────────────────────────────────────────
 export const placeOrder = asyncHandler(async (req, res) => {
-  const { shippingAddress, paymentMethod, paymentDetails, orderNotes } = req.body;
+  const { shippingAddress, paymentMethod, paymentDetails, orderNotes, cartItems } = req.body;
 
   // ── Step 1: Fetch and validate user's cart ──
   const cart = await Cart.findOne({ user: req.user.id });
-  if (!cart || cart.items.length === 0) {
+  const fallbackItems = Array.isArray(cartItems) ? cartItems : [];
+  const effectiveCartItems = cart && cart.items.length > 0 ? cart.items : fallbackItems;
+
+  if (!effectiveCartItems.length) {
     throw new ErrorResponse('Your cart is empty.', 400);
   }
 
@@ -161,7 +177,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     discountAmount,
     couponData,
     totalAmount,
-  } = await buildOrderSummaryFromCart(cart);
+  } = await buildOrderSummaryFromItems(effectiveCartItems, cart?.appliedCoupon || null);
 
   // ── Step 2: Verify Razorpay payment signature ──
   if (paymentMethod === 'razorpay') {
@@ -192,7 +208,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
   }
 
   // Apply coupon discount if present
-  if (cart.appliedCoupon?.couponId) {
+  if (cart?.appliedCoupon?.couponId) {
     await Coupon.findByIdAndUpdate(cart.appliedCoupon.couponId, {
       $inc: { usedCount: 1 },
       $push: { usedBy: { user: req.user.id } },
