@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   Calendar, 
@@ -41,13 +41,13 @@ export default function AdminAppointments() {
   const [statusFilter, setStatusFilter] = useState('');
   const [rescheduleData, setRescheduleData] = useState<{ id: string, date: string, time: string } | null>(null);
 
-  const fetchAppointments = () => {
+  const fetchAppointments = useCallback(() => {
     dispatch(getAllAdminAppointments({ page: 1, status: statusFilter }));
-  };
+  }, [dispatch, statusFilter]);
 
   useEffect(() => {
     fetchAppointments();
-  }, [dispatch, statusFilter]);
+  }, [fetchAppointments]);
 
   useEffect(() => {
     if (isError && message) {

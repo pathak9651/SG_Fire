@@ -100,8 +100,8 @@ export default function ClientSettingsPage() {
       await dispatch(updatePassword({ currentPassword, newPassword })).unwrap();
       setSecurityMsg({ type: 'success', text: 'Password updated successfully!' });
       setCurrentPassword('');
-      newPassword && setNewPassword('');
-      confirmPassword && setConfirmPassword('');
+      if (newPassword) setNewPassword('');
+      if (confirmPassword) setConfirmPassword('');
     } catch (err: any) {
       setSecurityMsg({ type: 'error', text: err || 'Failed to update password' });
     } finally {

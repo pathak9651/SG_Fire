@@ -207,16 +207,20 @@ export default function FloatingChatbot() {
 
   // Dynamic context awareness for welcome message updating when page changes (if chat hasn't started)
   useEffect(() => {
-    if (messages.length === 1 && messages[0].id === 'welcome') {
-      setMessages([
+    setMessages((prev) => {
+      if (prev.length !== 1 || prev[0].id !== 'welcome') {
+        return prev;
+      }
+
+      return [
         {
           id: 'welcome',
           sender: 'ai',
           text: getWelcomeMessage(pathname || ''),
           createdAt: new Date()
         }
-      ]);
-    }
+      ];
+    });
   }, [pathname]);
 
   // Set up Speech Recognition on mount if supported
