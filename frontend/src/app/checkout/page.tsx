@@ -77,12 +77,18 @@ export default function CheckoutPage() {
   const handlePayment = async () => {
     if (!validateForm()) return;
 
+    const validItems = cart?.validItems;
+    if (!validItems?.length) {
+      toast.error('Your cart is empty');
+      return;
+    }
+
     if (paymentMethod === 'cod') {
       try {
         const orderPayload = {
           shippingAddress,
           paymentMethod: 'cod',
-          cartItems: cart.validItems,
+          cartItems: validItems,
           orderNotes
         };
         const finalOrder = await dispatch(placeOrder(orderPayload)).unwrap();
@@ -119,7 +125,7 @@ export default function CheckoutPage() {
             shippingAddress,
             paymentMethod: 'razorpay',
             paymentDetails,
-            cartItems: cart.validItems,
+            cartItems: validItems,
             orderNotes
           };
 
