@@ -16,11 +16,13 @@ import {
   ArrowLeft,
   User as UserIcon,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MENU_ITEMS = [
+  { label: 'Home', icon: Home, href: '/' },
   { label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
   { label: 'Appointments', icon: Calendar, href: '/admin/appointments' },
   { label: 'Products', icon: Package, href: '/admin/products' },
@@ -50,18 +52,18 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       )}
 
       <div className={cn(
-        "w-64 bg-gray-950 text-white h-screen fixed left-0 top-0 z-[100] flex flex-col border-r border-gray-800 transition-transform duration-300 lg:translate-x-0",
+        "w-64 bg-gray-950 text-white flex flex-col border-r border-gray-800 transition-transform duration-300 fixed inset-y-0 left-0 h-screen z-[100] lg:sticky lg:top-0 lg:h-screen lg:z-30 lg:translate-x-0 lg:flex-shrink-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
       {/* Brand */}
-      <div className="p-6 flex items-center gap-3">
+      <Link href="/" className="p-6 flex items-center gap-3 hover:opacity-90 transition-opacity">
         <div className="w-8 h-8 bg-fire-gradient rounded-lg flex items-center justify-center">
           <Flame size={18} className="text-white" />
         </div>
         <span className="font-outfit font-bold text-lg">
           Admin <span className="text-red-500">Panel</span>
         </span>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">

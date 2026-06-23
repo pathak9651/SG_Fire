@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Phone, Mail, Camera, Send, MessageCircle, 
@@ -26,6 +26,7 @@ const NAV_LINKS = [
 export default function MobileMenu() {
   const dispatch = useDispatch();
   const pathname = usePathname();
+  const router = useRouter();
   const { isMobileMenuOpen, theme } = useSelector((s: RootState) => s.ui);
   const { user, isAuthenticated } = useSelector((s: RootState) => s.auth);
 
@@ -56,6 +57,7 @@ export default function MobileMenu() {
     await dispatch(logoutUser() as any);
     toast.success('Logged out successfully');
     dispatch(closeMobileMenu());
+    router.push('/');
   };
 
   return (

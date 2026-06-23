@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   User, 
   ShoppingBag, 
@@ -31,6 +31,7 @@ const NAV_ITEMS = [
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -39,6 +40,7 @@ export default function DashboardSidebar() {
   const handleLogout = async () => {
     await dispatch(logoutUser());
     toast.success('Logged out successfully');
+    router.push('/');
   };
 
   return (

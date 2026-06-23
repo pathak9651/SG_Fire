@@ -27,6 +27,7 @@ import productReducer from './slices/productSlice';
 import categoryReducer from './slices/categorySlice';
 import orderReducer from './slices/orderSlice';
 import appointmentReducer from './slices/appointmentSlice';
+import notificationReducer from './slices/notificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     category: categoryReducer, // Category state
     order: orderReducer,     // Order state
     appointment: appointmentReducer, // Appointment state
+    notification: notificationReducer, // Admin notifications
   },
 
   // Middleware configuration
