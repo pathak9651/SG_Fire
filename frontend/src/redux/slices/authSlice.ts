@@ -156,6 +156,18 @@ export const fetchMe = createAsyncThunk<
 // ─────────────────────────────────────────────
 // AUTH SLICE
 // ─────────────────────────────────────────────
+const setSessionHint = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('sgfire_logged_in', 'true');
+  }
+};
+
+const clearSessionHint = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('sgfire_logged_in');
+  }
+};
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -173,6 +185,7 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.isInitialized = true;
+      setSessionHint();
     },
 
     /**
@@ -183,6 +196,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.isAuthenticated = false;
       state.isInitialized = true;
+      clearSessionHint();
     },
 
     /**
@@ -209,12 +223,14 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
         state.isInitialized = true;
+        setSessionHint();
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
         state.accessToken = null;
         state.isAuthenticated = false;
         state.isInitialized = true;
+        clearSessionHint();
       })
       // Update Profile
       .addCase(updateProfile.fulfilled, (state, action) => {
@@ -233,6 +249,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.isAuthenticated = false;
       state.isInitialized = true;
+      clearSessionHint();
     });
 
     // ── Fetch Me (session restore) ─────────────────────────
@@ -244,12 +261,14 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
         state.isAuthenticated = true;
         state.isInitialized = true;
+        setSessionHint();
       })
       .addCase(fetchMe.rejected, (state) => {
         state.isLoading = false;
         state.accessToken = null;
         state.isAuthenticated = false;
         state.isInitialized = true;
+        clearSessionHint();
       });
   },
 });

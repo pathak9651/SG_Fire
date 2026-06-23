@@ -1,11 +1,9 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import DashboardSidebar from './DashboardSidebar';
-import Spinner from '@/components/ui/Spinner';
 import { motion } from 'framer-motion';
 
 interface DashboardLayoutProps {
@@ -15,24 +13,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading, isInitialized } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    if (isInitialized && !isLoading && !isAuthenticated) {
-      router.replace('/auth/login?returnUrl=/dashboard');
-    }
-  }, [isInitialized, isLoading, isAuthenticated, router]);
-
-  if (!isInitialized || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
-        <Spinner className="w-10 h-10 border-red-600" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) return null;
+  const { user } = useSelector((state: RootState) => state.auth);
 
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-20">

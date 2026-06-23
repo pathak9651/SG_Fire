@@ -19,8 +19,6 @@
 
 import Link from 'next/link';
 import { Flame, Phone, Mail, MapPin, Globe, Share2, MessageCircle, Video, Users } from 'lucide-react';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
 
 // Footer navigation structure
 const FOOTER_LINKS = {
@@ -71,55 +69,8 @@ const FOOTER_LINKS = {
 };
 
 export default function Footer() {
-  const [email, setEmail] = useState('');
-  const [subscribeLoading, setSubscribeLoading] = useState(false);
-
-  // Newsletter subscription handler (placeholder — integrate with backend)
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribeLoading(true);
-
-    // TODO: Connect to /api/newsletter/subscribe endpoint
-    await new Promise((r) => setTimeout(r, 1000)); // Simulated delay
-    toast.success('Subscribed! You\'ll receive fire safety tips and offers.');
-    setEmail('');
-    setSubscribeLoading(false);
-  };
-
   return (
     <footer className="bg-gray-950 text-gray-300">
-
-      {/* ── Newsletter Section ──────────────────────────── */}
-      <div className="bg-gradient-to-r from-red-900 to-orange-900">
-        <div className="container-main py-10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h3 className="font-outfit text-xl font-bold text-white">
-              🔥 Stay Fire Safe!
-            </h3>
-            <p className="text-red-200 text-sm mt-1">
-              Get fire safety tips, product updates, and exclusive offers.
-            </p>
-          </div>
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 outline-none focus:border-white/50 text-sm flex-1 sm:w-64 transition-colors"
-              required
-            />
-            <button
-              type="submit"
-              disabled={subscribeLoading}
-              className="px-5 py-2.5 bg-white text-red-700 font-bold rounded-lg hover:bg-red-50 transition-colors text-sm disabled:opacity-70 whitespace-nowrap h-11 sm:h-auto"
-            >
-              {subscribeLoading ? 'Subscribing...' : 'Subscribe'}
-            </button>
-          </form>
-        </div>
-      </div>
 
       {/* ── Main Footer Content ─────────────────────────── */}
       <div className="container-main py-14">

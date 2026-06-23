@@ -39,7 +39,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     try {
       await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
       toast.success('Added to cart!');
-      if (redirect) {
+      if (redirect || (typeof window !== 'undefined' && window.innerWidth < 768)) {
         router.push('/cart');
       }
     } catch (error) {
@@ -56,7 +56,11 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     
     try {
       await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
-      router.push('/checkout');
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        router.push('/cart');
+      } else {
+        router.push('/checkout');
+      }
     } catch (error) {
       toast.error(error as string || 'Failed to initiate purchase');
     }
@@ -65,6 +69,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
       toast.error('Please login to use wishlist');
+      router.push(`/auth/login?returnUrl=/products/${product.slug}`);
       return;
     }
 

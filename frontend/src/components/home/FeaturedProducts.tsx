@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Star, Zap, Eye, ArrowRight, Flame } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import { Product } from '@/types';
 import { useEffect, useState } from 'react';
 
 export default function FeaturedProducts() {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { items: wishlistItems } = useSelector((s: RootState) => s.wishlist);
   const { isAuthenticated } = useSelector((s: RootState) => s.auth);
@@ -33,14 +35,27 @@ export default function FeaturedProducts() {
 
   const handleAddToCart = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
-    if (!isAuthenticated) { toast.error('Please login to add items to cart'); return; }
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to cart');
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
+      router.push(`/auth/login?returnUrl=${encodeURIComponent(currentPath)}`);
+      return;
+    }
     dispatch(addToCart({ productId, quantity: 1 }));
     toast.success('Added to cart!');
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      router.push('/cart');
+    }
   };
 
   const handleWishlist = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
-    if (!isAuthenticated) { toast.error('Please login to save to wishlist'); return; }
+    if (!isAuthenticated) {
+      toast.error('Please login to save to wishlist');
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/';
+      router.push(`/auth/login?returnUrl=${encodeURIComponent(currentPath)}`);
+      return;
+    }
     dispatch(optimisticToggle(productId));
   };
 

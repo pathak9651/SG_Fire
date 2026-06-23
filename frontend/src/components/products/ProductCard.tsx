@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Product } from '@/types';
@@ -20,6 +21,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, className }: ProductCardProps) {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { items: wishlistItems } = useSelector((state: RootState) => state.wishlist);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
@@ -32,6 +34,8 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
     if (!isAuthenticated) {
       toast.error('Please login to use wishlist');
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/products';
+      router.push(`/auth/login?returnUrl=${encodeURIComponent(currentPath)}`);
       return;
     }
 
@@ -54,6 +58,8 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/products';
+      router.push(`/auth/login?returnUrl=${encodeURIComponent(currentPath)}`);
       return;
     }
 
@@ -66,6 +72,9 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       .unwrap()
       .then(() => {
         toast.success('Added to cart!');
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+          router.push('/cart');
+        }
       })
       .catch((err) => {
         toast.error(err || 'Failed to add to cart');

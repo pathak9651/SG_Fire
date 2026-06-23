@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, TrendingUp, History, Flame } from 'lucide-react';
 
@@ -17,9 +18,17 @@ const TRENDING_SEARCHES = [
   'Fire Safety Training'
 ];
 
+const QUICK_ACCESS_LINKS: { [key: string]: string } = {
+  'New Arrivals': '/products?isNewArrival=true',
+  'Best Sellers': '/products?isBestSeller=true',
+  'Safety Guides': '/services',
+  'Contact Support': '/contact'
+};
+
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // Focus input when modal opens
   useEffect(() => {
@@ -44,7 +53,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      window.location.href = `/products?keyword=${encodeURIComponent(query)}`;
+      router.push(`/products?keyword=${encodeURIComponent(query.trim())}`);
       onClose();
     }
   };
@@ -100,7 +109,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     {TRENDING_SEARCHES.map((term) => (
                       <button
                         key={term}
-                        onClick={() => { setQuery(term); }}
+                        onClick={() => {
+                          setQuery(term);
+                          router.push(`/products?keyword=${encodeURIComponent(term)}`);
+                          onClose();
+                        }}
                         className="px-4 py-2 rounded-full bg-gray-50 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-colors"
                       >
                         {term}
@@ -115,12 +128,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     <Flame size={14} /> Quick Access
                   </h3>
                   <div className="space-y-1">
-                    {['New Arrivals', 'Best Sellers', 'Safety Guides', 'Contact Support'].map((item) => (
+                    {Object.entries(QUICK_ACCESS_LINKS).map(([label, href]) => (
                       <button
-                        key={item}
+                        key={label}
+                        onClick={() => {
+                          router.push(href);
+                          onClose();
+                        }}
                         className="flex items-center justify-between w-full p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 text-left text-sm font-medium dark:text-gray-300 transition-colors group"
                       >
-                        {item}
+                        {label}
                         <History size={14} className="text-gray-300 group-hover:text-gray-400" />
                       </button>
                     ))}

@@ -133,7 +133,7 @@ export default function Navbar() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => dispatch(toggleSearch())}
-              className="hidden sm:flex p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+              className="flex p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
               aria-label="Search"
             >
               <Search size={19} />

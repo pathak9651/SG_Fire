@@ -15,38 +15,10 @@ import { motion } from 'framer-motion';
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { cart, isLoading, error } = useSelector((state: RootState) => state.cart);
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    // Only fetch cart if authenticated (since backend cart requires auth)
-    if (isAuthenticated) {
-      dispatch(fetchCart());
-    }
-  }, [dispatch, isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 bg-gray-50 dark:bg-gray-950">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 text-center max-w-md w-full">
-          <div className="mx-auto w-16 h-16 bg-red-50 dark:bg-red-950/30 rounded-full flex items-center justify-center mb-6">
-            <ShoppingBag className="w-8 h-8 text-red-600 dark:text-red-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Please Sign In</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">
-            You need to be logged in to view and manage your shopping cart.
-          </p>
-          <Link href="/auth/login?returnUrl=/cart">
-            <Button fullWidth size="lg">Sign in to your account</Button>
-          </Link>
-          <div className="mt-4">
-            <Link href="/auth/signup" className="text-sm font-medium text-red-600 hover:text-red-500">
-              Don't have an account? Sign up
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   if (isLoading && !cart) {
     return (

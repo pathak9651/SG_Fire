@@ -19,7 +19,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { cart, isLoading: cartLoading } = useSelector((state: RootState) => state.cart);
-  const { user, isAuthenticated, isLoading: authLoading, isInitialized } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   const { isLoading: orderLoading } = useSelector((state: RootState) => state.order);
 
   const [shippingAddress, setShippingAddress] = useState({
@@ -37,14 +37,8 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay');
 
   useEffect(() => {
-    if (isInitialized && !authLoading) {
-      if (!isAuthenticated) {
-        router.replace('/auth/login?returnUrl=/checkout');
-        return;
-      }
-      dispatch(fetchCart());
-    }
-  }, [dispatch, isInitialized, authLoading, isAuthenticated, router]);
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   useEffect(() => {
     if (user) {
@@ -156,15 +150,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (!isInitialized || authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
 
-  if (!isAuthenticated) return null;
 
   if (cartLoading && !cart) {
     return (

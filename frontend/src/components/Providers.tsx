@@ -23,10 +23,11 @@ import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { store } from '@/redux/store';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import AuthInitializer from '@/components/auth/AuthInitializer';
+import RouteGuard from '@/components/auth/RouteGuard';
 import FloatingChatbot from '@/components/chat/FloatingChatbot';
 
 /**
@@ -60,7 +61,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
           {/* Main page content */}
           <main className="min-h-screen">
-            {children}
+            <Suspense fallback={null}>
+              <RouteGuard>
+                {children}
+              </RouteGuard>
+            </Suspense>
           </main>
 
           {/* Global footer */}
