@@ -28,9 +28,9 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
   };
 
   return (
-    <div className={`flex py-6 border-b border-gray-200 last:border-0 ${!item.inStock ? 'opacity-50 grayscale' : ''}`}>
+    <div className={`flex py-6 border-b border-gray-200 dark:border-gray-800 last:border-0 ${!item.inStock ? 'opacity-50 grayscale' : ''}`}>
       {/* Product Image */}
-      <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+      <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 dark:border-gray-800">
         <Image
           src={item.image || '/images/placeholder.png'}
           alt={item.title}
@@ -43,7 +43,7 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
       <div className="ml-4 flex flex-1 flex-col">
         {/* Title and Price */}
         <div>
-          <div className="flex flex-col sm:flex-row sm:justify-between text-base font-medium text-gray-900">
+          <div className="flex flex-col sm:flex-row sm:justify-between text-base font-medium text-gray-900 dark:text-white">
             <h3>
               <Link href={`/products/${item.product}`} className="hover:text-red-600 line-clamp-2">
                 {item.title}
@@ -52,7 +52,7 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
             <p className="mt-1 sm:mt-0 sm:ml-4 whitespace-nowrap font-bold text-red-600">₹{item.price.toLocaleString('en-IN')}</p>
           </div>
           {item.price < item.originalPrice && (
-            <p className="mt-1 text-sm text-gray-500 line-through">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-through">
               ₹{item.originalPrice.toLocaleString('en-IN')}
             </p>
           )}
@@ -66,21 +66,21 @@ export default function CartItem({ item, disabled = false }: CartItemProps) {
                 <AlertCircle className="w-4 h-4 mr-1" /> Out of stock
               </span>
             ) : (
-              <div className="flex items-center border border-gray-300 rounded-md bg-white">
+              <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
                 <button
                   type="button"
-                  className="px-3 py-1 text-gray-600 hover:text-red-600 disabled:opacity-50 transition-colors"
+                  className="px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 disabled:opacity-50 transition-colors"
                   onClick={() => handleQuantityChange(item.quantity - 1)}
                   disabled={item.quantity <= 1 || disabled}
                 >
                   -
                 </button>
-                <span className="px-3 py-1 text-gray-900 font-medium w-10 text-center select-none">
+                <span className="px-3 py-1 text-gray-900 dark:text-white font-medium w-10 text-center select-none">
                   {item.quantity}
                 </span>
                 <button
                   type="button"
-                  className="px-3 py-1 text-gray-600 hover:text-red-600 disabled:opacity-50 transition-colors"
+                  className="px-3 py-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 disabled:opacity-50 transition-colors"
                   onClick={() => handleQuantityChange(item.quantity + 1)}
                   disabled={item.quantity >= item.stock || disabled}
                 >

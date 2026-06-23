@@ -41,20 +41,20 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
   const hasValidItems = cart.validItems && cart.validItems.length > 0;
 
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm sticky top-24">
-      <h2 className="text-lg font-medium text-gray-900 mb-6">Order Summary</h2>
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm sticky top-24">
+      <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">Order Summary</h2>
 
-      <dl className="space-y-4 text-sm text-gray-600">
+      <dl className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
         <div className="flex justify-between">
           <dt>Subtotal ({cart.validItems?.length || 0} items)</dt>
-          <dd className="font-medium text-gray-900">₹{cart.itemsTotal?.toLocaleString('en-IN') || 0}</dd>
+          <dd className="font-medium text-gray-900 dark:text-white">₹{cart.itemsTotal?.toLocaleString('en-IN') || 0}</dd>
         </div>
         
         <div className="flex justify-between">
           <dt>Shipping estimate</dt>
-          <dd className="font-medium text-gray-900">
+          <dd className="font-medium text-gray-900 dark:text-white">
             {cart.shippingCharge === 0 ? (
-              <span className="text-green-600">Free</span>
+              <span className="text-green-600 dark:text-green-400">Free</span>
             ) : (
               `₹${cart.shippingCharge?.toLocaleString('en-IN') || 0}`
             )}
@@ -63,11 +63,11 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
 
         <div className="flex justify-between">
           <dt>Tax estimate (18% GST)</dt>
-          <dd className="font-medium text-gray-900">₹{cart.taxAmount?.toLocaleString('en-IN') || 0}</dd>
+          <dd className="font-medium text-gray-900 dark:text-white">₹{cart.taxAmount?.toLocaleString('en-IN') || 0}</dd>
         </div>
 
         {cart.appliedCoupon && (
-          <div className="flex justify-between text-green-600 border-t border-gray-200 pt-4">
+          <div className="flex justify-between text-green-600 dark:text-green-400 border-t border-gray-200 dark:border-gray-800 pt-4">
             <dt className="flex items-center">
               Discount ({cart.appliedCoupon.code})
             </dt>
@@ -75,7 +75,7 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
           </div>
         )}
 
-        <div className="flex justify-between items-center border-t border-gray-200 pt-4 text-base font-bold text-gray-900">
+        <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-800 pt-4 text-base font-bold text-gray-900 dark:text-white">
           <dt>Order Total</dt>
           <dd>
             ₹{((cart.totalAmount || 0) - (cart.appliedCoupon?.discount || 0)).toLocaleString('en-IN')}
@@ -98,18 +98,18 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                 placeholder="Enter promo code"
                 disabled={isLoading}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500 sm:text-sm uppercase"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md focus:ring-red-500 focus:border-red-500 sm:text-sm uppercase"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !couponCode.trim()}
-              className="bg-gray-900 text-white px-4 py-2 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors text-sm font-medium disabled:opacity-50"
+              className="bg-gray-900 dark:bg-red-600 text-white px-4 py-2 rounded-md hover:bg-gray-800 dark:hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors text-sm font-medium disabled:opacity-50"
             >
               Apply
             </button>
           </div>
-          {couponError && <p className="mt-2 text-sm text-red-600">{couponError}</p>}
+          {couponError && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{couponError}</p>}
         </form>
 
         <Button 
@@ -124,8 +124,8 @@ export default function CartSummary({ cart, isLoading = false }: CartSummaryProp
         </Button>
       </div>
 
-      <div className="mt-6 border-t border-gray-200 pt-6">
-        <div className="flex items-center text-sm text-gray-500">
+      <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-6">
+        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
           <ShieldCheck className="w-5 h-5 text-green-500 mr-2" />
           Secure 256-bit SSL encryption
         </div>

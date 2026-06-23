@@ -8,10 +8,10 @@ import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import {
   ShoppingCart, Search, Menu, X, User,
   LogOut, Package, Calendar, Heart, Phone, Flame,
-  Mail, ShieldAlert, ChevronDown
+  Mail, ShieldAlert, ChevronDown, Sun, Moon
 } from 'lucide-react';
 import { RootState, AppDispatch } from '@/redux/store';
-import { toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch } from '@/redux/slices/uiSlice';
+import { toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch, toggleTheme } from '@/redux/slices/uiSlice';
 import { logoutUser } from '@/redux/slices/authSlice';
 import toast from 'react-hot-toast';
 
@@ -24,7 +24,7 @@ export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
 
-  const { isSearchOpen } = useSelector((s: RootState) => s.ui);
+  const { isSearchOpen, theme } = useSelector((s: RootState) => s.ui);
   const { user, isAuthenticated } = useSelector((s: RootState) => s.auth);
   const { cart } = useSelector((s: RootState) => s.cart);
 
@@ -139,7 +139,16 @@ export default function Navbar() {
               <Search size={19} />
             </motion.button>
 
-            {/* Theme removed; always using light theme */}
+            {/* Theme Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => dispatch(toggleTheme())}
+              className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={19} className="text-orange-400" /> : <Moon size={19} className="text-indigo-400" />}
+            </motion.button>
 
             {/* Cart */}
             <Link

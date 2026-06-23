@@ -15,6 +15,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ─────────────────────────────────────────────
    CSS CUSTOM PROPERTIES (Design Tokens)
    Define all brand colors, gradients, shadows here.

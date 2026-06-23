@@ -27,6 +27,7 @@ interface UIState {
   isCartDrawerOpen: boolean;
   activeModal: ModalType;
   modalData: unknown; // Data passed to the active modal
+  theme: 'light' | 'dark';
 }
 
 const initialState: UIState = {
@@ -35,6 +36,7 @@ const initialState: UIState = {
   isCartDrawerOpen: false,
   activeModal: null,
   modalData: null,
+  theme: 'light',
 };
 
 const uiSlice = createSlice({
@@ -55,7 +57,13 @@ const uiSlice = createSlice({
     closeCartDrawer: (state) => { state.isCartDrawerOpen = false; },
     toggleCartDrawer: (state) => { state.isCartDrawerOpen = !state.isCartDrawerOpen; },
 
-    // Dark mode removed: theme is always light by design.
+    // ── Theme Management ───────────────────────────────────
+    setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
+      state.theme = action.payload;
+    },
+    toggleTheme: (state) => {
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+    },
 
     // ── Modals ─────────────────────────────────────────────
     openModal: (state, action: PayloadAction<{ type: ModalType; data?: unknown }>) => {
@@ -73,6 +81,7 @@ export const {
   toggleMobileMenu, closeMobileMenu,
   toggleSearch, closeSearch,
   openCartDrawer, closeCartDrawer, toggleCartDrawer,
+  setTheme, toggleTheme,
   openModal, closeModal,
 } = uiSlice.actions;
 

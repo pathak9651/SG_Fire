@@ -29,6 +29,7 @@ import Footer from '@/components/layout/Footer';
 import AuthInitializer from '@/components/auth/AuthInitializer';
 import RouteGuard from '@/components/auth/RouteGuard';
 import FloatingChatbot from '@/components/chat/FloatingChatbot';
+import ThemeInitializer from '@/components/theme/ThemeInitializer';
 
 /**
  * Create a stable QueryClient instance.
@@ -55,25 +56,27 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       {/* React Query provider for data fetching and caching */}
       <QueryClientProvider client={queryClient}>
-        <AuthInitializer>
-          {/* Global navigation bar */}
-          <Navbar />
+        <ThemeInitializer>
+          <AuthInitializer>
+            {/* Global navigation bar */}
+            <Navbar />
 
-          {/* Main page content */}
-          <main className="min-h-screen">
-            <Suspense fallback={null}>
-              <RouteGuard>
-                {children}
-              </RouteGuard>
-            </Suspense>
-          </main>
+            {/* Main page content */}
+            <main className="min-h-screen">
+              <Suspense fallback={null}>
+                <RouteGuard>
+                  {children}
+                </RouteGuard>
+              </Suspense>
+            </main>
 
-          {/* Global footer */}
-          <Footer />
+            {/* Global footer */}
+            <Footer />
 
-          {/* Global Floating AI Safety Chatbot */}
-          <FloatingChatbot />
-        </AuthInitializer>
+            {/* Global Floating AI Safety Chatbot */}
+            <FloatingChatbot />
+          </AuthInitializer>
+        </ThemeInitializer>
 
         {/* 
           Toast notification container.
