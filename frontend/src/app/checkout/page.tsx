@@ -189,7 +189,7 @@ export default function CheckoutPage() {
   const finalTotal = (cart.totalAmount || 0) - (cart.appliedCoupon?.discount || 0);
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen py-12">
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen py-6 sm:py-12">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-800"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-red-600" />
@@ -315,7 +315,7 @@ export default function CheckoutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-800"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-8 shadow-sm border border-gray-100 dark:border-gray-800"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-red-600" />
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
 
           {/* Sidebar Summary */}
           <div className="lg:col-span-5 mt-8 lg:mt-0">
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden sticky top-24">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden lg:sticky lg:top-24">
               <div className="p-6 border-b border-gray-50 dark:border-gray-800">
                 <h2 className="text-xl font-bold">Order Summary</h2>
               </div>

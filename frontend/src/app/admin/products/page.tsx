@@ -108,12 +108,12 @@ export default function AdminProducts() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50 dark:border-gray-800">
-                    <th className="px-8 py-5">Product Details</th>
-                    <th className="px-6 py-5">Category</th>
-                    <th className="px-6 py-5">Price</th>
-                    <th className="px-6 py-5">Stock</th>
-                    <th className="px-6 py-5 text-center">Status</th>
-                    <th className="px-8 py-5 text-right">Actions</th>
+                    <th className="px-4 sm:px-8 py-5">Product Details</th>
+                    <th className="px-4 sm:px-6 py-5 hidden sm:table-cell">Category</th>
+                    <th className="px-4 sm:px-6 py-5">Price</th>
+                    <th className="px-4 sm:px-6 py-5 hidden md:table-cell">Stock</th>
+                    <th className="px-4 sm:px-6 py-5 text-center hidden sm:table-cell">Status</th>
+                    <th className="px-4 sm:px-8 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -126,25 +126,27 @@ export default function AdminProducts() {
                         transition={{ delay: i * 0.05 }}
                         className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all"
                       >
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-1 group-hover:scale-110 transition-transform">
+                        <td className="px-4 sm:px-8 py-5">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-1 group-hover:scale-110 transition-transform flex-shrink-0">
                               <img src={product.images?.[0]?.url || 'https://placehold.co/100x100/red/white?text=Fire'} alt={product.title} className="w-full h-full object-cover rounded-lg" />
                             </div>
-                            <div>
-                              <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors">
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors line-clamp-1">
                                 {product.title}
                               </p>
                               <p className="text-[10px] text-gray-500 font-medium">SKU: {product.sku || `SG-FR-${product._id.slice(-5)}`}</p>
+                              {/* Show category inline on mobile */}
+                              <p className="text-[10px] text-gray-400 mt-0.5 sm:hidden">{getCategoryName(product.category)}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-4 sm:px-6 py-5 hidden sm:table-cell">
                           <span className="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full uppercase tracking-widest scale-90 inline-block">
                             {getCategoryName(product.category)}
                           </span>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-4 sm:px-6 py-5">
                           <div>
                             <p className="text-sm font-black dark:text-white">₹{product.discountPrice || product.price}</p>
                             {product.discountPrice && (
@@ -152,7 +154,7 @@ export default function AdminProducts() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-4 sm:px-6 py-5 hidden md:table-cell">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-bold ${product.stock <= 10 ? 'text-red-600' : 'dark:text-white'}`}>
                               {product.stock}
@@ -162,14 +164,14 @@ export default function AdminProducts() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-center">
+                        <td className="px-4 sm:px-6 py-5 text-center hidden sm:table-cell">
                           <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                             product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                           }`}>
                             {product.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </td>
-                        <td className="px-8 py-5 text-right">
+                        <td className="px-4 sm:px-8 py-5 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Link href={`/products/${product.slug}`} target="_blank" className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all" title="View Public">
                               <Eye size={18} />

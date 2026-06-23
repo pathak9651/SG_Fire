@@ -441,7 +441,7 @@ function AppointmentFormContent() {
                 >
                   <div
                     className={cn(
-                      'flex h-12 w-12 items-center justify-center rounded-full border-2 text-sm font-black transition-all duration-300 shadow-md',
+                      'flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full border-2 text-xs sm:text-sm font-black transition-all duration-300 shadow-md',
                       isCompleted
                         ? 'border-red-600 bg-red-600 text-white dark:border-red-500 dark:bg-red-500'
                         : isActive
@@ -474,7 +474,7 @@ function AppointmentFormContent() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.28 }}
-              className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900"
+              className="rounded-3xl border border-gray-200 bg-white card-responsive-p shadow-xl dark:border-gray-800 dark:bg-gray-900"
             >
               {/* STEP 1: SERVICE TYPE */}
               {currentStep === 1 && (

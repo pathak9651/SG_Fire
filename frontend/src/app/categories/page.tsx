@@ -69,7 +69,7 @@ const categories = [
 export default function CategoriesPage() {
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen">
-      <div className="bg-gray-900 dark:bg-black py-16 px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden border-b border-gray-800">
+      <div className="bg-gray-900 dark:bg-black header-responsive-py px-4 sm:px-6 lg:px-8 text-center relative overflow-hidden border-b border-gray-800">
         <div className="absolute inset-0 bg-red-900/20 dark:bg-red-900/10" />
         <div className="relative z-10 max-w-3xl mx-auto">
           <h1 className="text-4xl font-extrabold text-white sm:text-5xl tracking-tight">
@@ -81,8 +81,8 @@ export default function CategoriesPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 section-responsive-py">
+        <div className="grid-responsive-3col gap-8">
           {categories.map((category) => {
             const Icon = category.icon;
             return (

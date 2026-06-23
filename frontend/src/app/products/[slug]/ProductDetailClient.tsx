@@ -207,13 +207,13 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               </div>
 
               {/* CTA Buttons Row */}
-              <div className="flex items-stretch gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch gap-3">
 
                 {/* Add to Cart */}
                 <button
                   onClick={() => handleAddToCart(false)}
                   disabled={product.stock === 0}
-                  className="flex-1 flex items-center justify-center gap-2.5 h-14 px-6 rounded-2xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-600 hover:text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-sm hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                  className="flex-1 sm:flex-1 flex items-center justify-center gap-2.5 h-14 px-4 sm:px-6 rounded-2xl border-2 border-red-600 text-red-600 bg-white hover:bg-red-600 hover:text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-sm hover:shadow-lg hover:shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                 >
                   <ShoppingCart className="w-5 h-5 flex-shrink-0" />
                   <span>Add to Cart</span>
@@ -223,7 +223,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                 <button
                   onClick={handleBuyNow}
                   disabled={product.stock === 0}
-                  className="flex-[1.5] flex items-center justify-center gap-2 h-14 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 active:scale-[0.98]"
+                  className="flex-[1.5] flex items-center justify-center gap-2 h-14 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-base whitespace-nowrap transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 active:scale-[0.98]"
                 >
                   <span>Buy Now</span>
                 </button>
@@ -272,7 +272,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
         {/* Detailed Description & Specs */}
         <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-16">
             <div className="lg:col-span-2 prose prose-red max-w-none">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Product Description</h2>
               <div className="text-gray-600 leading-relaxed whitespace-pre-line">
@@ -285,9 +285,9 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
                 <dl className="divide-y divide-gray-200">
                   {Object.entries(product.specifications || {}).map(([key, value], index) => (
-                    <div key={index} className="grid grid-cols-3 gap-4 px-6 py-4">
-                      <dt className="text-sm font-medium text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</dt>
-                      <dd className="text-sm text-gray-900 col-span-2 font-medium">{String(value)}</dd>
+                    <div key={index} className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 px-4 sm:px-6 py-4">
+                      <dt className="text-sm font-medium text-gray-500 capitalize col-span-1">{key.replace(/([A-Z])/g, ' $1').trim()}</dt>
+                      <dd className="text-sm text-gray-900 sm:col-span-2 font-medium">{String(value)}</dd>
                     </div>
                   ))}
                   {(!product.specifications || Object.keys(product.specifications).length === 0) && (

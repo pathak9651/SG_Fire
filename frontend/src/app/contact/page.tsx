@@ -42,10 +42,10 @@ export default function ContactPage() {
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen">
       {/* Header */}
-      <div className="bg-gray-900 py-16 px-4 sm:px-6 lg:px-8 text-center relative border-b border-gray-800">
+      <div className="bg-gray-900 py-10 sm:py-16 px-4 sm:px-6 lg:px-8 text-center relative border-b border-gray-800">
         <div className="absolute inset-0 bg-red-900/10 dark:bg-red-900/5" />
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-4xl font-extrabold text-white sm:text-5xl tracking-tight">
+          <h1 className="text-3xl font-extrabold text-white sm:text-5xl tracking-tight">
             Contact Us
           </h1>
           <p className="mt-4 text-xl text-gray-300">
@@ -54,7 +54,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
         <div className="lg:grid lg:grid-cols-3 lg:gap-16">
           
           {/* Contact Information */}

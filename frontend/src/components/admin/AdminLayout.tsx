@@ -23,9 +23,9 @@ export default function AdminLayout({ children, title = 'Dashboard' }: AdminLayo
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
-      <main className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <main className="flex-1 min-h-screen flex flex-col lg:ml-64">
         {/* Top Header */}
-        <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 px-3 sm:px-4 md:px-8 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
@@ -74,7 +74,7 @@ export default function AdminLayout({ children, title = 'Dashboard' }: AdminLayo
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="p-8 flex-1"
+          className="p-4 sm:p-6 md:p-8 flex-1 min-w-0"
         >
           {children}
         </motion.div>

@@ -19,10 +19,10 @@ export default function AboutPage() {
           <div className="h-full w-full opacity-10" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-4xl font-extrabold sm:text-5xl lg:text-6xl tracking-tight mb-6">
+          <h1 className="text-3xl font-extrabold sm:text-5xl lg:text-6xl tracking-tight mb-4 sm:mb-6">
             Defending What Matters Most
           </h1>
-          <p className="text-xl text-gray-300 leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
             At SG Fire, we believe that safety is not a luxury, but a fundamental right. 
             For over a decade, we have been India's trusted partner in comprehensive fire protection.
           </p>
@@ -31,7 +31,7 @@ export default function AboutPage() {
 
       {/* Story Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Our Story</h2>
             <div className="space-y-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">

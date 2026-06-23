@@ -80,7 +80,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     <motion.div
       whileHover={{ y: -5 }}
       className={cn(
-        'group relative flex flex-col rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden',
+        'group relative flex flex-col rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden',
         className
       )}
     >
@@ -114,7 +114,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       </button>
 
       {/* Image */}
-      <Link href={`/products/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-50">
+      <Link href={`/products/${product.slug}`} className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-800">
         <Image
           src={product.images[0]?.url || '/placeholder.png'}
           alt={product.title}
@@ -128,19 +128,19 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       {/* Content */}
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             {typeof product.category === 'string' ? product.category : product.category.name}
           </p>
           <StarRating rating={product.ratings} count={product.reviews?.length || 0} size="sm" />
         </div>
 
         <Link href={`/products/${product.slug}`} className="group-hover:text-red-600 transition-colors">
-          <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 line-clamp-2 mb-1 lg:mb-2 leading-tight">
+          <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-white line-clamp-2 mb-1 lg:mb-2 leading-tight">
             {product.title}
           </h3>
         </Link>
 
-        <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-150 dark:border-gray-800">
           <div className="flex flex-col">
             {product.discountPrice ? (
               <>
@@ -148,7 +148,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
                 <span className="text-base sm:text-xl font-bold text-red-600">₹{product.discountPrice.toLocaleString('en-IN')}</span>
               </>
             ) : (
-              <span className="text-base sm:text-xl font-bold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+              <span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">₹{product.price.toLocaleString('en-IN')}</span>
             )}
           </div>
           
@@ -156,7 +156,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             onClick={handleAddToCart}
             type="button"
             disabled={product.stock <= 0}
-            className="flex items-center justify-center rounded-full bg-gray-900 p-3 text-white transition-all hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-gray-900 disabled:cursor-not-allowed group-hover:shadow-md"
+            className="flex items-center justify-center rounded-full bg-gray-900 dark:bg-gray-800 p-3 text-white transition-all hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-gray-900 disabled:cursor-not-allowed group-hover:shadow-md"
             aria-label="Add to cart"
           >
             <ShoppingCart className="h-5 w-5" />

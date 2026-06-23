@@ -81,15 +81,15 @@ export default function MyOrders() {
                 transition={{ delay: i * 0.1 }}
                 className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 hover:shadow-xl hover:shadow-red-500/5 transition-all group"
               >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 group-hover:text-red-600 transition-all">
-                      <Package size={28} />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 dark:bg-gray-800 rounded-xl sm:rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 group-hover:text-red-600 transition-all flex-shrink-0">
+                      <Package className="w-5 h-5 sm:w-7 sm:h-7" />
                     </div>
                     <div>
-                      <h4 className="font-black dark:text-white mb-1">Order #{order.orderNumber}</h4>
+                      <h4 className="font-black dark:text-white mb-1 text-sm sm:text-base">Order #{order.orderNumber}</h4>
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                        {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} • <span className="md:hidden text-red-600 dark:text-red-500 font-extrabold">₹{order.totalAmount.toLocaleString()}</span>
                       </p>
                     </div>
                   </div>

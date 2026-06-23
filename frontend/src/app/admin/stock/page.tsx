@@ -82,7 +82,7 @@ export default function InventoryPage() {
     <AdminLayout title="Inventory & Stock">
       <div className="space-y-6">
         {/* Inventory Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid-responsive-admin-stats">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600">
@@ -149,12 +149,12 @@ export default function InventoryPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50 dark:border-gray-800">
-                  <th className="px-8 py-6">Product</th>
-                  <th className="px-6 py-6">Current Stock</th>
-                  <th className="px-6 py-6">Quick Adjustment</th>
-                  <th className="px-6 py-6">Total Sold</th>
-                  <th className="px-6 py-6">Stock Status</th>
-                  <th className="px-8 py-6 text-right">Last Updated</th>
+                  <th className="px-4 sm:px-8 py-6">Product</th>
+                  <th className="px-4 sm:px-6 py-6">Current Stock</th>
+                  <th className="px-4 sm:px-6 py-6">Quick Adjustment</th>
+                  <th className="px-4 sm:px-6 py-6 hidden sm:table-cell">Total Sold</th>
+                  <th className="px-4 sm:px-6 py-6">Stock Status</th>
+                  <th className="px-4 sm:px-8 py-6 text-right hidden md:table-cell">Last Updated</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -167,9 +167,9 @@ export default function InventoryPage() {
                       transition={{ delay: i * 0.03 }}
                       className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all"
                     >
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-1 group-hover:scale-105 transition-transform">
+                      <td className="px-4 sm:px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-1 group-hover:scale-105 transition-transform flex-shrink-0">
                             <img src={product.images?.[0]?.url || 'https://placehold.co/100x100/red/white?text=Fire'} alt={product.title} className="w-full h-full object-cover rounded-lg" />
                           </div>
                           <div>
@@ -180,12 +180,12 @@ export default function InventoryPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 sm:px-6 py-6">
                         <span className={`text-sm font-black ${product.stock <= 10 ? 'text-red-600' : 'dark:text-white'}`}>
                           {product.stock}
                         </span>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 sm:px-6 py-6">
                         {editingId === product._id ? (
                           <div className="flex items-center gap-2">
                             <input 
@@ -217,13 +217,13 @@ export default function InventoryPage() {
                           </button>
                         )}
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 sm:px-6 py-6 hidden sm:table-cell">
                         <div className="flex items-center gap-2">
                           <BarChart3 size={14} className="text-gray-400" />
                           <span className="text-sm font-bold dark:text-gray-300">{product.totalSold || 0}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-4 sm:px-6 py-6">
                         {product.stock <= 0 ? (
                           <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase tracking-wider">Out of Stock</span>
                         ) : product.stock <= 10 ? (
@@ -232,7 +232,7 @@ export default function InventoryPage() {
                           <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase tracking-wider">Healthy</span>
                         )}
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-4 sm:px-8 py-6 text-right hidden md:table-cell">
                         <p className="text-[10px] text-gray-500 font-medium">
                           {product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : new Date(product.createdAt).toLocaleDateString()}
                         </p>

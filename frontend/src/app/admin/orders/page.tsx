@@ -80,7 +80,7 @@ export default function AdminOrders() {
     <AdminLayout title="Orders Management">
       <div className="space-y-6">
         {/* Statistics Overview (Mini) */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Total Orders</p>
             <h4 className="text-2xl font-black dark:text-white">{orders.length * totalPages || 0}</h4>
@@ -142,12 +142,12 @@ export default function AdminOrders() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-50 dark:border-gray-800">
-                    <th className="px-8 py-6">Order Details</th>
-                    <th className="px-6 py-6">Customer</th>
-                    <th className="px-6 py-6">Amount</th>
-                    <th className="px-6 py-6">Status</th>
-                    <th className="px-6 py-6">Date</th>
-                    <th className="px-8 py-6 text-right">Actions</th>
+                    <th className="px-4 sm:px-8 py-6">Order Details</th>
+                    <th className="px-4 sm:px-6 py-6 hidden sm:table-cell">Customer</th>
+                    <th className="px-4 sm:px-6 py-6">Amount</th>
+                    <th className="px-4 sm:px-6 py-6">Status</th>
+                    <th className="px-4 sm:px-6 py-6 hidden md:table-cell">Date</th>
+                    <th className="px-4 sm:px-8 py-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
@@ -160,7 +160,7 @@ export default function AdminOrders() {
                         transition={{ delay: i * 0.03 }}
                         className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all"
                       >
-                        <td className="px-8 py-6">
+                        <td className="px-4 sm:px-8 py-6">
                           <div>
                             <p className="text-sm font-black text-gray-900 dark:text-white group-hover:text-red-600 transition-colors">
                               #{order.orderNumber}
@@ -168,9 +168,11 @@ export default function AdminOrders() {
                             <p className="text-[10px] text-gray-500 font-medium mt-1 uppercase tracking-wider">
                               {order.items.length} {order.items.length === 1 ? 'item' : 'items'} • {order.paymentInfo?.method}
                             </p>
+                            {/* Show customer name inline on mobile */}
+                            <p className="text-[10px] text-gray-400 mt-1 sm:hidden">{order.user?.name}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-6">
+                        <td className="px-4 sm:px-6 py-6 hidden sm:table-cell">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 text-[10px] font-black">
                               {order.user?.name?.charAt(0)}
@@ -182,22 +184,22 @@ export default function AdminOrders() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-6">
+                        <td className="px-4 sm:px-6 py-6">
                           <p className="text-sm font-black dark:text-white">₹{order.totalAmount.toLocaleString()}</p>
                         </td>
-                        <td className="px-6 py-6">
-                          <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${getStatusColor(order.orderStatus)}`}>
+                        <td className="px-4 sm:px-6 py-6">
+                          <div className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${getStatusColor(order.orderStatus)}`}>
                             {getStatusIcon(order.orderStatus)}
-                            {order.orderStatus}
+                            <span className="hidden sm:inline">{order.orderStatus}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-6">
+                        <td className="px-4 sm:px-6 py-6 hidden md:table-cell">
                           <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                             {new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </p>
                         </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="px-4 sm:px-8 py-6 text-right">
+                          <div className="flex items-center justify-end gap-1 sm:gap-2">
                             <button 
                               onClick={() => setSelectedOrder(order)}
                               className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all"
@@ -283,7 +285,7 @@ export default function AdminOrders() {
               className="relative w-full max-w-4xl bg-white dark:bg-gray-950 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
             >
               {/* Modal Header */}
-              <div className="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <div className="p-4 sm:p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-black dark:text-white">Order Details</h2>
                   <p className="text-xs font-bold text-red-600 mt-1 uppercase tracking-widest">#{selectedOrder.orderNumber}</p>
@@ -297,7 +299,7 @@ export default function AdminOrders() {
               </div>
 
               {/* Modal Content */}
-              <div className="p-8 overflow-y-auto flex-1 space-y-8">
+              <div className="p-4 sm:p-8 overflow-y-auto flex-1 space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Customer & Shipping */}
                   <div className="space-y-6">
@@ -400,7 +402,7 @@ export default function AdminOrders() {
                 </div>
 
                 {/* Totals */}
-                <div className="p-8 bg-gray-950 rounded-[2rem] text-white flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="p-4 sm:p-8 bg-gray-950 rounded-[2rem] text-white flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex gap-8">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Subtotal</p>

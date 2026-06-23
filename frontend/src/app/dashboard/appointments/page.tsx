@@ -85,14 +85,14 @@ export default function MyAppointments() {
                   </div>
                 )}
                 
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-red-50 dark:bg-red-950/30 rounded-2xl flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
-                      <Wrench size={28} />
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
+                  <div className="flex items-center gap-4 sm:gap-6">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-50 dark:bg-red-950/30 rounded-xl sm:rounded-2xl flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Wrench className="w-5 h-5 sm:w-7 sm:h-7" />
                     </div>
                     <div>
-                      <h4 className="font-black dark:text-white mb-1">{apt.serviceType}</h4>
-                      <div className="flex items-center gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                      <h4 className="font-black dark:text-white mb-1 text-sm sm:text-base">{apt.serviceType}</h4>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Calendar size={12} className="text-red-500" /> {new Date(apt.preferredDate).toLocaleDateString()}</span>
                         <span className="flex items-center gap-1.5"><Clock size={12} className="text-red-500" /> {apt.preferredTime}</span>
                       </div>

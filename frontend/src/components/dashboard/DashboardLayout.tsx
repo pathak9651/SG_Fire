@@ -35,11 +35,11 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 pt-32 pb-20">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-20">
       <div className="container-main">
         {/* Header Section */}
         {(title || subtitle) && (
-          <div className="mb-10">
+          <div className="mb-6 sm:mb-10">
             {title && (
               <h1 className="text-3xl md:text-4xl font-outfit font-black dark:text-white mb-2">
                 {title}

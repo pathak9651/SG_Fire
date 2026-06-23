@@ -294,6 +294,16 @@ img {
   outline-offset: 2px;
 }
 
+/* Hide scrollbar while keeping scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;   /* IE and Edge */
+  scrollbar-width: none;       /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;               /* Chrome, Safari, Opera */
+}
+
+
 /* Animation utilities */
 .animate-fade-up { animation: fadeInUp 0.6s ease forwards; }
 .animate-fade-left { animation: fadeInLeft 0.6s ease forwards; }
@@ -465,3 +475,134 @@ img {
 ───────────────────────────────────────────── */
 .star-filled { color: #f59e0b; }
 .star-empty { color: #d1d5db; }
+
+/* ─────────────────────────────────────────────
+   CENTRALIZED RESPONSIVE UTILITIES
+───────────────────────────────────────────── */
+
+/* Standard vertical section padding */
+.section-responsive-py {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+@media (min-width: 640px) {
+  .section-responsive-py {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+/* Standard page header/hero vertical padding */
+.header-responsive-py {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+@media (min-width: 640px) {
+  .header-responsive-py {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+@media (min-width: 768px) {
+  .header-responsive-py {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Standard card padding */
+.card-responsive-p {
+  padding: 1rem;
+}
+@media (min-width: 640px) {
+  .card-responsive-p {
+    padding: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .card-responsive-p {
+    padding: 2rem;
+  }
+}
+
+/* Button groups that stack on mobile */
+.flex-responsive-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .flex-responsive-group {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Grid layout with 1 col on mobile, 2 cols on tablet/desktop */
+.grid-responsive-2col {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-2col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Grid layout with 1 col on mobile, 2 cols on tablet, 3 cols on desktop */
+.grid-responsive-3col {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-3col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-3col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Grid layout with 1 col on mobile, 2 cols on tablet, 3-4 cols on desktop */
+.grid-responsive-4col {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-4col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-4col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1280px) {
+  .grid-responsive-4col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Grid layout for admin overview cards */
+.grid-responsive-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .grid-responsive-admin-stats {
+    gap: 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  .grid-responsive-admin-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+

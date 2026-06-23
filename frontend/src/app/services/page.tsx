@@ -142,7 +142,7 @@ export default function ServicesPage() {
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
             Every building is unique. Contact our engineering team for a custom-designed fire safety architecture.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex-responsive-group justify-center gap-4">
             <Link href="/contact">
               <Button size="lg" variant="outline" className="border-gray-300 text-gray-700">
                 Contact Us

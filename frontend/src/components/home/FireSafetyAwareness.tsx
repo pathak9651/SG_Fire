@@ -134,13 +134,13 @@ export default function FireSafetyAwareness() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="relative bg-gradient-to-br from-red-950 via-gray-900 to-red-950 rounded-3xl p-8 md:p-12 overflow-hidden"
+          className="relative bg-gradient-to-br from-red-950 via-gray-900 to-red-950 rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden"
         >
           {/* Decorative glows */}
           <div className="absolute top-0 left-0 w-64 h-64 bg-red-600/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-600/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-          <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
             {/* Emergency numbers */}
             <div className="flex items-center gap-5">
               <motion.div

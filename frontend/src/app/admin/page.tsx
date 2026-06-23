@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   return (
     <AdminLayout title="System Overview">
       {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <StatCard 
           label="Total Revenue" 
           value={`₹${totalRevenue.toLocaleString()}`} 
@@ -77,10 +77,10 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
         {/* Recent Orders Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 p-8">
+        <div className="xl:col-span-2 space-y-6">
+          <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 p-4 sm:p-8">
             <div className="flex items-center justify-between mb-8">
               <h3 className="font-outfit font-black text-xl dark:text-white">Recent Orders</h3>
               <Link href="/admin/orders" className="text-xs font-black text-red-600 uppercase tracking-widest hover:underline flex items-center gap-1">
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
 
         {/* System Activity Section */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 p-8">
+          <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 p-4 sm:p-8">
             <h3 className="font-outfit font-black text-xl dark:text-white mb-8">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-4">
               <Link href="/admin/products/upload" className="p-4 bg-red-50 dark:bg-red-950/20 rounded-2xl border border-red-100 dark:border-red-900/30 flex flex-col items-center gap-2 group hover:bg-red-600 transition-all">

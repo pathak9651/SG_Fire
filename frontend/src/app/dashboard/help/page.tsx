@@ -288,10 +288,10 @@ export default function UserHelpPage() {
 
   return (
     <DashboardLayout title="AI Safety Co-Pilot" subtitle="Your interactive, smart residential safety advisor">
-      <div className="h-[calc(100vh-20rem)] lg:h-[600px] flex flex-col gap-6">
+      <div className="h-auto lg:h-[600px] flex flex-col gap-6">
         
         {/* Main Grid: Info Sidebar + Chat Area */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           
           {/* Preset Prompts Sidebar */}
           <div className="lg:col-span-1 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-6 flex flex-col gap-5 shadow-sm">

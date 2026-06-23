@@ -156,12 +156,12 @@ export default function ProfilePage() {
           className="relative group rounded-[2rem] p-[1.5px] bg-transparent hover:bg-gradient-to-tr hover:from-red-600 hover:via-orange-500 hover:to-yellow-500 transition-all duration-700 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 overflow-hidden"
         >
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[30.5px] overflow-hidden transition-colors duration-500">
-            <div className="p-8 border-b border-gray-50 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/30 dark:bg-gray-850/10">
+            <div className="p-4 sm:p-8 border-b border-gray-50 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30 dark:bg-gray-850/10">
               <div className="flex items-center gap-6">
                 <motion.div 
                   whileHover={{ scale: 1.08, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300, damping: 12 }}
-                  className="w-24 h-24 bg-fire-gradient rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-red-500/25 cursor-pointer relative overflow-hidden group-2"
+                  className="w-16 h-16 sm:w-24 sm:h-24 bg-fire-gradient rounded-3xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-xl shadow-red-500/25 cursor-pointer relative overflow-hidden group-2"
                 >
                   <span className="relative z-10">{user?.name?.charAt(0).toUpperCase()}</span>
                   <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300" />
@@ -188,7 +188,7 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-4 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               <div className="space-y-6">
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 group-hover:text-red-600 transition-all">
@@ -250,7 +250,7 @@ export default function ProfilePage() {
           whileHover={{ y: -3 }}
           className="relative group rounded-3xl p-[1.5px] bg-transparent hover:bg-gradient-to-r hover:from-red-700 hover:to-rose-600 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-red-600/10 overflow-hidden"
         >
-          <div className="bg-red-50 dark:bg-red-950/10 rounded-[23px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors duration-500">
+          <div className="bg-red-50 dark:bg-red-950/10 rounded-[23px] p-4 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-500">
             <div className="flex items-center gap-6">
               <div className="w-14 h-14 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/25 transition-transform duration-300 group-hover:scale-110 flex-shrink-0">
                 <ShieldCheck size={28} />
@@ -283,7 +283,7 @@ export default function ProfilePage() {
           whileHover={{ y: -3 }}
           className="relative group rounded-3xl p-[1.5px] bg-transparent hover:bg-gradient-to-r hover:from-orange-600 hover:to-amber-500 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 overflow-hidden"
         >
-          <div className="bg-orange-50 dark:bg-orange-950/10 rounded-[23px] p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors duration-500">
+          <div className="bg-orange-50 dark:bg-orange-950/10 rounded-[23px] p-4 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-500">
             <div className="flex items-center gap-6">
               <div className="w-14 h-14 bg-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/25 transition-transform duration-300 group-hover:scale-110 flex-shrink-0">
                 <MessageSquare size={28} />

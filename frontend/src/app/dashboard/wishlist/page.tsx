@@ -100,7 +100,7 @@ export default function WishlistPage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid-responsive-3col gap-6">
         <AnimatePresence mode='popLayout'>
           {products.map((product) => (
             <motion.div
