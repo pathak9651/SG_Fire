@@ -75,23 +75,21 @@ export const bookAppointment = asyncHandler(async (req, res) => {
     ],
   });
 
-  // Send confirmation email to customer
-  try {
-    await sendEmail({
-      to: contactEmail || req.user.email,
-      subject: `Appointment Booked — #${appointment.appointmentNumber}`,
-      template: 'appointment',
-      data: {
-        name: contactName,
-        serviceType,
-        date: new Date(preferredDate).toDateString(),
-        time: preferredTime,
-        appointmentId: appointment.appointmentNumber,
-      },
-    });
-  } catch (e) {
+  // Send confirmation email to customer (non-blocking)
+  sendEmail({
+    to: contactEmail || req.user.email,
+    subject: `Appointment Booked — #${appointment.appointmentNumber}`,
+    template: 'appointment',
+    data: {
+      name: contactName,
+      serviceType,
+      date: new Date(preferredDate).toDateString(),
+      time: preferredTime,
+      appointmentId: appointment.appointmentNumber,
+    },
+  }).catch((e) => {
     console.error('Appointment email failed:', e.message);
-  }
+  });
 
   res.status(201).json({ success: true, data: appointment });
 });

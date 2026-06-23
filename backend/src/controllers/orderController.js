@@ -252,23 +252,21 @@ export const placeOrder = asyncHandler(async (req, res) => {
     { items: [], appliedCoupon: undefined }
   );
 
-  // ── Step 7: Send order confirmation email ──
-  try {
-    await sendEmail({
-      to: req.user.email,
-      subject: `Order Confirmed — #${order.orderNumber}`,
-      template: 'orderConfirm',
-      data: {
-        name: req.user.name,
-        orderId: order.orderNumber,
-        totalAmount,
-        items: orderItems,
-      },
-    });
-  } catch (emailError) {
+  // ── Step 7: Send order confirmation email (non-blocking) ──
+  sendEmail({
+    to: req.user.email,
+    subject: `Order Confirmed — #${order.orderNumber}`,
+    template: 'orderConfirm',
+    data: {
+      name: req.user.name,
+      orderId: order.orderNumber,
+      totalAmount,
+      items: orderItems,
+    },
+  }).catch((emailError) => {
     // Don't fail the order if email fails — just log it
     console.error('Order confirmation email failed:', emailError.message);
-  }
+  });
 
   res.status(201).json({ success: true, data: order });
 });

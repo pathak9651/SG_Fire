@@ -35,8 +35,8 @@ const api = axios.create({
   // Include cookies (HTTP-only JWT cookies) in cross-origin requests
   withCredentials: true,
 
-  // Request timeout: fail if server doesn't respond within 15 seconds
-  timeout: 15000,
+  // Request timeout: fail if server doesn't respond within 60 seconds
+  timeout: 60000,
 
   headers: {
     'Content-Type': 'application/json',
