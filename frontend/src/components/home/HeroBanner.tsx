@@ -48,7 +48,7 @@ const HERO_SLIDES: HeroSlide[] = [
     description: 'Comprehensive Annual Maintenance Contracts for offices, factories, and commercial buildings. Stay compliant with fire safety regulations.',
     primaryCTA: { label: 'Get AMC Quote', href: '/appointments?type=amc' },
     secondaryCTA: { label: 'View Products', href: '/products' },
-    image: '/images/hero-3.png',
+    image: '/images/hero-3-new.png',
     badge: '🏢 B2B Solutions',
     accentColor: 'from-red-700 to-orange-500',
   },
