@@ -9,7 +9,7 @@ import {
   ShoppingCart, Search, Menu, X, User,
   LogOut, Package, Calendar, Heart, Phone, Flame,
   Mail, ShieldAlert, ChevronDown, Sun, Moon,
-  Bell, CheckCheck, Trash2
+  Bell, CheckCheck, Trash2, ShoppingBag
 } from 'lucide-react';
 import { RootState, AppDispatch } from '@/redux/store';
 import { toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch, toggleTheme } from '@/redux/slices/uiSlice';
@@ -25,6 +25,7 @@ import NavLinks from './nav/NavLinks';
 import MegaMenu from './nav/MegaMenu';
 import SearchModal from './nav/SearchModal';
 import MobileMenu from './nav/MobileMenu';
+import { cn } from '@/lib/utils';
 
 export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
@@ -87,7 +88,7 @@ export default function Navbar() {
 
   // Sync client notifications when orders or appointments load
   useEffect(() => {
-    if (isAuthenticated && user?._id && user?.role !== 'admin') {
+    if (isAuthenticated && user && user.role !== 'admin') {
       dispatch(
         syncNotifications({
           orders: clientOrders,
@@ -113,8 +114,9 @@ export default function Navbar() {
 
   // Client notification simulation (every 60s)
   useEffect(() => {
-    if (!isAuthenticated || user?.role === 'admin') return;
+    if (!isAuthenticated || !user || user.role === 'admin') return;
 
+    const currentUser = user; // Capture user in a block-scoped constant to narrow type inside setInterval
     const orderStatuses = ['Shipped', 'Out for Delivery', 'Delivered'];
     const apptStatuses = ['Approved', 'Assigned to Technician Rahul', 'Completed'];
     const promoAlerts = [
@@ -138,7 +140,7 @@ export default function Navbar() {
             message: `Your Order #ORD-${orderNum} status has been updated to: ${status}`,
             link: '/dashboard/orders',
             target: 'client',
-            userId: user._id,
+            userId: currentUser._id,
           })
         );
 
@@ -157,7 +159,7 @@ export default function Navbar() {
             message: `Your appointment is now: ${status}`,
             link: '/dashboard/appointments',
             target: 'client',
-            userId: user._id,
+            userId: currentUser._id,
           })
         );
 
@@ -176,7 +178,7 @@ export default function Navbar() {
             message: promo,
             link: '/services',
             target: 'client',
-            userId: user._id,
+            userId: currentUser._id,
           })
         );
 
