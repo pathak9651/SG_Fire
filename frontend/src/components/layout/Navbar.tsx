@@ -26,6 +26,7 @@ import MegaMenu from './nav/MegaMenu';
 import SearchModal from './nav/SearchModal';
 import MobileMenu from './nav/MobileMenu';
 import { cn } from '@/lib/utils';
+import InstallButton from '@/components/pwa/InstallButton';
 
 export default function Navbar() {
   const dispatch = useDispatch<AppDispatch>();
@@ -222,6 +223,7 @@ export default function Navbar() {
             </span>
             <Link href="/track-order" className="!text-white hover:!text-yellow-200 transition-colors">Track Order</Link>
             <Link href="/about" className="!text-white hover:!text-yellow-200 transition-colors">Help Center</Link>
+            <InstallButton />
           </div>
         </div>
       </div>

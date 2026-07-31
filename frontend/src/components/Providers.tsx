@@ -30,6 +30,7 @@ import AuthInitializer from '@/components/auth/AuthInitializer';
 import RouteGuard from '@/components/auth/RouteGuard';
 import FloatingChatbot from '@/components/chat/FloatingChatbot';
 import ThemeInitializer from '@/components/theme/ThemeInitializer';
+import PwaPrompt from '@/components/pwa/PwaPrompt';
 
 /**
  * Create a stable QueryClient instance.
@@ -75,6 +76,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
             {/* Global Floating AI Safety Chatbot */}
             <FloatingChatbot />
+
+            {/* PWA install prompt and service worker registration */}
+            <PwaPrompt />
           </AuthInitializer>
         </ThemeInitializer>
 
