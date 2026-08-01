@@ -44,7 +44,38 @@ export const register = asyncHandler(async (req, res, next) => {
   // Check if user with this email already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ErrorResponse('An account with this email already exists.', 400);
+    // If the account exists but is not verified yet, let the user continue to OTP
+    if (!existingUser.isVerified) {
+      // Re-send a fresh OTP so they can verify
+      const otp = await existingUser.generateOTP();
+      await existingUser.save({ validateBeforeSave: false });
+
+      let emailResult = null;
+      try {
+        emailResult = await sendEmail({
+          to: existingUser.email,
+          subject: 'Verify your SG Fire account',
+          template: 'otp',
+          data: { name: existingUser.name, otp },
+        });
+      } catch (emailError) {
+        console.warn('OTP email delivery failed on re-register attempt:', emailError.message);
+      }
+
+      const responseBody = {
+        success: true,
+        alreadyExists: true,
+        userId: existingUser._id,
+        message: 'An account with this email was already created but not verified. A new OTP has been sent to your email.',
+      };
+      if (process.env.NODE_ENV !== 'production' && emailResult?.mocked) {
+        responseBody.debugOtp = otp;
+        responseBody.message = 'Account already exists but not verified. Use the OTP shown in the response.';
+      }
+      return res.status(200).json(responseBody);
+    }
+    // Fully verified account — reject
+    throw new ErrorResponse('An account with this email already exists. Please log in instead.', 400);
   }
 
   // Create new user (password will be hashed by pre-save hook)

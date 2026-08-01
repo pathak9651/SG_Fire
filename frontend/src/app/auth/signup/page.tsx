@@ -7,22 +7,31 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Phone, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, Phone, ShieldAlert, CheckCircle2, ArrowRight, Info } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { registerUser } from '@/redux/slices/authSlice';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
+// Phone validation: must be a 10-digit Indian mobile number (starts with 6–9).
+// Accepts optional +91 or 91 prefix — we strip it before validation.
+const INDIAN_PHONE_RE = /^[6-9]\d{9}$/;
+
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Please enter a valid phone number').max(15, 'Phone number is too long'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string()
+  phone: z
+    .string()
+    .transform((val) => val.replace(/^\+?91[-\s]?/, '').replace(/\s/g, ''))
+    .refine((val) => INDIAN_PHONE_RE.test(val), {
+      message: 'Please enter a valid 10-digit Indian mobile number (e.g. 9876543210)',
+    }),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
-  path: ["confirmPassword"],
+  path: ['confirmPassword'],
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -38,9 +47,10 @@ export default function SignupPage() {
   }, []);
 
   const isLoading = mounted ? reduxLoading : false;
-  
+
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [infoMessage, setInfoMessage] = useState(''); // For "already exists but unverified"
   const [registeredUserId, setRegisteredUserId] = useState('');
   const [debugOtp, setDebugOtp] = useState('');
 
@@ -55,38 +65,52 @@ export default function SignupPage() {
   const onSubmit = async (data: SignupFormValues) => {
     setServerError('');
     setSuccessMessage('');
+    setInfoMessage('');
     setDebugOtp('');
-    
+
+    // Strip +91 prefix before sending to backend (backend expects bare 10-digit)
+    const phone = data.phone.replace(/^\+?91[-\s]?/, '').replace(/\s/g, '');
+
     try {
       const resultAction = await dispatch(registerUser({
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        password: data.password
+        phone,
+        password: data.password,
       }));
 
       if (registerUser.fulfilled.match(resultAction)) {
-        setSuccessMessage(resultAction.payload.message);
-        if (resultAction.payload.debugOtp) {
-          setDebugOtp(resultAction.payload.debugOtp);
+        const payload = resultAction.payload;
+        setRegisteredUserId(payload.userId);
+
+        if (payload.debugOtp) {
+          setDebugOtp(payload.debugOtp);
         }
-        setRegisteredUserId(resultAction.payload.userId);
-        
-        // Redirect to OTP verification page after 2 seconds
-        setTimeout(() => {
-          router.push(`/auth/verify?userId=${resultAction.payload.userId}`);
-        }, 2000);
-      } else {
-        if (resultAction.payload) {
-          setServerError(resultAction.payload as string);
+
+        if (payload.alreadyExists) {
+          // Account existed but was unverified — a fresh OTP was sent
+          setInfoMessage(payload.message);
         } else {
-          setServerError('Registration failed. Please try again.');
+          setSuccessMessage(payload.message);
         }
+      } else {
+        // rejected — payload is the error string from rejectWithValue
+        const errorMsg =
+          typeof resultAction.payload === 'string'
+            ? resultAction.payload
+            : 'Registration failed. Please try again.';
+        setServerError(errorMsg);
       }
-    } catch (err) {
-      setServerError('An unexpected error occurred.');
+    } catch {
+      setServerError('An unexpected error occurred. Please try again.');
     }
   };
+
+  const handleGoToVerify = () => {
+    router.push(`/auth/verify?userId=${registeredUserId}`);
+  };
+
+  const isRegistered = !!(successMessage || infoMessage) && !!registeredUserId;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -104,24 +128,58 @@ export default function SignupPage() {
           </p>
         </div>
 
+        {/* ── Error notification ── */}
         {serverError && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg flex items-center">
-            <ShieldAlert className="h-5 w-5 text-red-500 mr-3" />
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg flex items-start gap-3">
+            <ShieldAlert className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-700">{serverError}</p>
           </div>
         )}
 
+        {/* ── Success notification ── */}
         {successMessage && (
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg flex items-center">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mr-3" />
-            <p className="text-sm text-green-700">{successMessage}</p>
+          <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg space-y-3">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-700">{successMessage}</p>
+            </div>
+            {registeredUserId && (
+              <button
+                onClick={handleGoToVerify}
+                className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Continue to Verification <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
           </div>
         )}
 
+        {/* ── Info notification (account existed but unverified) ── */}
+        {infoMessage && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg space-y-3">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700">{infoMessage}</p>
+            </div>
+            {registeredUserId && (
+              <button
+                onClick={handleGoToVerify}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Go to Verification <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ── Dev OTP debug box ── */}
         {debugOtp && (
           <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg text-left">
             <p className="text-sm font-semibold text-amber-900">Development OTP</p>
-            <p className="text-sm text-amber-800 mt-1">Use this code on the verification page: <span className="font-mono font-bold">{debugOtp}</span></p>
+            <p className="text-sm text-amber-800 mt-1">
+              Use this code on the verification page:{' '}
+              <span className="font-mono font-bold">{debugOtp}</span>
+            </p>
           </div>
         )}
 
@@ -133,7 +191,7 @@ export default function SignupPage() {
               placeholder="John Doe"
               icon={<User className="h-5 w-5" />}
               error={errors.name?.message}
-              disabled={!!successMessage || isLoading}
+              disabled={isRegistered || isLoading}
               {...register('name')}
             />
 
@@ -143,17 +201,17 @@ export default function SignupPage() {
               placeholder="you@example.com"
               icon={<Mail className="h-5 w-5" />}
               error={errors.email?.message}
-              disabled={!!successMessage || isLoading}
+              disabled={isRegistered || isLoading}
               {...register('email')}
             />
 
             <Input
               label="Phone Number"
               type="tel"
-              placeholder="+91 9876543210"
+              placeholder="9876543210"
               icon={<Phone className="h-5 w-5" />}
               error={errors.phone?.message}
-              disabled={!!successMessage || isLoading}
+              disabled={isRegistered || isLoading}
               {...register('phone')}
             />
 
@@ -163,7 +221,7 @@ export default function SignupPage() {
               placeholder="••••••••"
               icon={<Lock className="h-5 w-5" />}
               error={errors.password?.message}
-              disabled={!!successMessage || isLoading}
+              disabled={isRegistered || isLoading}
               {...register('password')}
             />
 
@@ -173,20 +231,21 @@ export default function SignupPage() {
               placeholder="••••••••"
               icon={<Lock className="h-5 w-5" />}
               error={errors.confirmPassword?.message}
-              disabled={!!successMessage || isLoading}
+              disabled={isRegistered || isLoading}
               {...register('confirmPassword')}
             />
           </div>
 
-          <Button 
-            type="submit" 
-            fullWidth 
-            isLoading={isLoading} 
-            disabled={!!successMessage}
-            size="lg"
-          >
-            {successMessage ? 'Redirecting...' : 'Sign up'}
-          </Button>
+          {!isRegistered && (
+            <Button
+              type="submit"
+              fullWidth
+              isLoading={isLoading}
+              size="lg"
+            >
+              Sign up
+            </Button>
+          )}
         </form>
 
         <div className="mt-6">
@@ -211,3 +270,4 @@ export default function SignupPage() {
     </div>
   );
 }
+

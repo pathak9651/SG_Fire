@@ -106,16 +106,29 @@ export const loginUser = createAsyncThunk<
  * redirect to OTP verification page.
  */
 export const registerUser = createAsyncThunk<
-  { userId: string; message: string; debugOtp?: string },
+  { userId: string; message: string; debugOtp?: string; alreadyExists?: boolean },
   { name: string; email: string; phone: string; password: string },
   { rejectValue: string }
 >('auth/register', async (userData, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/register', userData);
-    return { userId: data.userId, message: data.message, debugOtp: data.debugOtp };
+    return {
+      userId: data.userId,
+      message: data.message,
+      debugOtp: data.debugOtp,
+      alreadyExists: data.alreadyExists ?? false,
+    };
   } catch (error) {
     const axiosError = error as AxiosError<{ message: string }>;
-    return rejectWithValue(axiosError.response?.data?.message || 'Registration failed');
+    if (axiosError.response?.data?.message) {
+      // Server responded with a specific error message — show it directly
+      return rejectWithValue(axiosError.response.data.message);
+    }
+    if (!axiosError.response) {
+      // Network error or timeout — server never responded
+      return rejectWithValue('Unable to connect to the server. Please check your internet connection and try again.');
+    }
+    return rejectWithValue('Registration failed. Please try again.');
   }
 });
 
