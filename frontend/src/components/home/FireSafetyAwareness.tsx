@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
 import { useRef, useState, useEffect } from 'react';
 import { ShieldCheck, BookOpen, Phone, ArrowRight } from 'lucide-react';
+import { useReveal } from '@/lib/useReveal';
 
 const STATS = [
   { value: '25,000+', label: 'Fires reported annually in India', icon: '🔥', color: 'from-red-500 to-orange-500' },
@@ -21,7 +21,7 @@ const TIPS = [
   { title: 'Know Emergency Numbers', description: 'Save 101 (Fire) and 112 (Emergency) on every phone in your household.', icon: '📞', color: 'bg-green-50 dark:bg-green-950/30 border-green-100 dark:border-green-900/30 hover:border-green-300' },
 ];
 
-// Animated counter hook
+/** Animated counter — runs only when element enters viewport */
 function useCounter(target: string, isInView: boolean) {
   const [display, setDisplay] = useState('0');
   useEffect(() => {
@@ -48,49 +48,49 @@ function useCounter(target: string, isInView: boolean) {
 }
 
 function StatCard({ stat, index }: { stat: typeof STATS[0]; index: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const ref = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
   const animated = useCounter(stat.value, isInView);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setIsInView(true); observer.disconnect(); }
+    }, { threshold: 0.5 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.12, duration: 0.5, ease: 'easeOut' }}
-      whileHover={{ y: -4, scale: 1.02 }}
-      className="relative text-center p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden group"
+      className="relative text-center p-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:shadow-lg hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200 overflow-hidden group"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-300 pointer-events-none`} />
       <div className="text-3xl mb-3">{stat.icon}</div>
       <p className={`font-outfit text-2xl sm:text-3xl font-black mb-1.5 text-transparent bg-clip-text bg-gradient-to-r ${stat.color}`}>
         {animated}
       </p>
       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-snug">{stat.label}</p>
-    </motion.div>
+    </div>
   );
 }
 
+const STAGGER = ['', 'reveal-delay-1', 'reveal-delay-2', 'reveal-delay-3', 'reveal-delay-4', 'reveal-delay-5'];
+
 export default function FireSafetyAwareness() {
+  const tipsRef = useReveal() as React.RefObject<HTMLDivElement>;
+
   return (
-    <section className="py-16 md:py-24 bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="py-16 md:py-24 bg-white dark:bg-gray-950">
       <div className="container-main">
 
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-14"
-        >
-          <motion.span
-            initial={{ scale: 0.8, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 font-bold text-xs uppercase tracking-widest rounded-full border border-red-100 dark:border-red-900/50 mb-4"
-          >
+        {/* Section Header — static, no animation needed */}
+        <div className="text-center mb-14">
+          <span className="inline-block px-4 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 font-bold text-xs uppercase tracking-widest rounded-full border border-red-100 dark:border-red-900/50 mb-4">
             Why Fire Safety Matters
-          </motion.span>
+          </span>
           <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white mb-4">
             Know the Risk.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500">
@@ -100,56 +100,41 @@ export default function FireSafetyAwareness() {
           <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-base md:text-lg">
             Fires can start anywhere, anytime. The difference between a minor incident and a catastrophe is proper preparation.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Stats */}
+        {/* Stats — each triggers its counter when scrolled to */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {STATS.map((stat, i) => <StatCard key={stat.label} stat={stat} index={i} />)}
         </div>
 
-        {/* Tips Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
+        {/* Tips Grid — CSS reveal stagger */}
+        <div ref={tipsRef} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
           {TIPS.map((tip, i) => (
-            <motion.div
+            <div
               key={tip.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.45 }}
-              whileHover={{ y: -3 }}
-              className={`flex gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-default ${tip.color}`}
+              className={`reveal ${STAGGER[Math.min(i, 5)]} flex gap-4 p-5 rounded-2xl border transition-[transform,border-color] duration-200 hover:-translate-y-0.5 cursor-default ${tip.color}`}
             >
               <span className="text-2xl flex-shrink-0 mt-0.5">{tip.icon}</span>
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-sm">{tip.title}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{tip.description}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        {/* Emergency CTA Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative bg-gradient-to-br from-red-950 via-gray-900 to-red-950 rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden"
-        >
-          {/* Decorative glows */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-red-600/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-600/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+        {/* Emergency CTA Banner — static, shown immediately */}
+        <div className="relative bg-gradient-to-br from-red-950 via-gray-900 to-red-950 rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden">
+          {/* Static decorative glows — not animated, no blur filter */}
+          <div className="absolute top-0 left-0 w-64 h-64 bg-red-600/10 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-600/8 rounded-full translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
           <div className="relative flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
             {/* Emergency numbers */}
             <div className="flex items-center gap-5">
-              <motion.div
-                animate={{ boxShadow: ['0 0 0 0 rgba(239,68,68,0.4)', '0 0 0 16px rgba(239,68,68,0)', '0 0 0 0 rgba(239,68,68,0)'] }}
-                transition={{ duration: 2.5, repeat: Infinity }}
-                className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl"
-              >
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl fire-pulse">
                 <Phone size={26} className="text-white" />
-              </motion.div>
+              </div>
               <div>
                 <p className="text-red-300 text-sm font-semibold mb-2 uppercase tracking-widest">Emergency Numbers</p>
                 <div className="flex gap-8">
@@ -165,24 +150,18 @@ export default function FireSafetyAwareness() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/products"
-                className="group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-red-500/40 hover:-translate-y-0.5 transition-all"
-              >
+              <Link href="/products" className="group inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-red-500/30 hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200">
                 <ShieldCheck size={18} />
                 Shop Safety Equipment
-                <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform duration-150" />
               </Link>
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 px-6 py-3.5 text-gray-300 border border-gray-700 rounded-2xl hover:border-red-500 hover:text-red-400 hover:bg-red-950/20 transition-all font-medium"
-              >
+              <Link href="/about" className="inline-flex items-center gap-2 px-6 py-3.5 text-gray-300 border border-gray-700 rounded-2xl hover:border-red-500 hover:text-red-400 hover:bg-red-950/20 transition-colors duration-200 font-medium">
                 <BookOpen size={16} />
                 Learn More
               </Link>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

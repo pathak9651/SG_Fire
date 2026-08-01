@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ShoppingCart, Search, Menu, X, User,
   LogOut, Package, Calendar, Heart, Phone, Flame,
@@ -43,8 +43,7 @@ export default function Navbar() {
   const [isClientNotificationsOpen, setIsClientNotificationsOpen] = useState(false);
   const clientDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+  // CSS scroll-driven progress bar — zero JS per scroll event (see .scroll-progress-bar in globals.css)
 
   const cartCount = cart?.validItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
@@ -232,20 +231,17 @@ export default function Navbar() {
       <header
         className={
           isAdminRoute
-            ? 'relative hidden lg:block bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950 py-3.5 z-[60]'
-            : `sticky top-0 z-[60] transition-all duration-500 ${
+            ? 'relative hidden lg:block bg-gray-950 py-3.5 z-[60]'
+            : `sticky top-0 z-[60] bg-gray-950 border-b py-3 transition-[border-color,box-shadow] duration-300 ${
                 isScrolled
-                  ? 'bg-gray-950/95 backdrop-blur-xl shadow-2xl shadow-black/30 border-b border-red-900/30 py-2'
-                  : 'bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950 py-3.5'
+                  ? 'border-red-900/30 shadow-lg shadow-black/30'
+                  : 'border-transparent shadow-none'
               }`
         }
       >
-        {/* Scroll Progress Bar */}
+        {/* Scroll Progress Bar — pure CSS, zero JS */}
         {!isAdminRoute && (
-          <motion.div
-            className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-red-600 via-orange-500 to-red-600 origin-left z-[70]"
-            style={{ scaleX }}
-          />
+          <div className="scroll-progress-bar" />
         )}
 
         {/* Subtle top border glow */}
@@ -255,13 +251,9 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/40 group-hover:shadow-red-500/60 transition-shadow"
-            >
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/40 group-hover:shadow-red-500/60 group-hover:scale-110 transition-[transform,box-shadow] duration-200">
               <Flame size={22} className="text-white drop-shadow" />
-            </motion.div>
+            </div>
             <div className="flex flex-col">
               <span className="font-outfit font-black text-lg sm:text-xl leading-none text-white tracking-tight">
                 SG <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">FIRE</span>
@@ -283,26 +275,22 @@ export default function Navbar() {
           <div className="flex items-center gap-1">
 
             {/* Search */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => dispatch(toggleSearch())}
-              className="flex p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+              className="flex p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition-colors duration-150"
               aria-label="Search"
             >
               <Search size={19} />
-            </motion.button>
+            </button>
 
             {/* Theme Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => dispatch(toggleTheme())}
-              className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+              className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition-colors duration-150"
               aria-label="Toggle Theme"
             >
               {theme === 'dark' ? <Sun size={19} className="text-orange-400" /> : <Moon size={19} className="text-indigo-400" />}
-            </motion.button>
+            </button>
 
             {/* Cart */}
             <Link
@@ -327,11 +315,9 @@ export default function Navbar() {
             {/* Client Notifications Dropdown */}
             {isAuthenticated && user?.role !== 'admin' && (
               <div className="relative font-sans" ref={clientDropdownRef}>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                <button
                   onClick={() => setIsClientNotificationsOpen(!isClientNotificationsOpen)}
-                  className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all relative"
+                  className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition-colors duration-150 relative"
                   aria-label="Notifications"
                 >
                   <Bell size={19} />
@@ -347,14 +333,14 @@ export default function Navbar() {
                       </motion.span>
                     </AnimatePresence>
                   )}
-                </motion.button>
+                </button>
 
                 <AnimatePresence>
                   {isClientNotificationsOpen && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
                       transition={{ duration: 0.15 }}
                       className="absolute right-0 mt-2 w-80 sm:w-96 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700/50 z-[999] overflow-hidden"
                     >
@@ -471,11 +457,10 @@ export default function Navbar() {
             {/* User Menu / Login */}
             {isAuthenticated ? (
               <div className="relative">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
+                <button
                   onMouseEnter={() => setShowUserMenu(true)}
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-xl border border-gray-700 hover:border-red-500/50 hover:bg-white/5 transition-all"
+                  className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-xl border border-gray-700 hover:border-red-500/50 hover:bg-white/5 transition-[border-color,background] duration-150"
                 >
                   <span className="text-xs font-semibold !text-gray-100 hidden md:block">
                     {user?.name?.split(' ')[0]}
@@ -483,14 +468,14 @@ export default function Navbar() {
                   <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-orange-500 rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-md">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
-                </motion.button>
+                </button>
 
                 <AnimatePresence>
                   {showUserMenu && (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 8 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
                       transition={{ duration: 0.15 }}
                       onMouseLeave={() => setShowUserMenu(false)}
                       className="absolute right-0 top-full mt-2 w-64 bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 border border-gray-700/50 py-2 z-[100] overflow-hidden"
@@ -542,24 +527,19 @@ export default function Navbar() {
                 <div className="p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all sm:hidden">
                   <User size={19} />
                 </div>
-                <motion.div
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="hidden sm:flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-shadow"
-                >
+                <div className="hidden sm:flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:-translate-y-0.5 transition-[transform,box-shadow] duration-150">
                   Sign In
-                </motion.div>
+                </div>
               </Link>
             )}
 
             {/* Mobile Menu Toggle */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={() => dispatch(toggleMobileMenu())}
-              className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all ml-1"
+              className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 active:scale-95 transition-colors duration-150 ml-1"
             >
               <Menu size={22} />
-            </motion.button>
+            </button>
           </div>
         </div>
 

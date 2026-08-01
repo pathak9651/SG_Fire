@@ -26,7 +26,6 @@ import FireSafetyAwareness from '@/components/home/FireSafetyAwareness';
 import ServiceHighlights from '@/components/home/ServiceHighlights';
 import Testimonials from '@/components/home/Testimonials';
 import BrandsSection from '@/components/home/BrandsSection';
-import { Skeleton } from '@/components/ui/Skeleton';
 
 // Page-specific SEO metadata (overrides defaults in layout.tsx)
 export const metadata: Metadata = {
@@ -46,14 +45,11 @@ export default function HomePage() {
       {/* 1. Hero Banner */}
       <HeroBanner />
 
-      {/* 2. Category Grid */}
-      <section className="section-padding bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/[0.03] rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/[0.03] rounded-full blur-3xl" />
-        </div>
-        <div className="container-main relative">
+      {/* 2. Category Grid
+          NOTE: No blur-3xl decorative divs — they cause software rasterization on scroll.
+          Using a simple clean background instead. */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900">
+        <div className="container-main">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-red-100 dark:border-red-900/50 mb-4">
               Browse By Category
@@ -96,22 +92,11 @@ export default function HomePage() {
       {/* 4. Fire Safety Awareness */}
       <FireSafetyAwareness />
 
-      {/* 5. Service Highlights */}
-      <section className="section-padding bg-gray-950 text-white relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-10 w-80 h-80 bg-red-600/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-10 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" />
-          {/* Dot grid pattern */}
-          <div
-            className="absolute inset-0 opacity-[0.015]"
-            style={{
-              backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-              backgroundSize: '32px 32px',
-            }}
-          />
-        </div>
-        <div className="container-main relative">
+      {/* 5. Service Highlights
+          NOTE: Using bg-gray-950 — NO blur orbs, NO dot-grid pattern (radial-gradient repeating
+          tiles are very expensive to paint during scroll). Simple solid dark background instead. */}
+      <section className="section-padding bg-gray-950 text-white">
+        <div className="container-main">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1.5 bg-orange-500/10 text-orange-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-orange-500/20 mb-4">
               Professional Services
@@ -130,13 +115,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Testimonials */}
-      <section className="section-padding bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-red-500/[0.04] rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-orange-500/[0.04] rounded-full blur-3xl" />
-        </div>
-        <div className="container-main relative">
+      {/* 6. Testimonials — clean light background, no blur orbs */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-900">
+        <div className="container-main">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-amber-100 dark:border-amber-900/40 mb-4">
               Customer Reviews

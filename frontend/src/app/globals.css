@@ -89,6 +89,7 @@
 /* Smooth scrolling for anchor links */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 4rem; /* Offset for sticky navbar */
 }
 
 /* Remove default margin/padding */
@@ -99,6 +100,8 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+  /* NOTE: No transition-colors here — firing CSS transitions on body during scroll
+     causes the entire page to be repainted on every color change. */
 }
 
 /* Headings use Outfit font for premium feel */
@@ -201,10 +204,16 @@ img {
   50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.7), 0 0 80px rgba(234, 88, 12, 0.2); }
 }
 
-/* Marquee (for brand scroll) */
+/* Marquee (for brand scroll) — pure CSS, GPU composited */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
+}
+
+/* Reverse marquee */
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
 
 /* Shine sweep */
@@ -315,6 +324,126 @@ img {
 
 /* Fire pulse indicator */
 .fire-pulse { animation: firePulse 2s infinite; }
+
+/* Card fade-in — for async-loaded content (API data).
+   Fires on render, not scroll-dependent. */
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card-fade-in {
+  animation: cardFadeIn 0.35s ease both;
+}
+
+/* ─────────────────────────────────────────────
+   CSS-ONLY SCROLL ENTRANCE SYSTEM
+   Replaces JS whileInView for static content —
+   uses IntersectionObserver class toggle via JS hook
+   OR pure CSS @keyframes triggered by visibility.
+   Elements start hidden, become visible when .is-visible
+   is added (done by a single lightweight observer).
+───────────────────────────────────────────── */
+
+/* Base: elements start hidden */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Triggered: elements become visible */
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger helpers */
+.reveal-delay-1 { transition-delay: 0.05s; }
+.reveal-delay-2 { transition-delay: 0.10s; }
+.reveal-delay-3 { transition-delay: 0.15s; }
+.reveal-delay-4 { transition-delay: 0.20s; }
+.reveal-delay-5 { transition-delay: 0.25s; }
+
+/* ─────────────────────────────────────────────
+   REDUCED MOTION — respect OS accessibility setting
+   Disables all animations for users who prefer it,
+   and also serves as a performance fallback.
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .brands-marquee-left,
+  .brands-marquee-right {
+    animation: none;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   BRANDS MARQUEE — CSS-only, GPU composited
+   Using will-change: transform for compositing hint
+───────────────────────────────────────────── */
+.brands-marquee-left {
+  animation: marquee 54s linear infinite;
+  will-change: transform;
+}
+
+.brands-marquee-right {
+  animation: marquee-reverse 54s linear infinite;
+  will-change: transform;
+}
+
+/* Pause marquee on hover for better UX */
+.brands-marquee-left:hover,
+.brands-marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* ─────────────────────────────────────────────
+   CSS SCROLL PROGRESS BAR — zero JS per frame
+   Uses scroll-driven animations API (Chrome 115+, Firefox 110+)
+   Falls back silently on unsupported browsers.
+───────────────────────────────────────────── */
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.scroll-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right, #dc2626, #f97316, #dc2626);
+  transform-origin: left center;
+  transform: scaleX(0);
+  z-index: 70;
+  /* CSS scroll-driven animation — no JS involved */
+  animation: scroll-progress linear;
+  animation-timeline: scroll(root block);
+}
+
+/* ─────────────────────────────────────────────
+   CATEGORY CARD HOVER — CSS-only lift
+───────────────────────────────────────────── */
+.category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.09);
+  border-color: transparent;
+}
 
 /* Glow borders */
 .glow-red {

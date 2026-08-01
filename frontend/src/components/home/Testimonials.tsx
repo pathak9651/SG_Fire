@@ -62,6 +62,12 @@ const TESTIMONIALS = [
   },
 ];
 
+const slideVariants = {
+  enter: { opacity: 0, y: 10 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+
 export default function Testimonials() {
   const [current, setCurrent] = useState(0);
   const [isAuto, setIsAuto] = useState(true);
@@ -70,7 +76,7 @@ export default function Testimonials() {
     if (!isAuto) return;
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 5000);
+    }, 8000);
     return () => clearInterval(timer);
   }, [isAuto]);
 
@@ -88,148 +94,111 @@ export default function Testimonials() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Main Card */}
-      <div className="relative">
-        {/* Animated background glow */}
-        <motion.div
-          key={current}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className={`absolute -inset-4 bg-gradient-to-br ${testimonial.gradient} opacity-[0.06] rounded-4xl blur-2xl -z-10`}
-        />
+      <div className="relative bg-white dark:bg-gray-900 rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
 
-        <div className="relative bg-white dark:bg-gray-900 rounded-3xl p-8 md:p-12 shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        {/* Decorative large quote */}
+        <div className={`absolute -top-4 -right-4 text-[12rem] font-serif leading-none bg-gradient-to-br ${testimonial.gradient} bg-clip-text text-transparent opacity-[0.05] select-none pointer-events-none`}>
+          "
+        </div>
 
-          {/* Decorative large quote */}
-          <div className={`absolute -top-4 -right-4 text-[12rem] font-serif leading-none bg-gradient-to-br ${testimonial.gradient} bg-clip-text text-transparent opacity-[0.06] select-none pointer-events-none`}>
-            "
-          </div>
+        {/* Quote icon */}
+        <div className={`inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br ${testimonial.gradient} items-center justify-center mb-6 shadow-md`}>
+          <Quote size={20} className="text-white" />
+        </div>
 
-          {/* Quote icon */}
+        <AnimatePresence mode="wait">
           <motion.div
             key={current}
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 300, delay: 0.15 }}
-            className={`inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br ${testimonial.gradient} items-center justify-center mb-6 shadow-lg`}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3, ease: 'easeOut' }}
           >
-            <Quote size={20} className="text-white" />
-          </motion.div>
+            {/* Stars */}
+            <div className="flex gap-1 mb-5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  size={20}
+                  className={i < testimonial.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}
+                />
+              ))}
+            </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              {/* Stars */}
-              <div className="flex gap-1 mb-5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0, rotate: -30 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
-                  >
-                    <Star
-                      size={20}
-                      className={i < testimonial.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}
-                    />
-                  </motion.div>
-                ))}
-              </div>
+            {/* Review */}
+            <p className="text-gray-700 dark:text-gray-200 text-lg md:text-xl leading-relaxed mb-8 font-medium">
+              "{testimonial.comment}"
+            </p>
 
-              {/* Review */}
-              <p className="text-gray-700 dark:text-gray-200 text-lg md:text-xl leading-relaxed mb-8 font-medium">
-                "{testimonial.comment}"
-              </p>
-
-              {/* Customer info */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  {/* Avatar */}
-                  <div className={`w-14 h-14 bg-gradient-to-br ${testimonial.gradient} rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg flex-shrink-0`}>
-                    {testimonial.initial}
+            {/* Customer info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {/* Avatar */}
+                <div className={`w-14 h-14 bg-gradient-to-br ${testimonial.gradient} rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-md flex-shrink-0`}>
+                  {testimonial.initial}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-gray-900 dark:text-white">{testimonial.name}</p>
+                    {testimonial.verified && (
+                      <BadgeCheck size={16} className="text-blue-500" />
+                    )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-bold text-gray-900 dark:text-white">{testimonial.name}</p>
-                      {testimonial.verified && (
-                        <BadgeCheck size={16} className="text-blue-500" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <MapPin size={11} className="text-gray-400" />
-                      <p className="text-sm text-gray-400">{testimonial.location}</p>
-                    </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <MapPin size={11} className="text-gray-400" />
+                    <p className="text-sm text-gray-400">{testimonial.location}</p>
                   </div>
                 </div>
-
-                {/* Service tag */}
-                <motion.span
-                  key={current}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className={`text-xs px-4 py-2 bg-gradient-to-r ${testimonial.gradient} text-white rounded-full font-bold shadow-md whitespace-nowrap`}
-                >
-                  {testimonial.service}
-                </motion.span>
               </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+
+              {/* Service tag */}
+              <span className={`text-xs px-4 py-2 bg-gradient-to-r ${testimonial.gradient} text-white rounded-full font-bold shadow whitespace-nowrap`}>
+                {testimonial.service}
+              </span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Navigation */}
       <div className="flex items-center justify-center gap-4 mt-8">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => handleNav('prev')}
-          className="w-11 h-11 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-red-400 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-400 transition-all shadow-sm hover:shadow-md"
+          className="w-11 h-11 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-red-400 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-400 transition-colors duration-150 shadow-sm"
         >
           <ChevronLeft size={18} />
-        </motion.button>
+        </button>
 
         {/* Dots */}
         <div className="flex gap-2 items-center">
           {TESTIMONIALS.map((t, i) => (
-            <motion.button
+            <button
               key={i}
               onClick={() => { setIsAuto(false); setCurrent(i); }}
-              animate={{
-                width: i === current ? 28 : 8,
-                opacity: i === current ? 1 : 0.35,
-              }}
-              transition={{ duration: 0.3 }}
-              className={`h-2 rounded-full bg-gradient-to-r ${TESTIMONIALS[i].gradient}`}
+              className={`h-2 rounded-full transition-all duration-300 bg-gradient-to-r ${TESTIMONIALS[i].gradient} ${i === current ? 'w-7 opacity-100' : 'w-2 opacity-35'}`}
             />
           ))}
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => handleNav('next')}
-          className="w-11 h-11 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-red-400 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-400 transition-all shadow-sm hover:shadow-md"
+          className="w-11 h-11 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:border-red-400 hover:text-red-600 dark:hover:border-red-500 dark:hover:text-red-400 transition-colors duration-150 shadow-sm"
         >
           <ChevronRight size={18} />
-        </motion.button>
+        </button>
       </div>
 
-      {/* Mini preview cards */}
+      {/* Mini preview avatars */}
       <div className="flex justify-center gap-3 mt-6">
         {TESTIMONIALS.map((t, i) => (
-          <motion.button
+          <button
             key={t.id}
             onClick={() => { setIsAuto(false); setCurrent(i); }}
-            animate={{ scale: i === current ? 1 : 0.9, opacity: i === current ? 1 : 0.5 }}
-            className={`w-9 h-9 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white text-sm font-bold shadow-md transition-all`}
+            className={`w-9 h-9 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white text-sm font-bold shadow transition-[opacity,transform] duration-200 ${i === current ? 'scale-100 opacity-100' : 'scale-90 opacity-50 hover:opacity-70'}`}
           >
             {t.initial}
-          </motion.button>
+          </button>
         ))}
       </div>
     </div>

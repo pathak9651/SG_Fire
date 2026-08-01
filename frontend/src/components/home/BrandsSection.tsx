@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 const BRANDS = [
   { name: 'Kanex Fire', category: 'Extinguishers', color: 'from-red-500 to-rose-600' },
   { name: 'Minimax', category: 'Fire Systems', color: 'from-orange-500 to-red-500' },
@@ -19,53 +17,45 @@ const BRANDS = [
 const getInitials = (name: string) =>
   name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 
+function BrandCard({ brand }: { brand: typeof BRANDS[0] }) {
+  return (
+    <div className="flex items-center gap-3 flex-shrink-0 px-5 py-3.5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 min-w-[170px] group hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md transition-[border-color,box-shadow] duration-200 cursor-default">
+      {/* Brand initial logo */}
+      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${brand.color} flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow`}>
+        {getInitials(brand.name)}
+      </div>
+      <div>
+        <p className="font-outfit font-bold text-gray-800 dark:text-gray-200 text-sm whitespace-nowrap">
+          {brand.name}
+        </p>
+        <p className="text-[10px] text-gray-400 mt-0.5">{brand.category}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function BrandsSection() {
   return (
     <section className="py-14 border-t border-gray-100 dark:border-gray-800 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-950 overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="container-main mb-8 text-center"
-      >
+      <div className="container-main mb-8 text-center">
         <p className="text-xs text-gray-400 uppercase tracking-[0.3em] font-bold mb-1">Trusted Partner Brands</p>
         <h3 className="font-outfit text-xl font-bold text-gray-800 dark:text-gray-200">
           India's Leading Fire Safety Manufacturers
         </h3>
-      </motion.div>
+      </div>
 
-      {/* Dual-direction marquee for premium feel */}
+      {/* Dual-direction marquee — pure CSS for buttery smooth performance */}
       <div className="space-y-4">
         {/* Row 1 — scrolls left */}
         <div className="relative flex overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white dark:from-gray-950 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white dark:from-gray-950 to-transparent z-10 pointer-events-none" />
 
-          <motion.div
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 30, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
-            className="flex gap-4 items-center"
-          >
+          <div className="brands-marquee-left flex gap-4 items-center">
             {[...BRANDS, ...BRANDS].map((brand, index) => (
-              <motion.div
-                key={`a-${index}`}
-                whileHover={{ scale: 1.05, y: -2 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                className="flex items-center gap-3 flex-shrink-0 px-5 py-3.5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all cursor-default min-w-[170px] group"
-              >
-                {/* Brand initial logo */}
-                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${brand.color} flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-md`}>
-                  {getInitials(brand.name)}
-                </div>
-                <div>
-                  <p className="font-outfit font-bold text-gray-800 dark:text-gray-200 text-sm whitespace-nowrap">
-                    {brand.name}
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{brand.category}</p>
-                </div>
-              </motion.div>
+              <BrandCard key={`a-${index}`} brand={brand} />
             ))}
-          </motion.div>
+          </div>
         </div>
 
         {/* Row 2 — scrolls right (opposite direction for depth effect) */}
@@ -73,41 +63,16 @@ export default function BrandsSection() {
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white dark:from-gray-950 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white dark:from-gray-950 to-transparent z-10 pointer-events-none" />
 
-          <motion.div
-            animate={{ x: ['-50%', '0%'] }}
-            transition={{ duration: 30, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
-            className="flex gap-4 items-center"
-          >
+          <div className="brands-marquee-right flex gap-4 items-center">
             {[...BRANDS.slice(5), ...BRANDS.slice(0, 5), ...BRANDS.slice(5), ...BRANDS.slice(0, 5)].map((brand, index) => (
-              <motion.div
-                key={`b-${index}`}
-                whileHover={{ scale: 1.05, y: -2 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                className="flex items-center gap-3 flex-shrink-0 px-5 py-3.5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all cursor-default min-w-[170px]"
-              >
-                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${brand.color} flex items-center justify-center text-white text-xs font-black flex-shrink-0 shadow-md`}>
-                  {getInitials(brand.name)}
-                </div>
-                <div>
-                  <p className="font-outfit font-bold text-gray-800 dark:text-gray-200 text-sm whitespace-nowrap">
-                    {brand.name}
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{brand.category}</p>
-                </div>
-              </motion.div>
+              <BrandCard key={`b-${index}`} brand={brand} />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Certification badges */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.3 }}
-        className="container-main mt-10 flex flex-wrap justify-center gap-4"
-      >
+      <div className="container-main mt-10 flex flex-wrap justify-center gap-4">
         {['ISI Certified', 'BIS Approved', 'ISO 9001:2015', 'CE Marked', 'NBC Compliant'].map((badge) => (
           <div
             key={badge}
@@ -119,7 +84,7 @@ export default function BrandsSection() {
             {badge}
           </div>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
