@@ -80,7 +80,7 @@ export default function ServiceHighlights() {
         {SERVICES.map((service, i) => (
           <div key={service.title} className={`reveal ${STAGGER[Math.min(i, 5)]}`}>
             <Link href={service.href} className="block h-full group">
-              <div className={`relative h-full p-6 bg-gray-900/80 rounded-2xl border border-gray-800 group-hover:border-gray-600 group-hover:-translate-y-1.5 group-hover:shadow-xl transition-[transform,border-color,box-shadow] duration-200 flex flex-col overflow-hidden`}>
+              <div className={`relative h-full p-6 bg-white dark:bg-gray-900/80 rounded-2xl border border-gray-200/80 dark:border-gray-800 group-hover:border-gray-300 dark:group-hover:border-gray-600 group-hover:-translate-y-1.5 shadow-sm hover:shadow-lg transition-[transform,border-color,box-shadow] duration-200 flex flex-col overflow-hidden`}>
                 {/* Background glow on hover — CSS only */}
                 <div className={`absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br ${service.gradient} opacity-0 group-hover:opacity-10 rounded-full blur-3xl transition-opacity duration-300 pointer-events-none`} />
 
@@ -102,14 +102,14 @@ export default function ServiceHighlights() {
                   <span className="text-xs text-gray-500 font-medium">{service.time}</span>
                 </div>
 
-                <h3 className={`font-outfit font-bold text-white text-lg mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${service.gradient} transition-colors duration-200`}>
+                <h3 className={`font-outfit font-bold text-gray-900 dark:text-white text-lg mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${service.gradient} transition-colors duration-200`}>
                   {service.title}
                 </h3>
-                <p className="text-gray-400 text-sm leading-relaxed flex-1">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed flex-1">
                   {service.description}
                 </p>
 
-                <div className={`mt-5 flex items-center gap-2 text-sm font-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${service.gradient} text-gray-500 transition-colors duration-200`}>
+                <div className={`mt-5 flex items-center gap-2 text-sm font-bold group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${service.gradient} text-gray-600 dark:text-gray-400 transition-colors duration-200`}>
                   Book Now <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-150" />
                 </div>
               </div>
@@ -118,13 +118,13 @@ export default function ServiceHighlights() {
         ))}
       </div>
 
-      {/* Stats Bar — plain, no animation (not needed) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 p-2 bg-gray-900/60 rounded-2xl border border-gray-800">
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1 p-2 bg-white dark:bg-gray-900/60 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-sm">
         {STATS.map(({ icon: Icon, value, label, color }) => (
-          <div key={label} className="text-center p-5 rounded-xl hover:bg-white/5 transition-colors duration-150">
+          <div key={label} className="text-center p-5 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors duration-150">
             <Icon size={20} className={`${color} mx-auto mb-3`} />
             <p className={`font-outfit text-2xl sm:text-3xl font-black ${color}`}>{value}</p>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1 font-medium">{label}</p>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 font-medium">{label}</p>
           </div>
         ))}
       </div>

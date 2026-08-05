@@ -33,6 +33,7 @@ import Product from '../models/Product.js';
 import Coupon from '../models/Coupon.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import sendEmail from '../utils/sendEmail.js';
+import { createNotification } from '../utils/createNotification.js';
 
 const getRazorpayClient = () => {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -252,6 +253,26 @@ export const placeOrder = asyncHandler(async (req, res) => {
     { items: [], appliedCoupon: undefined }
   );
 
+  // Create persistent notifications in DB
+  await createNotification({
+    user: req.user.id,
+    target: 'user',
+    type: 'order',
+    title: 'Order Placed Successfully',
+    message: `Your Order #${order.orderNumber} has been placed.`,
+    link: '/dashboard/orders',
+    order: order._id,
+  });
+
+  await createNotification({
+    target: 'admin',
+    type: 'order',
+    title: 'New Order Received',
+    message: `Order #${order.orderNumber} was placed by ${req.user.name || 'a customer'}.`,
+    link: '/admin/orders',
+    order: order._id,
+  });
+
   // ── Step 7: Send order confirmation email (non-blocking) ──
   sendEmail({
     to: req.user.email,
@@ -414,6 +435,20 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   });
 
   await order.save();
+
+  // Create notification for the order owner
+  if (order.user) {
+    const targetUserId = typeof order.user === 'object' ? order.user._id : order.user;
+    await createNotification({
+      user: targetUserId,
+      target: 'user',
+      type: 'order',
+      title: 'Order Status Updated',
+      message: `Your Order #${order.orderNumber} status has been updated to: ${status.toUpperCase()}.`,
+      link: '/dashboard/orders',
+      order: order._id,
+    });
+  }
 
   res.json({ success: true, data: order });
 });

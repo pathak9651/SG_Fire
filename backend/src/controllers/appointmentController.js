@@ -24,6 +24,7 @@ import User from '../models/User.js';
 import { asyncHandler, ErrorResponse } from '../middleware/errorHandler.js';
 import sendEmail from '../utils/sendEmail.js';
 import { bufferToBase64 } from '../middleware/upload.js';
+import { createNotification } from '../utils/createNotification.js';
 
 // Helper: Generate appointment number (e.g., APT-20240115-K8P3)
 const generateAppointmentNumber = () => {
@@ -89,6 +90,26 @@ export const bookAppointment = asyncHandler(async (req, res) => {
     },
   }).catch((e) => {
     console.error('Appointment email failed:', e.message);
+  });
+
+  // Create persistent notifications in DB
+  await createNotification({
+    user: req.user.id,
+    target: 'user',
+    type: 'appointment',
+    title: 'Appointment Booked',
+    message: `Your appointment for ${serviceType} (#${appointment.appointmentNumber}) is booked.`,
+    link: '/dashboard/appointments',
+    appointment: appointment._id,
+  });
+
+  await createNotification({
+    target: 'admin',
+    type: 'appointment',
+    title: 'New Appointment Booked',
+    message: `New appointment for ${serviceType} booked by ${contactName}.`,
+    link: '/admin/appointments',
+    appointment: appointment._id,
   });
 
   res.status(201).json({ success: true, data: appointment });

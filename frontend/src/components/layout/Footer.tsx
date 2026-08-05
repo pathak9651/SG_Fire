@@ -1,26 +1,11 @@
 'use client';
 
-/**
- * ============================================================
- * FILE: src/components/layout/Footer.tsx
- * PURPOSE: Global site footer for SG Fire.
- *          Includes:
- *          - Brand logo + description
- *          - Navigation link groups (Products, Services, Company, Legal)
- *          - Contact information (phone, email, address)
- *          - Social media links
- *          - Certification badges
- *          - Newsletter subscription form
- *          - Copyright notice
- *
- * USED ON: All pages (mounted in Providers.tsx → layout.tsx)
- * ============================================================
- */
-
 import Link from 'next/link';
-import { Flame, Phone, Mail, MapPin, Globe, Share2, MessageCircle, Video, Users } from 'lucide-react';
+import { 
+  Flame, Phone, Mail, MapPin, Globe, Share2, MessageCircle, 
+  Video, Users, CreditCard, ShieldCheck, ArrowRight, CheckCircle2 
+} from 'lucide-react';
 
-// Footer navigation structure
 const FOOTER_LINKS = {
   products: {
     title: 'Products',
@@ -70,48 +55,62 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-300">
+    <footer className="relative bg-slate-950 text-slate-300 dark:bg-gray-950 dark:text-gray-300 border-t border-slate-900 dark:border-gray-900 font-sans pt-12 pb-10">
+      
+      <div className="container-main">
 
-      {/* ── Main Footer Content ─────────────────────────── */}
-      <div className="container-main py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
-
+        {/* ── 2. Navigation & Brand Columns ─────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-12 pb-12">
           {/* Brand Column */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-fire-gradient rounded-xl flex items-center justify-center">
-                <Flame size={22} className="text-white" />
+          <div className="lg:col-span-2 space-y-5">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <div className="w-10 h-10 bg-fire-gradient rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+                <Flame size={22} className="animate-pulse" />
               </div>
-              <span className="font-outfit font-bold text-2xl text-white">
+              <span className="font-outfit font-extrabold text-2xl text-white tracking-wide">
                 SG <span className="text-red-500">Fire</span>
               </span>
             </Link>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              India's trusted fire safety equipment supplier and service provider.
-              Protecting lives and property with certified products and expert services since 2010.
+            <p className="text-slate-400 dark:text-gray-400 text-sm leading-relaxed max-w-sm font-normal">
+              India's trusted fire safety equipment supplier and certified service provider.
+              Protecting lives and property with certified equipment and expert safety solutions since 2010.
             </p>
 
-            {/* Contact Info */}
-            <div className="space-y-3">
-              <a href="tel:+919876543210" className="flex items-center gap-3 text-sm text-gray-400 hover:text-red-400 transition-colors">
-                <Phone size={16} className="text-red-500 flex-shrink-0" />
-                +91-9876543210 (24/7 Emergency)
+            {/* Direct Contact Info */}
+            <div className="space-y-3 pt-1">
+              <a 
+                href="tel:+919876543210" 
+                className="flex items-center gap-3 text-sm text-slate-400 dark:text-gray-400 hover:text-red-400 transition-colors group"
+              >
+                <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-gray-900 border border-slate-800 dark:border-gray-800 flex items-center justify-center flex-shrink-0 group-hover:border-red-500/50">
+                  <Phone size={15} className="text-red-500" />
+                </div>
+                <span className="font-medium">+91-9876543210 (24/7 Helpline)</span>
               </a>
-              <a href="mailto:contact@sgfire.com" className="flex items-center gap-3 text-sm text-gray-400 hover:text-red-400 transition-colors">
-                <Mail size={16} className="text-red-500 flex-shrink-0" />
-                contact@sgfire.com
+
+              <a 
+                href="mailto:contact@sgfire.com" 
+                className="flex items-center gap-3 text-sm text-slate-400 dark:text-gray-400 hover:text-red-400 transition-colors group"
+              >
+                <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-gray-900 border border-slate-800 dark:border-gray-800 flex items-center justify-center flex-shrink-0 group-hover:border-red-500/50">
+                  <Mail size={15} className="text-red-500" />
+                </div>
+                <span className="font-medium">contact@sgfire.com</span>
               </a>
-              <div className="flex items-start gap-3 text-sm text-gray-400">
-                <MapPin size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
-                <span>123 Fire Safety Building,<br />Mumbai, Maharashtra 400001, India</span>
+
+              <div className="flex items-start gap-3 text-sm text-slate-400 dark:text-gray-400">
+                <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-gray-900 border border-slate-800 dark:border-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <MapPin size={15} className="text-red-500" />
+                </div>
+                <span className="font-normal leading-relaxed">123 Fire Safety Building,<br />Mumbai, Maharashtra 400001, India</span>
               </div>
             </div>
 
-            {/* Social Links */}
-            <div className="flex gap-3 mt-6">
+            {/* Social Channels */}
+            <div className="flex gap-2.5 pt-2">
               {[
-                { Icon: Globe, href: '#', label: 'Facebook' },
+                { Icon: Globe, href: '#', label: 'Website' },
                 { Icon: MessageCircle, href: '#', label: 'Instagram' },
                 { Icon: Share2, href: '#', label: 'Twitter' },
                 { Icon: Video, href: '#', label: 'YouTube' },
@@ -121,7 +120,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-all duration-200"
+                  className="w-9 h-9 bg-slate-900 dark:bg-gray-900 border border-slate-800 dark:border-gray-800 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-fire-gradient hover:border-red-500 transition-all duration-200 shadow-xs"
                 >
                   <Icon size={16} />
                 </a>
@@ -129,10 +128,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Navigation Link Groups */}
+          {/* Navigation Links */}
           {Object.values(FOOTER_LINKS).map((group) => (
             <div key={group.title}>
-              <h4 className="font-outfit font-semibold text-white text-sm uppercase tracking-wider mb-4">
+              <h4 className="font-outfit font-extrabold text-white text-xs uppercase tracking-widest mb-4">
                 {group.title}
               </h4>
               <ul className="space-y-2.5">
@@ -140,7 +139,7 @@ export default function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-400 hover:text-red-400 transition-colors hover:pl-1 duration-200 inline-block"
+                      className="text-sm text-slate-400 dark:text-gray-400 hover:text-red-400 transition-all hover:translate-x-1 duration-200 inline-block font-normal"
                     >
                       {link.label}
                     </Link>
@@ -151,44 +150,40 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* ── Certifications ──────────────────────────────── */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-4 text-center">
-            Trusted & Certified
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            {['ISI Certified', 'CE Marked', 'BIS Approved', 'ISO 9001:2015', 'NABL Accredited'].map((cert) => (
-              <div
-                key={cert}
-                className="px-4 py-2 bg-gray-800 rounded-lg text-xs text-gray-300 font-medium border border-gray-700"
-              >
-                ✓ {cert}
-              </div>
-            ))}
+        {/* ── 3. Unified Bottom Bar ───────────────────────────────── */}
+        <div className="pt-8 border-t border-slate-900 dark:border-gray-900 space-y-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-xs font-medium text-slate-400 dark:text-gray-400">
+              <CheckCircle2 size={16} className="text-emerald-500" />
+              <span>100% Certified Fire Equipment & Authorised Inspection Services</span>
+            </div>
+
+            {/* Payment Chips */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold text-slate-500 dark:text-gray-500 mr-1 flex items-center gap-1">
+                <CreditCard size={14} /> Accepted Payments:
+              </span>
+              {['Razorpay', 'Stripe', 'UPI', 'Net Banking', 'COD'].map((method) => (
+                <span
+                  key={method}
+                  className="px-3 py-1 bg-slate-900 dark:bg-gray-900 rounded-xl text-xs font-medium text-slate-300 dark:text-gray-300 border border-slate-800 dark:border-gray-800 shadow-xs"
+                >
+                  {method}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-gray-500 font-normal">
+            <p>© {new Date().getFullYear()} SG Fire. All rights reserved. Built for Fire Safety Excellence.</p>
+            <div className="flex gap-6 font-medium text-slate-400 dark:text-gray-400">
+              <Link href="/privacy-policy" className="hover:text-red-400 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-red-400 transition-colors">Terms of Service</Link>
+              <Link href="/sitemap.xml" className="hover:text-red-400 transition-colors">Sitemap</Link>
+            </div>
           </div>
         </div>
 
-        {/* ── Payment Methods ─────────────────────────────── */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <span className="text-xs text-gray-500">Secure Payments:</span>
-          {['💳 Razorpay', '💳 Stripe', '📱 UPI', '🏦 Net Banking', '💵 COD'].map((method) => (
-            <span key={method} className="px-3 py-1 bg-gray-800 rounded text-xs text-gray-400 border border-gray-700">
-              {method}
-            </span>
-          ))}
-        </div>
-
-        {/* ── Copyright ───────────────────────────────────── */}
-        <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} SG Fire. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-xs text-gray-500">
-            <Link href="/privacy-policy" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</Link>
-            <Link href="/sitemap.xml" className="hover:text-gray-300 transition-colors">Sitemap</Link>
-          </div>
-        </div>
       </div>
     </footer>
   );

@@ -88,11 +88,16 @@ export default function SignupPage() {
         }
 
         if (payload.alreadyExists) {
-          // Account existed but was unverified — a fresh OTP was sent
           setInfoMessage(payload.message);
         } else {
           setSuccessMessage(payload.message);
         }
+
+        // Automatically redirect to verification page after a short delay
+        const emailParam = encodeURIComponent(data.email);
+        setTimeout(() => {
+          router.push(`/auth/verify?userId=${payload.userId}&email=${emailParam}`);
+        }, 1000);
       } else {
         // rejected — payload is the error string from rejectWithValue
         const errorMsg =

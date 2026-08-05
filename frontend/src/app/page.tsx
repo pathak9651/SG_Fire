@@ -92,22 +92,20 @@ export default function HomePage() {
       {/* 4. Fire Safety Awareness */}
       <FireSafetyAwareness />
 
-      {/* 5. Service Highlights
-          NOTE: Using bg-gray-950 — NO blur orbs, NO dot-grid pattern (radial-gradient repeating
-          tiles are very expensive to paint during scroll). Simple solid dark background instead. */}
-      <section className="section-padding bg-gray-950 text-white">
+      {/* 5. Service Highlights */}
+      <section className="section-padding bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-200">
         <div className="container-main">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-orange-500/10 text-orange-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-orange-500/20 mb-4">
+            <span className="inline-block px-4 py-1.5 bg-orange-500/10 text-orange-600 dark:text-orange-400 font-bold text-xs uppercase tracking-[0.2em] rounded-full border border-orange-500/20 mb-4">
               Professional Services
             </span>
-            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-white">
+            <h2 className="font-outfit text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white">
               Expert Fire Safety{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
                 Services
               </span>
             </h2>
-            <p className="text-gray-400 mt-3 max-w-2xl mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 mt-3 max-w-2xl mx-auto">
               From installation to annual maintenance, our certified technicians ensure your fire safety systems are always operational.
             </p>
           </div>

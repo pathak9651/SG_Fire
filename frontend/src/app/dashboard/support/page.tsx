@@ -7,6 +7,7 @@ import io, { Socket } from 'socket.io-client';
 import api from '@/services/api';
 import { Send, MessageSquare, AlertCircle, Sparkles, Loader2, Power } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 interface SupportTicket {
   _id: string;
@@ -188,17 +189,10 @@ export default function UserSupportPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white flex items-center tracking-tight">
-          <MessageSquare className="mr-3 text-red-600 animate-pulse" size={32} />
-          Help & Support
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm md:text-base">
-          Chat directly with our dedicated fire safety and technical support team in real-time.
-        </p>
-      </div>
-
+    <DashboardLayout 
+      title="Help & Support" 
+      subtitle="Chat directly with our dedicated fire safety and technical support team in real-time."
+    >
       {/* Chat Container */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col h-[600px] transition-all">
         
@@ -338,6 +332,6 @@ export default function UserSupportPage() {
           </>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

@@ -51,6 +51,7 @@ import categoryRoutes from './src/routes/category.routes.js';
 import userRoutes from './src/routes/user.routes.js';
 import supportRoutes from './src/routes/support.routes.js';
 import contactRoutes from './src/routes/contact.routes.js';
+import notificationRoutes from './src/routes/notification.routes.js';
 
 // ── Middleware Imports ─────────────────────────────────────
 import errorHandler, { ErrorResponse } from './src/middleware/errorHandler.js';
@@ -188,6 +189,7 @@ app.use('/api/categories', categoryRoutes);    // Categories: /api/categories/..
 app.use('/api/users', userRoutes);             // User profile/wishlist: /api/users/...
 app.use('/api/support', supportRoutes);        // Support chat: /api/support/...
 app.use('/api/contact', contactRoutes);        // Contact form: /api/contact
+app.use('/api/notifications', notificationRoutes); // Notifications: /api/notifications/...
 
 // ─────────────────────────────────────────────
 // 404 HANDLER

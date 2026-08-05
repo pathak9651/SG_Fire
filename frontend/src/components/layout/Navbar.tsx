@@ -9,7 +9,7 @@ import {
   ShoppingCart, Search, Menu, X, User,
   LogOut, Package, Calendar, Heart, Phone, Flame,
   Mail, ShieldAlert, ChevronDown, Sun, Moon,
-  Bell, CheckCheck, Trash2, ShoppingBag
+  Bell, CheckCheck, Trash2, ShoppingBag, XCircle
 } from 'lucide-react';
 import { RootState, AppDispatch } from '@/redux/store';
 import { toggleMobileMenu, closeMobileMenu, toggleSearch, closeSearch, toggleTheme } from '@/redux/slices/uiSlice';
@@ -18,7 +18,11 @@ import toast from 'react-hot-toast';
 import { getMyOrders } from '@/redux/slices/orderSlice';
 import { getMyAppointments } from '@/redux/slices/appointmentSlice';
 import { 
-  syncNotifications, markAsRead, markAllAsRead, clearNotifications, addNotification 
+  fetchNotifications, 
+  markNotificationAsRead, 
+  markAllNotificationsAsRead, 
+  deleteNotification, 
+  clearAllNotifications 
 } from '@/redux/slices/notificationSlice';
 
 import NavLinks from './nav/NavLinks';
@@ -71,35 +75,18 @@ export default function Navbar() {
 
   const { notifications: allNotifications } = useSelector((s: RootState) => s.notification);
   const clientNotifications = allNotifications.filter(
-    (n) => n.target === 'client' && n.userId === user?._id
+    (n) => n.target === 'user' || !n.target
   );
   const clientUnreadCount = clientNotifications.filter((n) => !n.isRead).length;
 
-  // Fetch client orders and appointments for notifications
+  // Fetch client notifications from DB on session load
   useEffect(() => {
     if (isAuthenticated && user?.role !== 'admin') {
+      dispatch(fetchNotifications()).catch((e) => console.error(e));
       dispatch(getMyOrders({ page: 1 })).catch((e) => console.error(e));
       dispatch(getMyAppointments()).catch((e) => console.error(e));
     }
   }, [isAuthenticated, user, dispatch]);
-
-  const clientOrders = useSelector((s: RootState) => s.order.myOrders);
-  const clientAppointments = useSelector((s: RootState) => s.appointment.myAppointments);
-
-  // Sync client notifications when orders or appointments load
-  useEffect(() => {
-    if (isAuthenticated && user && user.role !== 'admin') {
-      dispatch(
-        syncNotifications({
-          orders: clientOrders,
-          appointments: clientAppointments,
-          products: [],
-          userId: user._id,
-          role: user.role,
-        })
-      );
-    }
-  }, [clientOrders, clientAppointments, isAuthenticated, user, dispatch]);
 
   // Click outside to close client notifications dropdown
   useEffect(() => {
@@ -111,86 +98,6 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Client notification simulation (every 60s)
-  useEffect(() => {
-    if (!isAuthenticated || !user || user.role === 'admin') return;
-
-    const currentUser = user; // Capture user in a block-scoped constant to narrow type inside setInterval
-    const orderStatuses = ['Shipped', 'Out for Delivery', 'Delivered'];
-    const apptStatuses = ['Approved', 'Assigned to Technician Rahul', 'Completed'];
-    const promoAlerts = [
-      'Flash Sale: 15% off on all fire safety equipment! Use code SAFE15.',
-      'Special Deal: Get a free safety inspection with AMC signups this week!',
-      'Reminder: Keep your fire safety certificates updated. Book an audit today.',
-    ];
-
-    const interval = setInterval(() => {
-      const randType = Math.random();
-
-      if (randType < 0.35) {
-        // Order Status simulated update
-        const orderNum = Math.floor(100000 + Math.random() * 900000);
-        const status = orderStatuses[Math.floor(Math.random() * orderStatuses.length)];
-
-        dispatch(
-          addNotification({
-            type: 'order',
-            title: 'Order Status Update',
-            message: `Your Order #ORD-${orderNum} status has been updated to: ${status}`,
-            link: '/dashboard/orders',
-            target: 'client',
-            userId: currentUser._id,
-          })
-        );
-
-        toast.success(`[SG Fire] Order #ORD-${orderNum} has been ${status.toLowerCase()}!`, {
-          icon: '📦',
-          duration: 4000,
-        });
-      } else if (randType < 0.7) {
-        // Appointment status simulated update
-        const status = apptStatuses[Math.floor(Math.random() * apptStatuses.length)];
-
-        dispatch(
-          addNotification({
-            type: 'appointment',
-            title: 'Appointment Update',
-            message: `Your appointment is now: ${status}`,
-            link: '/dashboard/appointments',
-            target: 'client',
-            userId: currentUser._id,
-          })
-        );
-
-        toast.success(`[SG Fire] Appointment Update: ${status}!`, {
-          icon: '📅',
-          duration: 4000,
-        });
-      } else {
-        // Promo alert
-        const promo = promoAlerts[Math.floor(Math.random() * promoAlerts.length)];
-
-        dispatch(
-          addNotification({
-            type: 'promo',
-            title: 'Special Safety Offer',
-            message: promo,
-            link: '/services',
-            target: 'client',
-            userId: currentUser._id,
-          })
-        );
-
-        toast(`[SG Fire] ${promo}`, {
-          icon: '🔥',
-          duration: 5000,
-        });
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, user, dispatch]);
 
   const formatTimeAgo = (dateStr: string) => {
     const diffMs = Date.now() - new Date(dateStr).getTime();
@@ -357,7 +264,7 @@ export default function Navbar() {
                         <div className="flex items-center gap-3">
                           {clientUnreadCount > 0 && (
                             <button
-                              onClick={() => dispatch(markAllAsRead({ userId: user?._id }))}
+                              onClick={() => dispatch(markAllNotificationsAsRead())}
                               className="text-xs font-semibold text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors"
                               title="Mark all as read"
                             >
@@ -367,7 +274,7 @@ export default function Navbar() {
                           )}
                           {clientNotifications.length > 0 && (
                             <button
-                              onClick={() => dispatch(clearNotifications({ userId: user?._id }))}
+                              onClick={() => dispatch(clearAllNotifications())}
                               className="text-xs font-semibold text-gray-400 hover:text-red-400 flex items-center gap-1 transition-colors"
                               title="Clear all"
                             >
@@ -392,6 +299,7 @@ export default function Navbar() {
                           </div>
                         ) : (
                           clientNotifications.map((n) => {
+                            const targetId = n._id || n.id || '';
                             let Icon = ShoppingBag;
                             let iconColorBg = 'bg-blue-900/20 text-blue-400';
                             if (n.type === 'appointment') {
@@ -404,14 +312,14 @@ export default function Navbar() {
 
                             return (
                               <div
-                                key={n.id}
+                                key={targetId}
                                 onClick={() => {
-                                  dispatch(markAsRead(n.id));
+                                  dispatch(markNotificationAsRead(targetId));
                                   setIsClientNotificationsOpen(false);
-                                  router.push(n.link);
+                                  if (n.link) router.push(n.link);
                                 }}
                                 className={cn(
-                                  "p-4 flex gap-3 cursor-pointer transition-colors duration-150 relative text-left",
+                                  "p-4 flex gap-3 cursor-pointer transition-colors duration-150 relative text-left group",
                                   n.isRead
                                     ? "bg-gray-900 hover:bg-gray-800/50"
                                     : "bg-red-950/10 hover:bg-red-950/20"
@@ -433,9 +341,22 @@ export default function Navbar() {
                                     <p className={cn("text-xs leading-normal truncate", !n.isRead ? "font-bold text-white" : "font-medium text-gray-300")}>
                                       {n.title}
                                     </p>
-                                    <span className="text-[10px] text-gray-500 whitespace-nowrap pt-0.5">
-                                      {formatTimeAgo(n.createdAt)}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                                        {formatTimeAgo(n.createdAt)}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          dispatch(deleteNotification(targetId));
+                                        }}
+                                        className="text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
+                                        title="Delete notification"
+                                      >
+                                        <XCircle size={14} />
+                                      </button>
+                                    </div>
                                   </div>
                                   <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed font-normal">
                                     {n.message}
